@@ -4,131 +4,117 @@ Plugin Name: EventON Lite
 Author URI: http://ashanjay.com/
 Tags: calendar, event calendar, virtual events, events, event management
 Requires at least: 6.0
-Tested up to: 6.6.1
-Stable tag: 2.2.21
+Tested up to: 6.7.1
+Stable tag: 2.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
 EventON Lite is an event calendar plugin for WordPress, which allows you to create and share vital event information in a clean design. 
 
 == Description ==
+**[The EventON Lite](https://myeventon.com/lite)**, the **[#1 best selling Event Calendar plugin on Codecanyon](https://myeventon.com)** (with 63k+ paid installations around the world since 2011), is a flexible and easy-to-use event calendar for WordPress. With support for featured, repeating, and virtual events, as well as month- and year-long events, EventON Lite gives you full control over unlimited event creation.
 
 https://youtu.be/DQewHs7XWJE
 
-**[The EventON Lite](https://myeventon.com/lite)**, from the Number **[#1 best selling Event Calendar plugin on Codecanyon](https://myeventon.com)** (with 62k+ paid installations around the world since 2011) -- EventON Lite is an event calendar that supports creation of events with various configurations such as featured events, repeating events, month/year long events and virtual events are just a few of the many features. On top of that, EventON offers you to display your events to your audience in a clean, easy on the eye industry-trending minimal and responsive layout design. 
-
-EventON Lite allows you to create unlimited events with unlimited colors and unlimited event type categories. The unique interactive Shortcode Generator of EventON Lite, helps you to add event calendars with various configurations, effortlessly on any page, product or post - and it is built into WP Block editor! 
-
-Test out EventON demos for real-life action - **[EventON Lite Demo](https://demolite.myeventon.com/)**!
-
-If you love EventON Lite, you can easily extend the features with **[EventON Full Version](https://www.myeventon.com/)** and **[EventON Addons](https://www.myeventon.com/addons/)**!
+Display your events in a sleek, minimal, and responsive layout that’s designed to impress. Create unlimited events, choose from endless color options, and organize them with custom categories. Plus, the interactive Shortcode Generator makes it simple to add event calendars to any page or post—directly in the WP Block editor.
 
 
-== Main FEATURES ==
+== Start Building Your Event Calendar Today! ==
 
-* Create unlimited events
+See EventON calendar in action at **[EventON Lite Demo](https://demolite.myeventon.com/)** and experience its ease of use!
+
+Ready to take your event calendar to next level and unlock advanced features like tickets, RSVP, Seats, and more?
+
+<strong>Check out **[EventON Full Version](https://www.myeventon.com/)** and **[EventON Addons](https://www.myeventon.com/addons/)**</strong>
+
+Experience EventON Full version before you buy at **[EventON Full Demo](https://demo.myeventon.com/)** and **[EventON Addons Demo](https://addons.myeventon.com/)**.
+
+
+== Key Features ==
+
+Over the years we have added many amazing features to EventON.
+
+* Unlimited events, colors and categories
+* Event location (with Google map) and event organizers
 * Set featured image for events
-* Support single and multiple day events
-* Support all day events
-* Ability to hide event end time
-* Month long and year long events support
-* Support various event status support
-* Support event attendance modes
-* Repeating events with various configurations: Daily, Weekly, Monthly, Yearly & Custom
-* Virtual event support via various 3rd party platforms
-* Support health care guidelines for events
-* Feature events and prioritize those or show only feature events
-* Categorize events with unlimited event types and filter events using those
-* Allows to add event location and display google map locations
-* Allows to add event organizers
-* Ability to set related events and show them on eventCard
-* Ability to set custom colors for events 
-* Live now calendar view
-* Search Box or search bar on calendar to search events easily
-* Live event progress bar for live events
-* Jitsi integration for virtual events
-* Schedule view calendar
-* interactive shortcode generator
-* Month jumper on calendar to navigate to months easily
-* Event filter and sorting bar on calendar
-* Various event tile layouts for calendar
-* Basic calendar event list support
-* Single event box anywhere you want via shortcode
-* Interactive Eventcard Designer with 5 different layouts
-* Quick edit or Bulk edit vital event information on the go
-* Gradient event colors (v2.2)
+* Single, Multiple day, and All-day events
+* Month- and year-long events
+* Virtual Events
+* Event Categories (5+ Event types & Tags)
+* Event Custom meta data
+* Event Attendance modes
+* Repeating events (Daily, Weekly, Monthly, Yearly & Custom)
+* Event time as visitor's local time
+* Add to Google Cal and iCal 
+* Feature and prioritize events
+* Sort & Filter events
+* Event Search
+* Related Events
+* Live Now Calendar View
+* Schedule View
+* Various Tile Views
+* Gradient Event Colors
+* Interactive Calendar Generator (Shortcode Generator)
+* Responsive for any device
+* Event Schema and JSON-LD for event SEO
+* Basic paypal payments support
 
 
-== Virtual Events Support ==
+Try it now to see how easy it is to manage events on your website!
 
-EventON Lite support various 3rd party platforms at a basic level to create and set up your events as virtual. EventON Lite also support necessary Schema tags for virtual events and various online event attendance modes. EventON 
 
-== Health care guidelines ==
+== Other Features ==
 
-EventON Lite support various health care guidelines options, to be enabled for events based on real-world needs at the event settings. Additional health care guidelines field can also be used to show additional information aside from the icon based health care guidelines.
-
-== Basic Paypal Support ==
-
-Allow visitors to send payments for events using basic Paypal integration build into the events. For more comprehensive event payments and ticket sales please check out **[EventON Full Version](https://www.myeventon.com/)** & **[EventON Tickets Addon](https://www.myeventon.com/addons/event-tickets/)**
-
-== Other Powerful features ==
-* iCal and google cal, add to calendar
 * Various event interaction types: Do nothing, Slide down, Open a link, Open as lightbox, Open single event page
-* Learn more link for events
+* Jump months on calendar using Month jumper
 * Set different timezones for events
-* Show future repeating instances on event
-* Ability to click on future repeating instances
-* Hide location name from eventcard
-* Support location image and information over the image
-* Location archive page
+* Set custom icons (by fontawesome)
+* Accessibile future repeat instances of event
+* Location & Organizer archive page
 * Organizer archive page
-* Fully Responsive for mobile and various tablet layouts
-* Widgets for sidebars
-* Ability to add custom CSS styles
-* Sort events ascending or descending
-* Set event count limit for calendar
+* Various Widgets for sidebar
+* Learn more link for events
+* Ability to hide event end time
+* Support for various event status & attendance modes
+* Single event box anywhere you want on your website
+* Interactive Eventcard Designer with various layout
+* Quick edit and Bulk edit vital event data
+* Limit number of events on calendar
 * Load more events on calendar as you go
-* Load more events on calendar via AJAX
-* Set custom fixed month/year for calendar
-* Set global calendar event user interaction method via shortcode
-* Load the calendar on to page without ajax on page load
-* Prioritize featured events
+* Show events from fixed month/year
 * Move month/year long events to top of the calendar
 * Show only featured events in the calendar
 * Hide featured events from calendar
-* On page load, open all eventcards
+* Open eventcards on page load or as accordion style
 * Add accordion effect for eventcards on calendar
 * Show month navigation at the bottom of the calendar
-* Ability to hide all cancelled events
-* Ability to hide past events and set how to classify past events
+* Hide all cancelled events
+* Hide past events by start or end time
 * Calendar filter as a dropdown list or multiple checkboxes
-* Ability to set AND/OR as filter relationship for multiple event types
-* Various eventtop designs to create various event calendar styles
-* Ability to enable and disable eventtop data fields
-* Ability to makde the calendar only visible to loggedin users with shortcode members_only='yes'
+* Various eventtop data to create desired event calendar styles
+* Make the calendar only visible to loggedin users with shortcode members_only='yes'
 * Hide multiple occurance of events in event list months
 * Show only parts of events on single event box
-* Show featured event images on live now calendar view
-* Live now calendar supports coming up next events
 * Download all events as CSV or ICS
-* Support various google map display types: roadmap, satellite, hybrid, terrain
-* Support on load google map default map zoom level
-* Set global event time format
-* Allows users to view time in their timezone using "View in my time" button on eventtop and eventcard
-* Ability to customize the font family used in calendar via appearance
-* Ability to set custom icons, powered by awesomefonts
-* Basic paypal payments support
-* Support additional custom meta data fields for events
-* Support additional event type categories with pluggability to add more
-* Support build-in easy language translations
-* Move all month and all year events above other events or after other events
-* Various event statuses
+* Various Google map styles and custom zoom level
+* Build-in easy language translations
+* Add custom CSS styles
 * Output just raw event data values using shortcode for any event (v2.2)
 
-== EventON Full Version ==
+== EventON Documentation & Support ==
 
-Grab **[The EventON Full](https://myeventon.com)**  version to extend EventON Lite features to next level. Below are some of the features available only in EventON Full version!
+Stuck? Check out [Documentation Library](https://docs.myeventon.com). You can also reach out via [WordPress.org forum](https://wordpress.org/support/plugin/eventon-lite/).
 
+
+== Ready to Upgrade to EventON Full Version ? ==
+
+Grab **[The EventON Full](https://myeventon.com)**  version to extend EventON Lite features to next level. 
+
+Why upgrade to EventON Full version?
+
+* More Event Views: Display events in grid, weekly, or yearly views to suite your needs.
+* Advanced Customizations: Unlock additional layouts, designs, and event features.
+* Full Integration: Use premium addons like Tickets, RSVP, Seats and more.
 * **[Language corresponding event](https://docs.myeventon.com/documentations/setup-language-corresponding-events/)**
 * Autonomous functions - auto move past events to trash and set all past events as completed
 * Advance event post Query method for faster calendar loading
@@ -157,9 +143,9 @@ For complete list of features --> **[Comparisons](https://www.myeventon.com/lite
 
 == EventON Addons ==
 
-Along with **[The EventON Full](https://myeventon.com)** version you can use all our **[EventON Addons](https://www.myeventon.com/addons/)** to super duper charge your Event Calendar to provide a rich experience to your audience and users.
+**[The EventON Full](https://myeventon.com)** + **[EventON Addons](https://www.myeventon.com/addons/)** = Super charge your event calendar with tickets, countdowns, seats etc. Explore all our addons at **[EventON Addons](https://www.myeventon.com/addons/)**
 
-These are some of our popular addons!
+Our Most Popular Addons:
 
 * **[FullCal Addon](https://www.myeventon.com/addons/full-cal/)** - Display your calendar in a grid style
 * **[Event Tickets](https://www.myeventon.com/addons/event-tickets/)** - Sell tickets to your events with this addon that is powered by Woocommerce and pay only payment processing fees.
@@ -183,19 +169,103 @@ Check out **[all EventON Addons](https://www.myeventon.com/addons/)**.
 
 == Screenshots ==
 
-1. EventON Lite Intro Design
-2. Event tile design
-3. Lightbox eventcard design
-4. Event tiles with event image as background
-5. Event bubbles design
-6. Clean event calendar design
+1. EventON Defaul Calendar
+2. Calendar in Tile View
+3. EventCard View with Various Event Data
+4. Live Now Calendar View
+5. Calendar Schedule View
+6. Calendar Mobile View
 7. Schedule view design
-8. Live now calendar view
-9. EventON Lite settings page
-10. EventCard Designer settings page
-11. Event Edit page event time settings section
+8. EventON General Settings Page
+9. EventCard Designer Settings Page
+10. Language Settings Page
+11. Event Edit Page Settings
+12. All Events Edit Page
+
+== Installation ==
+
+Install EventON Lite easily with below steps:
+
+= Install EventON Lite from within WordPress =
+
+1. Visit the plugins page within your dashboard and select ‘Add New’
+2. Search for "EventON"
+3. Activate EventON Lite from your Plugins page
+4. Done!
+
+
+= Install EventON Lite Manually =
+
+1. From the dashboard of your site, navigate to Plugins --> Add New.
+2. Select the Upload option and hit "Choose File."
+3. When the popup appears select the eventon-lite-x.x.zip file from your desktop. (The 'x.x' will change depending on the current version number).
+4. Follow the on-screen instructions and wait as the upload completes.
+5. When it's finished, activate the plugin. 
+
+Done! Now you can configure EventON Settings to your liking and go crazy making amazing events!
+
+
+== Frequently Asked Questions ==
+
+= How to upgrade to Full version? =
+You can buy the EventON Full version from [codecanyon](http://codecanyon.net/item/ajde-event-calendar-wp-plugin/1211017?ref=ashanjay). After that uninstall the lite version and install the Full version on your website. If you want to move the data from lite version to Full version, make sure that you enable the "Do not delete eventon settings & data when EventON is uninstalled" option Settings -> General and "Save Changes" before uninstalling the lite version.
+
+= How can I insert calendar on any page? = 
+You can use the EventON shortcode generator that is available on any page in the classic editor tool panel or EventON gutenberg block. Simply access the generator, choose your desired settings, and the shortcode will be generated for you. You can then copy and paste the generated shortcode into the desired page where you want the calendar to be displayed. With the EventON shortcode generator, it becomes effortless to customize and incorporate EventON features into your pages.
+
+= How do I filter events on load? = 
+You can filter events on load using event type taxonomies using the eventON shortcode. Example [add_eventon event_type='23'] -- Please follow [the guide here](https://docs.myeventon.com/documentations/confused-event-type-categories/) for a detailed information.
+
+= Should I purchase a EventON Full version? =
+The decision of whether to purchase the paid version of EventON depends on your specific site requirements and the type of events you wish to create for your site visitors. The EventON Full version offers a wide range of features that enhance the functionality of the plugin, and we provide several bundles to ensure you receive the best value for your investment. One notable bundle is the [Ticketing Bundle](https://www.myeventon.com/addons/ticketing-bundle/), which includes addons such as Tickets, QR Code, Seats, Dynamic Pricing, Booking, Reminder, and Variations & Options. This comprehensive toolkit equips you with everything you need to start selling tickets for your events. 
+
+= How do I get support or request a new feature? =
+If you encounter any difficulties with EventON Lite or have a feature request, we recommend seeking assistance on our dedicated [Lite support forum](https://wordpress.org/support/plugin/eventon-lite/). It's important to note that, according to WordPress forum guidelines, we may not be able to provide support for paid features on the same forum. For any inquiries regarding paid features or for further assistance, we kindly ask you to reach out to our support team via our [helpdesk](https://www.myeventon.com/support/). Our team will be more than happy to assist you with any questions or concerns you may have.
+
+= What is the difference between EventON Lite and the Full version? =
+The EventON Lite plugin is a standalone plugin that provides all the essential features needed to create simple and customized events on your WordPress site. In contrast, EventON Full offers a wide range of advanced features and ability to use EventON addons. Check out [Compare EventON Page](https://www.myeventon.com/lite/) for complete list.
+
+= Can I sell tickets with the Lite version? =
+EventON Lite supports basic PayPal integration for event payments. If you want more advanced ticketing features like managing stock, ticket variations, or QR codes, we recommend upgrading to the full version and using the [Tickets addon](https://www.myeventon.com/addons/event-tickets/).
+
+= Do you offer a trial of Full version? =
+We don’t offer trial versions of EventON Full but you can review and test all the paid features on our [demo site](https://dev.myeventon.com/wp-login.php).
+
+= Can I use EventON Lite for virtual events? = 
+Yes, EventON Lite supports virtual events through basic integrations with third-party platforms like Jitsi. This makes it easy to host online events while keeping everything organized in your calendar.
+
+= Can I add custom fields or additional metadata for events? = 
+Yes! EventON Lite supports custom meta fields, allowing you to add additional data for your events (like speaker information, sponsors, or unique event details). You can also customize the design and layout of your event cards.
+
+= Can I show events in different time zones? = 
+Yes, EventON Lite supports different timezones for each event. You can even display events in the viewer's local timezone with the "View in my time" feature.
+
+= How do I get support for EventON Lite? = 
+For support with the Lite version, visit [support forum here](https://wordpress.org/support/plugin/eventon-lite/). For premium support or queries related to the Full version, please contact us through [our helpdesk](https://helpdesk.ashanjay.com).
 
 == Changelog ==
+= 2.3 (2025-1-10) =
+ADDED: Ability to add eventon version on meta data
+ADDED: event edit timezone to select2 field
+ADDED: Event edit date picker two months
+ADDED: Proper processing for social share links before outputting
+ADDED: Download all events as ICS link moved to custom url
+ADDED: Add to calendar ics file url as a custom url
+ADDED: Location contacts under location box
+ADDED: Event Organizer column to all events in admin
+ADDED: Location text over image to use interactive effects
+FIXED: Undefined variable $ in eventon-core-functions.php
+FIXED: certain eventon elements showing when disabled in settings
+FIXED: deprecated timezone string replaced with wordpress timezones
+FIXED: icon selector with multiple selects not loading correct icon
+FIXED: custom meta fields not showing in eventtop
+FIXED: Edit custom meta fields moved to lightbox
+FIXED: Calendar search bar content not showing
+UPDATED: taxonomy add image UI
+UPDATED: eventon styles settings page UI
+UPDATED: eventon language settings page UI
+UPDATED: Support settings UI
+
 = 2.2.21 (2024-9-5) =
 FIXED: event list with tiles layout styles
 FIXED: ssl check for google fonts loading in admin
@@ -518,38 +588,4 @@ UPDATED: compatibility with wordpress 5.9
 = 1.0 (2022-1-21) =
 * Initial release
 
-== Installation ==
 
-For installing EventON Lite please follow below steps:
-
-1. Install EventON Lite either via the WordPress.org plugin directory, or by uploading the files to your server.
-2. Activate the plugin through the 'Plugins' menu in WordPress.
-
-
-== Frequently Asked Questions ==
-
-= How to upgrade to Full version? =
-
-You can buy the EventON Full version from [codecanyon](http://codecanyon.net/item/ajde-event-calendar-wp-plugin/1211017?ref=ashanjay). After that uninstall the lite version and install the Full version on your website. If you want to move the data from lite version to Full version, make sure that you enable the "Do not delete eventon settings & data when EventON is uninstalled" option Settings -> General and "Save Changes" before uninstalling the lite version.
-
-= How can I insert calendar on any page? = 
-
-You can use the EventON shortcode generator that is available on any page in the classic editor tool panel or EventON gutenberg block. Simply access the generator, choose your desired settings, and the shortcode will be generated for you. You can then copy and paste the generated shortcode into the desired page where you want the calendar to be displayed. With the EventON shortcode generator, it becomes effortless to customize and incorporate EventON features into your pages.
-
-= How do I filter events on load? = 
-You can filter events on load using event type taxonomies using the eventON shortcode. Example [add_eventon event_type='23'] -- Please follow [the guide here](https://docs.myeventon.com/documentations/confused-event-type-categories/) for a detailed information.
-
-= Should I purchase a EventON Full version? =
-The decision of whether to purchase the paid version of EventON depends on your specific site requirements and the type of events you wish to create for your site visitors. The EventON Full version offers a wide range of features that enhance the functionality of the plugin, and we provide several bundles to ensure you receive the best value for your investment. One notable bundle is the [Ticketing Bundle](https://www.myeventon.com/addons/ticketing-bundle/), which includes addons such as Tickets, QR Code, Seats, Dynamic Pricing, Booking, Reminder, and Variations & Options. This comprehensive toolkit equips you with everything you need to start selling tickets for your events. 
-
-= How do I get support or request a new feature? =
-If you encounter any difficulties with EventON Lite or have a feature request, we recommend seeking assistance on our dedicated [Lite support forum](https://wordpress.org/support/plugin/eventon-lite/). It's important to note that, according to WordPress forum guidelines, we may not be able to provide support for paid features on the same forum. For any inquiries regarding paid features or for further assistance, we kindly ask you to reach out to our support team via our [helpdesk](https://www.myeventon.com/support/). Our team will be more than happy to assist you with any questions or concerns you may have.
-
-= What is the difference between EventON Lite and the Full version? =
-The EventON Lite plugin is a standalone plugin that provides all the essential features needed to create simple and customized events on your WordPress site. In contrast, EventON Full offers a wide range of advanced features and ability to use EventON addons. Check out [Compare EventON Page](https://www.myeventon.com/lite/) for complete list.
-
-= Can I create an event that allows ticket purchases?=
-EventON Lite supports basic paypal API integration for allowing customers to pay for an event. However, using EventON Full + [Tickets addon](https://www.myeventon.com/addons/event-tickets/) + Woocommerce allows you the ability to sell tickets and track orders and stock with huge customizable options.
-
-= Do you offer a trial? =
-We don’t offer trial versions of EventON Full but you can review and test all the paid features on our [demo site](https://dev.myeventon.com/wp-login.php).

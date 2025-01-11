@@ -1,7 +1,8 @@
 <?php
 /**
  * Appearance settings for eventon
- * @version Lite 2.2.16
+ * @version 2.3
+ * @fullversion 4.8
  */
 
 class evoadmin_set_appearance{
@@ -61,29 +62,25 @@ class evoadmin_set_appearance{
 							array('id'=>'evcal__sot', 'name'=>'Default State', 'type'=>'color', 'default'=>'B8B8B8'),
 							array('id'=>'evcal__sotH', 'name'=>'Hover State', 'type'=>'color', 'default'=>'d8d8d8'),
 						)
-					),array('id'=>'fs_calhead','type'=>'fontation','name'=>__('Jump Months Trigger Button','eventon'),
+					),array('id'=>'fs_calhead','type'=>'fontation','name'=>__('Calendar Header Buttons','eventon'),
 						'variations'=>array(
 							array('id'=>'evcal__jm001', 'name'=>'Text Color', 'type'=>'color', 'default'=>'ffffff'),
-							array('id'=>'evcal__jm002', 'name'=>'Background Color', 'type'=>'color', 'default'=>$preset_data['evo_color_1']),
-							array('id'=>'evcal__jm001H', 'name'=>'Text Color (Hover)', 'type'=>'color', 'default'=>'ffffff'),
-							array('id'=>'evcal__jm002H', 'name'=>'Background Color (Hover)', 'type'=>'color', 'default'=>'d3d3d3'),						
+							array('id'=>'evcal__jm002', 'name'=>'Background Color', 'type'=>'color', 'default'=>$evo_color_2),					
 						)
 					),array('id'=>'fs_calhead','type'=>'fontation','name'=>__('Jumper - Month/Year Buttons','eventon'),
 						'variations'=>array(
-							array('id'=>'evcal__jm003', 'name'=>'Text Color', 'type'=>'color', 'default'=>'a0a09f'),
-							array('id'=>'evcal__jm004', 'name'=>'Background Color', 'type'=>'color', 'default'=>'f5f5f5'),
-							array('id'=>'evcal__jm003H', 'name'=>'Text Color (Hover)', 'type'=>'color', 'default'=>'a0a09f'),
-							array('id'=>'evcal__jm004H', 'name'=>'Background Color (Hover)', 'type'=>'color', 'default'=>'e6e6e6'),							
+							array('id'=>'evcal__jm003', 'name'=>'Text Color', 'type'=>'color', 'default'=> $evo_color_2),
+							array('id'=>'evcal__jm004', 'name'=>'Background Color', 'type'=>'color', 'default'=>'f5f5f5'),						
 						)
 					),array('id'=>'fs_calhead','type'=>'fontation','name'=>__('Jumper - Month/Year Buttons: Current','eventon'),
 						'variations'=>array(
-							array('id'=>'evcal__jm006', 'name'=>'Text Color', 'type'=>'color', 'default'=>'ffffff'),
+							array('id'=>'evcal__jm006', 'name'=>'Text Color', 'type'=>'color', 'default'=>$evo_color_2),
 							array('id'=>'evcal__jm007', 'name'=>'Background Color', 'type'=>'color', 'default'=>'CFCFCF'),
 						)
 					),array('id'=>'fs_calhead','type'=>'fontation','name'=>__('Jumper - Month/Year Buttons: Active','eventon'),
 						'variations'=>array(
-							array('id'=>'evcal__jm008', 'name'=>'Text Color', 'type'=>'color', 'default'=>'ffffff'),
-							array('id'=>'evcal__jm009', 'name'=>'Background Color', 'type'=>'color', 'default'=>'f79191'),
+							array('id'=>'evcal__jm008', 'name'=>'Text Color', 'type'=>'color', 'default'=> $evo_color_2),
+							array('id'=>'evcal__jm009', 'name'=>'Background Color', 'type'=>'color', 'default'=> $evo_color_second),
 						)
 					),array('id'=>'fs_calhead','type'=>'fontation','name'=>__('Current month Button','eventon'),
 						'variations'=>array(
@@ -97,7 +94,7 @@ class evoadmin_set_appearance{
 							array('id'=>'evcal__jm010', 'name'=>'Line Color', 'type'=>'color', 'default'=>'737373'),
 							array('id'=>'evcal__jm011', 'name'=>'Background Color', 'type'=>'color', 'default'=>'ffffff'),
 							array('id'=>'evcal__jm010H', 'name'=>'Line Color (Hover)', 'type'=>'color', 'default'=>'e2e2e2'),
-							array('id'=>'evcal__jm011H', 'name'=>'Background Color (Hover)', 'type'=>'color', 'default'=>'ededed'),
+							array('id'=>'evcal__jm011H', 'name'=>'Background Color (Hover)', 'type'=>'color', 'default'=> $evo_color_1),
 							array('id'=>'evcal__jm01A', 'name'=>'The arrow color', 'type'=>'color', 'default'=>'737373'),
 							array('id'=>'evcal__jm01AH', 'name'=>'The arrow color (Hover)', 'type'=>'color', 'default'=>'ffffff'),
 						)
@@ -106,14 +103,14 @@ class evoadmin_set_appearance{
 							array('id'=>'evcal_loader_001', 'name'=>'Bar Color', 'type'=>'color', 'default'=>'efefef'),
 							array('id'=>'evcal_loader_002', 'name'=>'Moving Bar Color', 'type'=>'color', 'default'=>'f5b87a'),
 						)
-					),		
+					),				
 				array('id'=>'evcal_ftovrr','type'=>'hiddensection_close'),
 
 				// GENERAL CAlendar
 				array('id'=>'evcal_fcx','type'=>'hiddensection_open','name'=>__('General Calendar','eventon'), 'display'=>'none'),
 					array('id'=>'evose','type'=>'fontation','name'=>__('Social Media Icons','eventon'),
 						'variations'=>array(
-						array('id'=>'evose_1', 'name'=>__('Icon Color','eventon'),'type'=>'color', 'default'=>'888686'),			
+						array('id'=>'evose_1', 'name'=>__('Icon Color','eventon'),'type'=>'color', 'default'=> $evo_color_2),			
 						array('id'=>'evose_2', 'name'=>__('Icon Color (:Hover)','eventon'),'type'=>'color', 'default'=>'ffffff'),
 						array('id'=>'evose_4', 'name'=>__('Icon Background Color (:Hover)','eventon'),'type'=>'color', 'default'=>'9e9e9e'),
 						array('id'=>'evose_5', 'name'=>__('Icon right border Color','eventon'),'type'=>'color', 'default'=>'cdcdcd')
@@ -121,9 +118,9 @@ class evoadmin_set_appearance{
 					)),
 					array('id'=>'evors','type'=>'fontation','name'=>__('Search Field','eventon'),
 							'variations'=>array(
-							array('id'=>'evosr_1', 'name'=>__('Border Color','eventon'),'type'=>'color', 'default'=>'EDEDED'),
+							array('id'=>'evosr_1', 'name'=>__('Border Color','eventon'),'type'=>'color', 'default'=>$evo_color_1),
 							array('id'=>'evosr_2', 'name'=>__('Background Color','eventon'),'type'=>'color', 'default'=>'F2F2F2'),
-							array('id'=>'evosr_3', 'name'=>__('Border Color (Hover)','eventon'),'type'=>'color', 'default'=>'c5c5c5')	
+							array('id'=>'evosr_3', 'name'=>__('Border Color (Hover)','eventon'),'type'=>'color', 'default'=>$evo_color_1)	
 						)
 					),
 					array('id'=>'evors','type'=>'fontation','name'=>__('Search Icon','eventon'),
@@ -173,11 +170,46 @@ class evoadmin_set_appearance{
 
 				// event top
 				array('id'=>'evcal_fcx','type'=>'hiddensection_open','name'=>__('EventTop Styles','eventon'), 'display'=>'none'),
-					array('id'=>'evcal__fc3','type'=>'color','name'=>__('Event Title font color','eventon'), 'default'=>$preset_data['evo_color_1']),					
+					
+					// non colorful eventtop colors
+					array('id'=>'evcal_fcx','type'=>'subheader','name'=>__('Default EventTop Text Colors','eventon')),
+						array('id'=>'evcal__fc3','type'=>'color',
+							'name'=>__('Event Title Text Color','eventon'), 
+							'default'=>$evo_color_1
+						),
+						array('id'=>'evcal__fc3st','type'=>'color',
+							'name'=>__('Event Sub Title Text Color','eventon'), 
+							'default'=>$evo_color_1
+						),
+						array('id'=>'evcal__fc6a','type'=>'color',
+							'name'=>__('Date Block Text Color','eventon'),
+							'default'=>$evo_color_1
+						),
+						array('id'=>'evcal__fc6','type'=>'color',
+							'name'=>__('Other text ( Eg. Time, location etc.)','eventon'),
+							'default'=>$evo_color_1
+						),		
 
-					array('id'=>'evcal__fc3st','type'=>'color','name'=>__('Event Sub Title font color','eventon'), 'default'=>$preset_data['evo_color_1']),
-					array('id'=>'evcal__fc6','type'=>'color','name'=>__('Text under event title (on EventTop. Eg. Time, location etc.)','eventon'),'default'=>$preset_data['evo_color_1']),
-					array('id'=>'evcal__fc7','type'=>'color','name'=>__('Category title color (eg. Event Type)','eventon'),'default'=>$preset_data['evo_color_1']),	
+					// colorful eventtop colors
+					array('id'=>'evcal_fcx','type'=>'subheader','name'=>__('Colorful EventTop Text Colors','eventon')),
+
+						/* @4.8 */
+						array('id'=>'evo_ett_colorful_color',
+							'type'=>'dropdown',
+							'options'=> array(
+								'custom'=> __('Use custom colorful only color for eventtop text'),
+								'none'=> __('Use Default eventtop text colors'),
+							),
+							'default'=> 'custom',
+							'name'=>__('Configure text color for colorful & Image eventtops','eventon'),
+							'legend' => __('This will dictate what the color of text will be when eventtops are colorful or have image background.', 'eventon'),
+						),
+
+						
+						array('id'=>'evcal__colorful_text','type'=>'color',
+							'name'=>__('EventTop All Text Color for only colorful and image backgrounds','eventon'), 'default'=>'ffffff',
+							'legend' => __('This color will be used when eventtop is, colorful & image based backgrounds. This will be overridden when Auto eventTop text color is active.', 'eventon')
+						),		
 
 					array('id'=>'evcal__ett_borderleft','type'=>'dropdown',
 						'name'=>__('EventTop hover border left size','eventon'),
@@ -207,13 +239,13 @@ class evoadmin_set_appearance{
 					array('id'=>'fs_eventtop_tag','type'=>'fontation','name'=>__('General EventTop Tags','eventon'),
 						'variations'=>array(
 							array('id'=>'fs_eventtop_tag_1', 'name'=>'Background color', 'type'=>'color', 'default'=>'F79191'),
-							array('id'=>'fs_eventtop_tag_2', 'name'=>'Font Color', 'type'=>'color', 'default'=>'ffffff'),
+							array('id'=>'fs_eventtop_tag_2', 'name'=>'Font Color', 'type'=>'color', 'default'=>$evo_color_1),
 						)
 					),
 					array('id'=>'fs_cancel_event','type'=>'fontation','name'=>__('Cancelled Events Tag','eventon'),
 						'variations'=>array(
 							array('id'=>'evcal__cancel_event_1', 'name'=>'Background color', 'type'=>'color', 'default'=>'F79191'),
-							array('id'=>'evcal__cancel_event_2', 'name'=>'Font Color', 'type'=>'color', 'default'=>'ffffff'),
+							array('id'=>'evcal__cancel_event_2', 'name'=>'Font Color', 'type'=>'color', 'default'=>$evo_color_1),
 							array('id'=>'evcal__cancel_event_3x', 'name'=>'EventTop Background Color', 'type'=>'color', 'default'=>'333333'),
 							array('id'=>'evcal__cancel_event_4x', 'name'=>'EventTop Cancelled text color', 'type'=>'color', 'default'=>'464646'),
 						)
@@ -222,32 +254,38 @@ class evoadmin_set_appearance{
 					array('id'=>'fs_eventtop_tag','type'=>'fontation','name'=>__('Postponed Tag','eventon'),
 						'variations'=>array(
 							array('id'=>'fs_eventtop_est_1a', 'name'=>'Background color', 'type'=>'color', 'default'=>'e3784b'),
-							array('id'=>'fs_eventtop_est_1b', 'name'=>'Font Color', 'type'=>'color', 'default'=>'ffffff'),
+							array('id'=>'fs_eventtop_est_1b', 'name'=>'Font Color', 'type'=>'color', 'default'=>$evo_color_1),
 						)
 					),
 					array('id'=>'fs_eventtop_tag','type'=>'fontation','name'=>__('Moved Online Tag','eventon'),
 						'variations'=>array(
 							array('id'=>'fs_eventtop_est_2a', 'name'=>'Background color', 'type'=>'color', 'default'=>'6edccd'),
-							array('id'=>'fs_eventtop_est_2b', 'name'=>'Font Color', 'type'=>'color', 'default'=>'ffffff'),
+							array('id'=>'fs_eventtop_est_2b', 'name'=>'Font Color', 'type'=>'color', 'default'=>$evo_color_1),
 						)
 					),
 					array('id'=>'fs_eventtop_tag','type'=>'fontation','name'=>__('Rescheduled Tag','eventon'),
 						'variations'=>array(
 							array('id'=>'fs_eventtop_est_3a', 'name'=>'Background color', 'type'=>'color', 'default'=>'67ef78'),
-							array('id'=>'fs_eventtop_est_3b', 'name'=>'Font Color', 'type'=>'color', 'default'=>'ffffff'),
+							array('id'=>'fs_eventtop_est_3b', 'name'=>'Font Color', 'type'=>'color', 'default'=>$evo_color_1),
 						)
 					),
 
 					array('id'=>'fs_eventtop_tag','type'=>'fontation','name'=>__('Featured Events Tag','eventon'),
 						'variations'=>array(
 							array('id'=>'fs_eventtop_featured_1', 'name'=>'Background color', 'type'=>'color', 'default'=>'ffcb55'),
-							array('id'=>'fs_eventtop_featured_2', 'name'=>'Font Color', 'type'=>'color', 'default'=>'ffffff'),
+							array('id'=>'fs_eventtop_featured_2', 'name'=>'Font Color', 'type'=>'color', 'default'=>$evo_color_1),
+						)
+					),
+					array('id'=>'fs_eventtop_tag','type'=>'fontation','name'=>__('Repeating Events Tag','eventon'),
+						'variations'=>array(
+							array('id'=>'fs_eventtop_repeat_2', 'name'=>'Background color', 'type'=>'color', 'default'=> $evo_color_second),
+							array('id'=>'fs_eventtop_repeat_1', 'name'=>'Font Color', 'type'=>'color', 'default'=>$evo_color_1),
 						)
 					),
 					array('id'=>'fs_eventtop_cmd','type'=>'fontation','name'=>__('Custom Field Buttons','eventon'),
 						'variations'=>array(
 							array('id'=>'evoeventtop_cmd_btn', 'name'=>'Background color', 'type'=>'color', 'default'=>'237dbd'),
-							array('id'=>'evoeventtop_cmd_btnA', 'name'=>'Text Color', 'type'=>'color', 'default'=>'ffffff'),
+							array('id'=>'evoeventtop_cmd_btnA', 'name'=>'Text Color', 'type'=>'color', 'default'=>$evo_color_1),
 						)
 					),
 					array('id'=>'fs_eventtop_live','type'=>'fontation','name'=>__('Live Event Progress','eventon'),
@@ -256,7 +294,6 @@ class evoadmin_set_appearance{
 							array('id'=>'evoeventtop_live2', 'name'=>'Bar color - Completed', 'type'=>'color', 'default'=>'9a9a9a'),
 						)
 					),
-					array('id'=>'evcal__colorful_text','type'=>'color','name'=>__('Colorful EventTop General Text Color','eventon'), 'default'=>'ffffff'),
 				array('id'=>'evcal_fcx','type'=>'hiddensection_close',),
 				
 
@@ -265,10 +302,10 @@ class evoadmin_set_appearance{
 				array('id'=>'fs_fonti1','type'=>'fontation','name'=> __('Section Title Text','eventon'),
 					'variations'=>array(
 						array('id'=>'evcal__fc4', 'type'=>'color', 'default'=>$preset_data['evo_color_1']),
-						array('id'=>'evcal_fs_001', 'type'=>'font_size', 'default'=>'18px'),
+						array('id'=>'evcal_fs_001', 'type'=>'font_size', 'default'=>'20px'),
 					)
 				),
-				array('id'=>'evcal__fc5','type'=>'color','name'=>__('General Font Color','eventon'), 'default'=>'656565'),
+				array('id'=>'evcal__fc5','type'=>'color','name'=>__('General Font Color','eventon'), 'default'=> $evo_color_1),
 				array('id'=>'evcal__bc1','type'=>'color','name'=>__('Event Card Background Color','eventon'), 'default'=>'fdfdfd', 'rgbid'=>'evcal__bc1_rgb'),				
 				array('id'=>'evcal__bc1in','type'=>'color','name'=>__('Event Card Inner Section Background Color','eventon'), 'default'=>'f3f3f3'),				
 				

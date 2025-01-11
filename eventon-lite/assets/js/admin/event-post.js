@@ -117,8 +117,27 @@ jQuery(document).ready(function($){
 				}
 			});	
 
-	// Related events	
+	// Related events	@2.3
 		$('body')
+		// trigger configure related events
+		.on('click','.evo_configure_related_events',function(){
+			var el = $(this);
+			var box = el.closest('.evo_rel_events_box');
+			el.evo_lightbox_open({
+				'uid':'evo_get_related_events',
+				adata:{
+					a:'eventon_rel_event_list',
+					data:{
+						EVs: box.find('input[name=ev_releated]').val(),
+						eventid: box.find('input[name=ev_related_event_id]').val(),
+					}					
+				},
+				lbdata:{
+					class:'evo_related_events_lb',
+					title: box.find('input[name=ev_related_text]').val(),
+				}
+			});
+		})
 		.on('evo_ajax_success_evo_get_related_events',function (event, OO, data){
 			if(data.status=='good'){
 				LB = $('body').find('.' + OO.lightbox_key );			
@@ -144,8 +163,9 @@ jQuery(document).ready(function($){
 
 			BOX = $('body').find('.evo_rel_events_box');
 
+
 			BOX.find('.ev_rel_events_list').html( HTML );
-			BOX.find('.evo_rel_events_sel_list').val( JSON.stringify(EV) );
+			BOX.find('input[name=ev_releated]').val( JSON.stringify(EV) );
 
 			LB.evo_lightbox_show_msg({
 				'type':'good',
@@ -164,7 +184,7 @@ jQuery(document).ready(function($){
 			rel_box.find('span.l').each(function(){
 				EV[ $(this).data('id') ] = $(this).find('.n').html();
 			});
-			rel_box.find('.evo_rel_events_sel_list').val( JSON.stringify( EV ));
+			rel_box.find('input[name=ev_releated]').val( JSON.stringify( EV ));
 		})
 		// search related events @4.5.5
 		.on('keyup', '.evo_rel_search_input',function(event){
@@ -204,7 +224,7 @@ jQuery(document).ready(function($){
 
 		function update_rel_event_ids(obj){
 	    	var EIDS={},
-	    		INPUT = obj.find('input');
+	    		INPUT = obj.find('input[name=ev_releated]');
 
 	    	C= 1;
 	    	obj.find('span.l').each(function(index){

@@ -69,7 +69,7 @@ wp.blocks.registerBlockType( 'eventon-blocks/evo-eventon-main', {
                             sc: ATTR.shortcode,
                             style:{margin:'0',fontSize:'14px',lineHeight:'1',display:'flex',alignItems:'center',padding:'5px',cursor:'pointer',width:'190px',justifyContent:'center'},
                             onClick: function(item){
-                                $('body').trigger('evo_open_shortcode_generator', 
+                                $('body').trigger('evo_trigger_shortcodegenerator', 
                                     [ATTR.shortcode, 'block', ATTR.blockId] );
                             }
                         },

@@ -1,25 +1,10 @@
 <?php
 /**
  * EventON General Calendar Elements
- * @version L2.2.19
-
-Items //
-print_date_time_selector
-print_time_selector
-yesno_btn
-get_icon
-tooltips
-icons
-button - name, unqiue_class
-start_table_header
-
-register_shortcode_generator_styles_scripts
-enqueue_shortcode_generator
-load_colorpicker
-register_colorpicker
+ * @version 2.3
  */
 
-class EVO_General_Elements{	
+class EVO_General_Elements extends EVO_Elm_Trigs{	
 
 	public $svg;
 
@@ -57,9 +42,18 @@ class EVO_General_Elements{
 			'content'=> '', 'field_after_content'=>'', 'field_before_content'=>'',
 			'support_input'=>false,
 			'close'=>false,
+			'max_images'=>'2', // 4.6
+			'interactive'=> true, // 4.6
+			'link'=>'',// 4.7
+			'_blank'=>false,//4.7
+			'trig_data'=> false,//4.7
+			'trig_type'=>'', //4.7
+			'_echo'=> false,//4.7
 
 		), $A);
 		extract($A);
+
+		$help = new evo_helper();
 
 		// prelim
 			// reuses
@@ -107,7 +101,7 @@ class EVO_General_Elements{
 			case 'image':
 				$image_id = !empty($value) ? $value: false;
 
-				// image soruce array
+				// image source array
 				$img_src = ($image_id)? 	wp_get_attachment_image_src($image_id,'medium'): null;
 					$img_src = (!empty($img_src))? $img_src[0]: null;
 
@@ -115,14 +109,18 @@ class EVO_General_Elements{
 				$__button_text_not = ($image_id)? __('Remove Image','eventon'): __('Choose Image','eventon');
 				$__button_class = ($image_id)? 'removeimg':'chooseimg';
 				?>
-				<p class='evo_metafield_image'>
-					<label><?php echo esc_attr( $name ) .$legend_code; ?></label>
+				<p class='evo_metafield_image <?php echo !empty($image_id)?'has_img':'';?>'>
+					<label><?php echo $name.$legend_code; ?></label>
 					
-					<input class='field <?php echo esc_attr( $id );?> custom_upload_image evo_meta_img' name="<?php echo esc_attr( $id );?>" type="hidden" value="<?php echo ($image_id)? esc_attr( $image_id ): null;?>" /> 
+					<input class='evo_meta_img field <?php echo $id;?> custom_upload_image' name="<?php echo $id;?>" type="hidden" value="<?php echo ($image_id)? $image_id: null;?>" /> 
             		
-            		<input class="custom_upload_image_button button <?php echo esc_attr( $__button_class );?>" data-txt='<?php echo esc_attr( $__button_text_not );?>' type="button" value="<?php echo esc_attr( $__button_text );?>" /><br/>
-            		<span class='evo_loc_image_src image_src'>
-            			<img src='<?php echo !empty( $img_src ) ? esc_url( $img_src ) : '';?>' style='<?php echo !empty($image_id)?'':'display:none';?>'/>
+            		<span class='image_src evoposr evo_hover_op7 evomart5 evobr10'>
+            			<span class='evolm_img_actions evoposa evodfx evofx_jc_c evofx_ai_c evoh100p evow100p'>
+            				<button class='evolm_img_select_trig evoposa evoboxsn evobgclt evocurp evobrn evow100p evoh100p'><?php _e('Select an Image','eventon');?></button>
+            				<i class='evoel_img_remove_trig fa fa-times evofx_jc_c evofx_ai_c evobgclw evopad10 evobr50p evofz18 evocurp evo_trans_sc1_07 evo_transit_all'></i>
+            			</span>
+            			
+            			<span class='evoelm_img_holder evobr10 evoh100p evow100p evodb evobgpc evobgsc' style='background-image: url(<?php echo $img_src;?>);'></span>
             		</span>
             		
             	</p>
@@ -145,12 +143,12 @@ class EVO_General_Elements{
 
 				if($show_val && $hideable){
 					echo "<input class='". esc_attr( $field_class ). "' type='password' style='' name='". esc_attr( $id ) ."'";
-					echo'value="'. htmlspecialchars( $value , ENT_QUOTES ) .'"';
+					echo'value="'. ( !empty($value) ? htmlspecialchars( $value , ENT_QUOTES) : '' ) .'"';
 				}else{
 					echo "<input class='". esc_attr( $field_class )."' type='". esc_attr( $field_type )."' name='". esc_attr( $id )."' max='". esc_attr( $max )."' min='". esc_attr( $min )."' step='". esc_attr( $step )."'";
 
 					if( $readonly ) echo 'readonly="true"';
-					$__values = htmlspecialchars( $value , ENT_QUOTES);
+					$__values = !empty($value) ? htmlspecialchars( $value , ENT_QUOTES) : '' ;
 					//$__values =  $value ;
 					echo 'value="'. $__values .'"';
 				}				
@@ -237,24 +235,30 @@ class EVO_General_Elements{
 				echo "</p></div>";
 
 			break;
-			// wysiwyg
+			// wysiwyg @2.3
 			case 'wysiwyg':
 
-				$__value = empty( $value ) ? null : wp_kses_post( $value );
+				$action = empty($value)? "<span class='evo_elm_act_on ".(empty($legend_code) ? '':'le')." evo_transit_all evobr5 evodib'><i class='fa fa-align-left evomarr5 evoop5'></i> ".__('Add Content','eventon') ."<i class='fa fa-plus evomarl10 evoop7'></i></span>":'';
 
-				echo "<div class='evo_elm_row trumbowyg ". esc_attr( $id )."' style='". esc_attr( $row_style )."'>";
-				echo"<p class='evo_field_label'>". esc_html( $name ) .$legend_code . "</p><p class='evo_field_container'>";
+				echo "<div class='evo_elm_row trumbowyg {$id} closed {$row_class}' style='{$row_style}'>";
+				echo"<p class='evo_field_label'>".$name.$legend_code ."</p>";
 
-				echo "<textarea class='evoelm_trumbowyg' name='".esc_attr( $id )."' style='width:100%; min-height:300px;'>". $__value ."</textarea>";
+				echo $action;
 
-				echo "</p></div>";
+				echo "<p class='evo_field_container' style='display:none'>";
+				echo "<textarea class='evoelm_trumbowyg' name='{$id}' style='width:100%; min-height:300px;'>{$value}</textarea>";
+				echo "</p>";
+
+				if( !empty($value) ) echo "<div class='evo_field_preview evomarb10 evoop7' style=''>{$value}</div>";
+
+				echo "</div>";
 
 			break;
-
+			
 			// Select in a lightbox -- for taxonomy values
 			case 'lightbox_select_vals':
 
-				echo "<div class='evo_elm_row evo_elm_lb_select ". esc_attr( $row_class )."' style='". esc_attr( $row_style )."'>";
+				echo "<div class='evo_elm_row evo_elm_lb_select {$row_class}' style='{$row_style}'>";
 				// get values to show
 					$values = !empty($value)? explode(',', $value): array();
 
@@ -270,25 +274,27 @@ class EVO_General_Elements{
 						}
 					}
 
+				$DATA = '';
 				if(count($values_array)>0):
-					echo "
-					<div class='evo_elm_lb_window' style='display:none'>
-						<div class='eelb_in'>
-						<div class='eelb_i_i'>";
-						foreach($values_array as $f=>$v){
-							echo "<span class='". (in_array($f, $values)?'select':'') ."' value='". esc_attr( $f )."'>". esc_html( $v )."</span>";
-						}
-					echo "</div></div></div>";
+					$data = array(
+						'd'=> $values_array,
+						'v'=> $values
+					);
+
+					$DATA = $help->array_to_html_data( $data );
+					
 				endif;
 
-				$placeholder = (!empty($default) )? 'placeholder="'. esc_attr( $default ).'"':null;	
+				
 
-				echo "<div class='evo_elm_lb_fields'>";
-					if(!$reverse_field) echo"<p class='evo_field_label'>". esc_html( $name ) .$legend_code . "</p>";					
+				$placeholder = (!empty($default) )? 'placeholder="'.$default.'"':null;	
+
+				echo "<div class='evo_elm_lb_fields'  ". $DATA .">";
+					if(!$reverse_field) echo"<p class='evo_field_label'>".$name.$legend_code . "</p>";					
 					echo "<p class='evo_field_container evo_elm_lb_field'>";
-					echo "<input class='evo_elm_lb_field_input ". esc_attr( $field_class )."' type='". esc_attr( $field_type )."' ". esc_attr( $field_attr )." name='". esc_attr( $id )."' ". $placeholder ." " . 'value="'. esc_attr( $value ) .'"/>';
+					echo "<input class='evo_elm_lb_field_input {$field_class}' type='{$field_type}' {$field_attr} name='{$id}' {$placeholder} " . 'value="'. $value .'"/>';
 					echo "</p>";
-					if($reverse_field) echo"<p class='evo_field_label'>". esc_html( $name ) .$legend_code . "</p>";				
+					if($reverse_field) echo"<p class='evo_field_label'>".$name.$legend_code . "</p>";				
 				echo "</div>";
 				echo "</div>";
 			break;
@@ -296,28 +302,27 @@ class EVO_General_Elements{
 			// Select in a lightbox -- for other general values
 			case 'lightbox_select_cus_vals':
 
-				echo "<div class='evo_elm_row evo_elm_lb_select ". esc_attr( $row_class )."' style='". esc_attr( $row_style )."'>";
+				echo "<div class='evo_elm_row evo_elm_lb_select {$row_class}' style='{$row_style}'>";
 								
+				$DATA = '';
+				if( is_array($options) && count($options)>0):
+					$data = array(
+						'd'=> $options,
+						'v'=> $values
+					);
 
-				if(count($options)>0):
-					echo "
-					<div class='evo_elm_lb_window' style='display:none'>
-						<div class='eelb_in'>
-						<div class='eelb_i_i'>";
-						foreach($options as $f=>$v){
-							echo "<span class='". (in_array($f, $values)?'select':'') ."' value='". esc_attr( $f )."'>". wp_kses_post( $v )."</span>";
-						}
-					echo "</div></div></div>";
+					$DATA = $help->array_to_html_data( $data );
+					
 				endif;
 
-				$placeholder = (!empty($default) )? 'placeholder="'. esc_attr( $default ).'"':null;	
+				$placeholder = (!empty($default) )? 'placeholder="'.$default.'"':null;	
 
-				echo "<div class='evo_elm_lb_fields'>";
-					if(!$reverse_field) echo"<p class='evo_field_label'>". esc_html( $name ) .$legend_code . "</p>";					
+				echo "<div class='evo_elm_lb_fields' ". $DATA .">";
+					if(!$reverse_field) echo"<p class='evo_field_label'>".$name.$legend_code . "</p>";					
 					echo "<p class='evo_field_container evo_elm_lb_field'>";
-					echo "<input class='evo_elm_lb_field_input ". esc_attr( $field_class )."' type='". esc_attr( $field_type )."' ". esc_attr( $field_attr )." name='". esc_attr( $id )."' ". $placeholder ." " . 'value="'. esc_attr( $value ) .'"/>';
+					echo "<input class='evo_elm_lb_field_input {$field_class}' type='{$field_type}' {$field_attr} name='{$id}' {$placeholder} " . 'value="'. $value .'"/>';
 					echo "</p>";
-					if($reverse_field) echo"<p class='evo_field_label'>". esc_html( $name ) .$legend_code . "</p>";				
+					if($reverse_field) echo"<p class='evo_field_label'>".$name.$legend_code . "</p>";				
 				echo "</div>";
 				echo "</div>";
 			break;
@@ -357,26 +362,30 @@ class EVO_General_Elements{
 			break;
 
 			// DROP Down select field
-			case 'dropdown':					
+			case 'dropdown':		
+			case 'select':		
+		
 						
-				echo "<p class='evo_elm_row evo_elm_select ". esc_attr( $id )." ". esc_attr( $row_class )."' style='". esc_attr( $row_style )."'>";
-				echo "<label>". esc_html( $name )." $legend_code</label>"; 
-				echo "<select class='ajdebe_dropdown ". esc_attr( $field_class ) ."' name='". esc_attr( $id ) ."'>";
+				echo "<p class='evo_elm_row evo_elm_select {$id} {$row_class}' style='{$row_style}'>";
+				echo "<label>$name $legend_code</label>"; 
+				echo "<select class='ajdebe_dropdown {$field_class}' name='".$id."' ". $field_attr .">";
 
 				if(is_array($options)){
-					$dropdown_opt = !empty($value)? $value: (!empty($default)? $default :'');		
+					$dropdown_opt = !empty($value)? $value: (!empty($default)? $default :'');	
+
 					foreach($options as $option=>$option_val){
-						echo"<option name='". esc_attr( $id ) ."' value='". esc_attr( $option )."' "
-						.  ( ($option == $dropdown_opt)? 'selected=\"selected\"':null)  .">". esc_html( $option_val ) ."</option>";
+						echo"<option name='".$id."' value='".$option."' "
+						.  ( ($option == $dropdown_opt)? 'selected=\"selected\"':null)  .">".$option_val."</option>";
 					}	
 				}					
 				echo  "</select>";
 					// legend for under the field
 					if(!empty( $legend )){
-						echo "<br/><i style='opacity:0.6'>". esc_html( $legend ) ."</i>";
+						echo "<br/><i style='opacity:0.6'>".$legend."</i>";
 					}
 				echo "</p>";						
 			break;
+
 			// DROP Down select field -- select2
 			case 'dropdownS2':					
 						
@@ -467,6 +476,68 @@ class EVO_General_Elements{
 				echo "<a class='evo_btn ". esc_attr( $unqiue_class )."' data-d='". esc_attr( $data )."'>". esc_html( $name )."</a>";
 				echo'</p>';
 			break;
+			// @2.3
+			case 'detailed_button':
+				$_target = $_blank ? 'target="_blank"' : null;
+
+				$_extra = $_attr_class = '';
+
+				// trigger action
+				if( $trig_data && is_array( $trig_data ) && empty($field_after_content) ){
+					$_extra .= $this->_process_trigger_data( $trig_data , $trig_type , 'data');
+					if( $trig_type == 'trig_lb' || empty($trig_type) ) $_attr_class .= ' evolb_trigger'; 
+					if( $trig_type == 'trig_ajax' ) $_attr_class .= ' evo_trigger_ajax_run'; 
+				}
+
+				// precontent present
+				if( !empty($field_before_content)) $_attr_class .= ' pre';
+
+
+
+				$elm_start = ( !empty($link)) ? 
+					"<a class='evo_elm_button {$_attr_class} {$field_class}' href='". esc_url( $link ) ."' {$_target} {$_extra}>": 
+					"<button class='evo_elm_button {$_attr_class} {$field_class}' {$_extra}>";
+				$elm_end = ( !empty($link)) ? '</a>' : '</button>';
+
+				// after content as static button
+				if( !empty($field_after_content)){
+					$_attr_class .= ' inbtn';
+					$elm_start = "<div class='evo_elm_button {$_attr_class} {$row_class}' {$_extra}>";
+					$elm_end = '</div>';
+				} 
+
+				echo $elm_start;
+
+				if( !empty($field_before_content)) echo "<span class='evo_btn_vis pre'>" . $field_before_content ."</span>";
+				echo "<span class='evo_btn_item_details'>";
+					echo "<span class='evo_btn_item'>". $name ."</span>";
+					if( !empty($description)) echo "<span class='evo_btn_info'>". $description ."</span>";
+				echo "</span>";
+				if( !empty($content)) echo "<span class='evo_btn_vis'>". $content ."</span>";
+
+				// after content as static button
+				if( !empty($field_after_content)){
+					
+					// if trigger data available for after content button
+					if( !empty($trig_data)){
+						//print_r($trig_data);
+						$_extra .= $this->_process_trigger_data( $trig_data , $trig_type, 'data' );
+						if( $trig_type == 'trig_lb' || empty($trig_type) ) $_attr_class .= ' evolb_trigger'; 
+						if( $trig_type == 'trig_ajax' ) $_attr_class .= ' evo_trigger_ajax_run'; 
+					}
+					
+
+					$_elm_start = ( !empty($link)) ? 
+						"<a class='evo_btn {$_attr_class} {$field_class}' href='". esc_url( $link ) ."' {$_target} {$_extra}>": 
+						"<button class='evo_btn {$_attr_class} {$field_class}' {$_extra}>";
+					$_elm_end = ( !empty($link)) ? '</a>' : '</button>';
+					echo $_elm_start . $field_after_content .$_elm_end;
+
+				} 
+				
+				echo $elm_end;
+
+			break;
 			case 'icon_select':
 				$value = empty( $value) ? '' : $value;
 				
@@ -486,7 +557,9 @@ class EVO_General_Elements{
 
 		echo $_nesting_end;
 
-		return ob_get_clean();
+		$output = ob_get_clean();
+
+		if($_echo): echo $output; else: return $output; endif;
 	}
 
 	public function print_process_multiple_elements( $A){
@@ -506,168 +579,7 @@ class EVO_General_Elements{
 			echo "<input type='hidden' name='". esc_attr( $name )."' value='". esc_attr( $value )."'>";
 		}
 	}
-// Ligthbox triggering button @since 4.3.5
-	function print_trigger_element($args, $type){
-		$help = EVO()->helper;
 
-		switch($type){
-			case 'trig_lb':
-				/*
-					'extra_classes'=>'',
-					'styles'=> '',
-					'title'=>'',
-					'id'=>'',
-					'dom_element'=> 'span',
-					'uid'=>'',
-					'lb_class' =>'',
-					'lb_title'=>'',	
-					'ajax_data'=>array(),
-
-				*/
-				$opt = extract( array_merge(array(					
-					'class_attr'=>'', // pass class to replace default
-					'extra_classes'=>'',
-					'styles'=> '',
-					'title'=>'',
-					'id'=>'',
-					'dom_element'=> 'span',
-					'uid'=>'',
-					'lb_class' =>'',
-					'lb_title'=>'',
-					'lb_size'=>'', // mid, small
-					'lb_padding'=>'evopad30',
-					'lb_loader'=> false,			
-					'lb_load_new_content'=> true,			
-					'ajax'=>'yes',
-					'ajax_data'=>'',
-					'end'=>'admin',// client or admin
-					'ajax_action'=>'',// @since 4.4
-					'ajax_type'=>'', // @since 4.4
-					//'content_id'=>'',
-					//'content'=>'', // pass dynamic content
-				), $args) );
-
-				$btn_data = array(
-					'lbvals'=> array(
-						'lbc'=> 		esc_attr( $lb_class ),
-						'lbsz'=> 		esc_attr( $lb_size ),
-						'lb_padding'=> 	esc_attr( $lb_padding ),
-						't'=> 			esc_attr( $lb_title ),
-						'ajax'=> 		esc_attr( $ajax ),
-						'd'=> 			array_map('esc_html', $ajax_data ),
-						'uid'=> 		esc_attr( $uid ),
-						'load_new_content'=> $lb_load_new_content ,
-						'lightbox_loader'=> $lb_loader,
-					)
-				);
-
-				if( $end != 'admin' ) $btn_data['lbvals']['end'] = $end;
-				if( !empty($ajax_action) ) $btn_data['lbvals']['ajax_action'] = $ajax_action; // @since 4.4
-				if( !empty($ajax_type) ) $btn_data['lbvals']['ajax_type'] = $ajax_type; // @since 4.4
-
-				$class_attr = empty($class_attr) ? 'evo_btn evolb_trigger ': $class_attr;
-				?><<?php echo esc_html( $dom_element );?> <?php echo !empty($id) ? "id='". esc_attr( $id )."'" :null;?> class='<?php echo esc_attr( $class_attr . $extra_classes );?>' <?php echo $help->array_to_html_data($btn_data);?>  style='<?php echo esc_attr( $styles );?>'><?php echo esc_html( $title );?></<?php echo esc_html( $dom_element );?>>
-				<?php
-
-			break;
-			case 'trig_form_submit':
-				/* easy copy
-					'extra_classes'=>'',
-					'styles'=> '',
-					'title'=>'',
-					'dom_element'=> 'span',
-					'uid'=>'',
-					'lb_class' =>'',
-				*/
-
-				$opt = extract( array_merge(array(
-					'class_attr'=>'', // pass class to replace default
-					'extra_classes'=>'',
-					'styles'=> '',
-					'title'=>'',
-					'dom_element'=> 'span',
-					'uid'=>'',
-					'lb_class' =>'',
-					'lb_loader'=> false,			
-					'lb_hide'=> false,			
-					'lb_hide_message'=> false,			
-					'lb_load_new_content'=> false,			
-					'load_new_content_id'=> '',		
-					'end'=>'admin',// client or admin
-					//'content_id'=>'',
-					//'content'=>'', // pass dynamic content
-				), $args) );
-
-				$btn_data = array(
-					'd'=> array( 'uid'=> esc_attr( $uid ),
-						'lightbox_key'=> esc_attr( $lb_class ),
-						'lightbox_loader'=>esc_attr( $lb_loader ),
-						'end'=>$end,
-						'hide_lightbox'=> 		esc_attr( $lb_hide ),
-						'hide_message'=> 		esc_attr( $lb_hide_message ),
-						'load_new_content'=>	esc_attr( $lb_load_new_content ),
-						'load_new_content_id'=> esc_attr( $load_new_content_id )
-					)
-				);
-
-				$class_attr = empty($class_attr) ? 'evo_btn evolb_trigger_save ': $class_attr;
-				?><<?php echo esc_html( $dom_element );?> class='<?php echo esc_attr( $class_attr . $extra_classes );?>' <?php echo $help->array_to_html_data($btn_data);?> style='<?php echo esc_attr( $styles );?>'><?php echo esc_html( $title );?></<?php echo esc_html( $dom_element );?>>
-				<?php
-			break;
-			case 'trig_ajax':
-				/* easy copy
-					'extra_classes'=>'',
-					'styles'=> '',
-					'title'=>'',
-					'dom_element'=> 'span',
-					'uid'=>'',
-					'lb_class' =>'',
-					'lb_load_new_content'=> false,			
-					'load_new_content_id'=> '',	
-					'ajax_data' =>array(),
-				*/
-
-				$opt = extract( array_merge(array(
-					'class_attr'=>'',
-					'extra_classes'=>'',
-					'styles'=> '',
-					'title'=>'',
-					'dom_element'=> 'span',
-					'uid'=>'',
-					'ajax_data'=>'',
-					'lb_class' =>'',
-					'lb_loader'=> false,	
-					'lb_hide'=> false,			
-					'lb_hide_message'=> false,					
-					'lb_load_new_content'=> false,			
-					'load_new_content_id'=> '',		
-					'end'=>'admin',// client or admin
-					//'content_id'=>'',
-					//'content'=>'', // pass dynamic content
-				), $args) );
-
-				$btn_data = array(
-					'd'=> array( 'uid'=> $uid,
-						'lightbox_key'=>$lb_class,
-						'lightbox_loader'=>$lb_loader,
-						'end'=>$end,
-						'load_new_content'=>$lb_load_new_content,
-						'ajaxdata'=> $ajax_data
-					)
-				);
-
-				if( !empty($load_new_content_id)) $btn_data['d']['load_new_content_id'] = $load_new_content_id;
-				if( $lb_hide) $btn_data['d']['hide_lightbox'] = $lb_hide;
-				if( $lb_hide_message) $btn_data['d']['hide_message'] = $lb_hide_message;
-
-				$class_attr = empty($class_attr) ? 'evo_btn evo_trigger_ajax_run ': $class_attr;
-
-				?>
-				<<?php echo esc_html( $dom_element );?> class='<?php echo esc_attr( $class_attr . $extra_classes );?>' <?php echo $help->array_to_html_data($btn_data);?> style='<?php echo esc_attr( $styles );?>'><?php echo esc_html( $title );?></<?php echo esc_html( $dom_element );?>>
-				<?php
-			break;
-		}
-	}
 
 
 // date time selector
@@ -959,7 +871,7 @@ class EVO_General_Elements{
 
 // DEFAULT CSS style colors @since 4.3
 	function get_def_css(){
-		$preset_data = array(
+		$preset_data = apply_filters('evo_elm_def_css', array(
 			'evo_color_1' => '202124',
 			'evo_color_2' => '656565',
 			'evo_color_link' => '656565',
@@ -967,8 +879,181 @@ class EVO_General_Elements{
 			'evo_color_second' => 'fed584',
 			'evo_font_1' => "'Poppins', sans-serif",
 			'evo_font_2' => "'Noto Sans',arial",
-		);
+			'evo_cl_w' => "ffffff",
+		));
 		return $preset_data;
+	}
+
+// Preloading animation html 4.6
+	function get_preload_html($data = array()){
+		$D = array_merge(  array(
+			'pclass'=>'',// extra parent class
+			'styles'=>'',// extra styles to holder
+			's'=> array(
+				'multiply'=> 1,
+				array('w'=>'50%', 'h'=>'50%','m'=>3),
+				array('w'=>'100%', 'h'=>'50%'),				
+			),
+			'echo' => true,
+			'animation_style'=>'swipe',// swipe or blink
+		), $data );
+
+		extract( $D );
+
+		$multiply = isset( $s['multiply'] ) ? $s['multiply'] : 1;
+
+		ob_start();
+		echo "<div class='evo_loading_bar_holder h100 {$pclass} {$animation_style}' style='{$styles}'>";
+
+		for( $x = 0; $x< $multiply ; $x++){
+			foreach( $s as $SS ){	
+			
+				if( isset( $SS['nesting'])){
+					echo "<div class='nest nest1 {$SS['nesting']}'>";
+				}
+				if( is_array($SS)){
+					if( isset( $SS['w'])){
+						
+						$M = isset( $SS['m'] ) ? (int)$SS['m'] : 1; // if multiple passed						
+						for($y = 0; $y<$M; $y++){
+							echo $this->get_preload_one( $SS);
+						}
+						
+						continue;
+					}
+
+					$DR = isset( $SS['dr'] ) ? $SS['dr']:'' ;
+					$GAP = isset( $SS['gap'] ) ? $SS['gap']:'' ;
+
+					echo "<div class='nesthold {$DR} g{$GAP}'>";
+
+					foreach( $SS as $SS2){
+						if( isset( $SS2['nesting'])){
+							echo "<div class='nest nest2 {$SS2['nesting']}'>";
+						}
+						if( is_array($SS2)){
+							if( isset( $SS2['w'])){
+
+								$M2 = isset( $SS2['m'] ) ? (int)$SS2['m'] : 1; // if multiple passed
+								for($y2 = 0; $y2<$M2; $y2++){
+									echo $this->get_preload_one( $SS2);
+								}
+
+								continue;
+							}
+							foreach( $SS2 as $SS3){
+								if( isset( $SS3['nesting'])){
+									echo "<div class='nest {$SS3['nesting']}'>";
+								}
+								if( is_array($SS3)){
+
+									$M3 = isset( $SS3['m'] ) ? (int)$SS3['m'] : 1; // if multiple passed
+									for($y3 = 0; $y3<$M3; $y3++){
+										echo $this->get_preload_one( $SS3);
+									}
+									
+								}
+								if( isset( $SS3['nesting']))	echo "</div>"; // close nesting
+							}
+						}
+						if( isset( $SS2['nesting']))	echo "</div>"; // close nesting
+					}
+
+					echo "</div>";
+					
+				}
+				
+				if( isset( $SS['nesting']))	echo "</div>"; // close nesting
+			}
+		}
+		
+
+		echo "</div>";
+
+		$O = ob_get_clean();
+
+		if($echo){ echo $O; }else{ return $O; }
+	}
+	private function get_preload_one( $data ){
+		extract ( $data );
+
+		$MB = !empty($mb) ? 'margin-bottom:'. $mb .'px;' :'';
+
+		return "<div class='evo_loading_bar wid_{$w} hi_{$h}' style='width:{$w}; height:{$h}; {$MB}'></div>";
+	}
+
+	function get_preload_standalone( $data ){
+
+	}
+
+	// @s 4.6
+	function get_preload_map(){
+		return "
+		<span class='evo_map_load_out evoposr evodb evobr15'>
+		<i class='fa fa-map-marker evoposa'></i><span class='evo_map_load evoposr evodb'>					
+					<i class='a'></i>
+					<i class='b'></i>
+					<i class='c'></i>
+					<i class='d'></i>
+					<i class='e'></i>
+					<i class='f'></i>
+				</span></span>";
+	}
+
+// HTML for grid 
+	// @version 4.7
+	public function get_grid_content($structure){
+		
+		extract( $structure );
+
+		echo "<div class='evo_grid'>";
+
+		foreach( $structure as $boxes => $boxdata ){
+
+			$sizes = '12,12,12';
+			if( isset($boxdata['sizes'])) $sizes = $boxdata['sizes'];
+			list($large, $medium, $small) = explode(',', $sizes);
+
+			echo "<div class='evo_grid_box evo_spanL_{$large} evo_spanM_{$medium} evo_spanS_{$small}'>";
+
+			echo "<div class='evo_tile'>";
+			echo "<div class='evo_tile_content' style='".( isset($boxdata['styles']) ? esc_html($boxdata['styles']): '' )."'>";
+
+				if( isset( $boxdata['header'] )):
+
+					echo "<div class='evo_tile_header'>";
+
+					echo $boxdata['header'];
+
+					echo "</div>";	
+				endif;
+
+				if( isset( $boxdata['body'] )):
+
+					echo "<div class='evo_tile_body'>";
+
+					echo $boxdata['body'];
+
+					echo "</div>";
+
+				endif;
+
+				if( isset( $boxdata['footer'] )):
+					echo "<div class='evo_tile_footer'>";
+
+					echo $boxdata['footer'];
+
+					echo "</div>";
+				endif;
+			
+			echo "</div>";
+			echo "</div>";
+
+			echo "</div>";
+		}
+
+		echo "</div>";
+		
 	}
 
 // SVG icons
@@ -978,7 +1063,7 @@ class EVO_General_Elements{
 		}
 	}
 
-// Tool Tips updated 4.0.2
+// Tool Tips updated 2.3
 // central tooltip generating function
 	function tooltips($content, $position='', $echo = false, $handleClass= false, $class = ''){
 		// tool tip position
@@ -993,21 +1078,21 @@ class EVO_General_Elements{
 				$L = null;
 			}
 
-		$output = "<span class='ajdeToolTip". esc_attr( $L )." fa". ($handleClass? ' handle':'')." ". esc_attr( $class )."' data-d='". wp_kses_post( $content )."' data-handle='". esc_attr( $handleClass )."'></span>";
+		$output = "<span class='evo_tooltip ajdeToolTip{$L} fa". ($handleClass? ' handle':'')." {$class}' data-d='{$content}' data-handle='{$handleClass}'></span>";
 
 		if(!$echo)
 			return $output;			
 		
 		echo $output;
 	}
+	function echo_tooltips($content, $position=''){
+		$this->tooltips($content, $position,true);
+	}
 	public function print_tooltips($content ='' , $position=''){
 		if( empty($content)) return;
 		$this->tooltips($content, $position,true);
 	}
-	function echo_tooltips($content, $position=''){
-		$this->tooltips($content, $position,true);
-	}
-
+	
 	
 
 // Icon Selector -@updated 4.5.2
@@ -1024,7 +1109,7 @@ class EVO_General_Elements{
 		?>
 		<div id='evo_icons_data' style='display:none'>
 			<p class='evo_icon_search_bar evomar0'>
-				<input id='evo_icon_search' type='search' class='evo_icon_search' placeholder='<?php esc_html_e('Type name to search icons','eventon');?>'/></p>
+				<input id='evo_icon_search' type='search' class='evo_icon_search' placeholder='<?php _e('Search icons by name','eventon');?>'/></p>
 			<div class="evo_icon_selector fai_in">
 				<ul class="faicon_ul">
 				<?php

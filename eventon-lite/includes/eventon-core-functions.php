@@ -742,7 +742,7 @@ require EVO_ABSPATH. 'includes/evo-conditional-functions.php';
 			if(!empty($lang_options)) {$lang_options = $lang_options;}
 			else{
 				$opt = get_option('evcal_options_evcal_2');
-				$lang_options = $$opt && is_array( $opt ) ? $opt['L1'] : array();
+				$lang_options = $opt && is_array( $opt ) ? $opt['L1'] : array();
 			}
 
 			$__months = array('J','F','M','A','M','J','J','A','S','O','N','D');
@@ -761,7 +761,7 @@ require EVO_ABSPATH. 'includes/evo-conditional-functions.php';
 			if(!empty($lang_options)) {$lang_options = $lang_options;}
 			else{
 				$opt = get_option('evcal_options_evcal_2');
-				$lang_options = $$opt && is_array( $opt ) ? $opt['L1'] : array();
+				$lang_options = $opt && is_array( $opt ) ? $opt['L1'] : array();
 			}
 
 			$__months = array('january','february','march','april','may','june','july','august','september','october','november','december');

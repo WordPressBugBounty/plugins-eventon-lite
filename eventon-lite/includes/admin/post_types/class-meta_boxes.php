@@ -458,91 +458,12 @@ class evo_event_metaboxes{
 
 							case 'ev_location':
 
-								// $opt = get_option( "evo_tax_meta");
-								// print_r($opt);
-								?>
-								<div class='evcal_data_block_style1'>
-									<p class='edb_icon evcal_edb_map'></p>
-									<div class='evcal_db_data'>
-										<div class='evcal_location_data_section'>										
-											<div class='evo_singular_tax_for_event event_location' data-tax='event_location' data-eventid='<?php echo esc_attr( $p_id );?>'>
-											<?php
-												echo EVO()->taxonomies->get_meta_box_content( 'event_location' ,esc_attr( $p_id ), esc_html__('location','eventon'));
-											?>
-											</div>									
-										</div>										
-										<?php
-
-											// if generate gmap enabled in settings
-												$gen_gmap = !$EVENT->check_yn('evcal_gmap_gen') ? true: false;
-
-											// yea no options for location
-											foreach(array(
-												'evo_access_control_location'=>array('evo_access_control_location',esc_html__('Make location information only visible to logged-in users','eventon')),
-												'evcal_hide_locname'=>array('evo_locname',esc_html__('Hide Location Name from Event Card','eventon')),
-												'evcal_gmap_gen'=>array('evo_genGmap',esc_html__('Generate Google Map from the address','eventon')),
-												'evcal_name_over_img'=>array('evcal_name_over_img',esc_html__('Show location information over location image (If location image exist)','eventon')),
-											) as $key=>$val){
-
-												$variable_val = $EVENT->get_prop($key)? $EVENT->get_prop($key): 'no';
-
-												if($variable_val == 'no' && $gen_gmap && $key=='evcal_gmap_gen')
-														$variable_val = 'yes';
-
-												EVO()->elements->print_element(
-													array(
-														'type'=>'yesno_btn',
-														'label'=> esc_attr( $val[1] ), 
-														'id'=> esc_attr( $key ),
-														'value'=> esc_attr( $variable_val )
-													)
-												);
-											}
-
-											// check google maps API key
-											if( !EVO()->cal->get_prop('evo_gmap_api_key','evcal_1')){
-												echo "<p class='evo_notice'>".esc_html__('Google Maps API key is required for maps to show on event. Please add them via ','eventon') ."<a href='". esc_url( get_admin_url() ) .'admin.php?page=eventon#evcal_005'."'>".esc_html__('Settings','eventon'). "</a></p>";
-											}
-										?>									
-									</div>
-								</div>
-								<?php
+								include_once ('class-meta_boxes-location.php');
+								
 							break;
 
 							case 'ev_organizer':
-								?>
-								<div class='evcal_data_block_style1'>
-									<p class='edb_icon evcal_edb_map'></p>
-									<div class='evcal_db_data'>
-										<div class='evcal_location_data_section'>
-											<div class='evo_singular_tax_for_event event_organizer' >
-											<?php
-												echo EVO()->taxonomies->get_meta_box_content( 'event_organizer', esc_attr( $p_id ), esc_html__('organizer','eventon'));
-											?>
-											</div>										
-					                    </div><!--.evcal_location_data_section-->
-
-					                    <?php
-					                    EVO()->elements->print_process_multiple_elements(
-											array(
-												array(
-													'type'=>'yesno_btn',
-													'label'=> esc_html__('Hide Organizer field from EventCard','eventon'),
-													'id'=>'evo_evcrd_field_org',
-													'value'=> esc_attr( $EVENT->get_prop('evo_evcrd_field_org') ),
-												),
-												array(
-													'type'=>'yesno_btn',
-													'label'=> esc_html__('SEO: Use organizer information to also populate performer schema data for this event.','eventon'),
-													'id'=>'evo_event_org_as_perf',
-													'value'=> esc_attr( $EVENT->get_prop('evo_event_org_as_perf') ),
-												),
-											)
-										);
-					                    ?>
-									</div>
-								</div>
-								<?php
+								include_once ('class-meta_boxes-organizer.php');
 							break;
 
 							case 'ev_timedate':
@@ -702,17 +623,6 @@ class evo_event_metaboxes{
 					array('evcal_subtitle',)
 				);
 
-			// append custom fields based on activated number
-				$evcal_opt1= get_option('evcal_options_evcal_1');
-				$num = evo_calculate_cmd_count($evcal_opt1);
-				for($x =1; $x<=$num; $x++){	
-					if(eventon_is_custom_meta_field_good($x)){
-						$fields_ar[]= '_evcal_ec_f'.$x.'a1_cus';
-						$fields_ar[]= '_evcal_ec_f'.$x.'a1_cusL';
-						$fields_ar[]= '_evcal_ec_f'.$x.'_onw';
-					}
-				}
-
 
 			// array of post meta fields that should be deleted from event post meta
 				foreach(array(
@@ -800,10 +710,6 @@ class evo_event_metaboxes{
 							continue;
 						}
 
-						// for saving custom meta fields @since 4.3.3 @4.5.5
-						if( strpos($f_val, '_evcal_ec_f') !== false ){
-							$post_value = $HELP->sanitize_html( $_POST[$f_val]);			
-						}
 						
 						$EVENT->set_prop( $f_val , $post_value);
 

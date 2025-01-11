@@ -5,7 +5,7 @@
  * @author 		AJDE
  * @category 	Admin
  * @package 	eventON/Admin/ajde_events
- * @version     L 2.2.21
+ * @version     2.3
  */
 
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
@@ -55,6 +55,7 @@ class evo_ajde_events{
 			$columns["name"] = esc_html__( 'Event Name', 'eventon' );
 
 			$columns["event_location"] = 	esc_html__( 'Location', 'eventon' );
+			$columns["event_organizer"] = 	esc_html__( 'Organizer', 'eventon' );
 			$columns["event_type"] = 		$evt_name;
 			$columns["event_type_2"] = 		$evt_name2;
 			$columns["event_start_date"] = 	esc_html__( 'Start Date', 'eventon' );
@@ -328,6 +329,7 @@ class evo_ajde_events{
 					}
 				break;
 				case "event_location":
+				case "event_organizer":
 					
 					if ( ! $terms = get_the_terms( $post->ID, $column ) ) {
 						echo '<span class="na">&ndash;</span>';

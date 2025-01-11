@@ -84,8 +84,6 @@ class EVO_AJAX{
 				'get_events'=>'main_ajax_call',			
 				'load_event_content'=>'load_event_content',
 				'load_single_eventcard_content'=>'load_single_eventcard_content',
-				'ics_download'=>'eventon_ics_download',			
-				'export_events_ics'=>'export_events_ics',
 				'search_evo_events'=>'search_evo_events',
 				'refresh_now_cal'=>'refresh_now_cal',
 				'refresh_elm'=>'refresh_elm',
@@ -432,89 +430,6 @@ class EVO_AJAX{
 			); wp_die(); 
 		}
 	
-	// ICS file generation for add to calendar buttons
-	// @2.2.8
-		function eventon_ics_download(){
-
-			if( !isset( $_GET['event_id'])) return false;
-
-			// verify nonce
-				if(!wp_verify_nonce( wp_unslash( $_REQUEST['nonce'] ), 'eventon_ics_oneevent')) {
-					wp_die('Security Check Failed!');
-				}
-
-			$event_id = (int)( sanitize_text_field( $_GET['event_id']) );
-			$ri = isset($_GET['ri'])? (int)( sanitize_text_field($_GET['ri']) ) : 0;
-
-
-			$EVENT = new EVO_Event($event_id,'',$ri);
-			$EVENT->get_event_post();
-
-			// validations
-				// check post type
-				if( 'ajde_events' !== $EVENT->post_type ) die('Not a valid Event!');
-
-				// check event exists
-				if( $EVENT->post_status != 'publish' && !is_user_logged_in() ) die('Not a valid Event!');
-
-				// check password protected event
-				if( $EVENT->is_password_required() ) die('Password Protected Event!');			
-			
-			$slug = $EVENT->post_name;
-						
-			header("Content-Type: text/Calendar; charset=utf-8");
-			header("Content-Disposition: inline; filename={$slug}.ics");
-
-			echo "BEGIN:VCALENDAR\r\n";
-			echo "VERSION:2.0\r\n";
-			echo "PRODID:-//eventon.com NONSGML v1.0//EN\n";
-
-			$EVENT->print_get_ics_content();
-
-			echo "END:VCALENDAR";
-			
-			wp_die();
-
-		}
-
-	// download all event data as ICS
-	// @updated 4.3
-		function export_events_ics(){
-			
-			if(!wp_verify_nonce( wp_unslash( $_REQUEST['nonce'] ), 'eventon_download_events')){
-				wp_die('Nonce Security Failed.');
-			}
-
-			$events = EVO()->calendar->get_all_event_data(array(
-				'hide_past'=>'yes'
-			));
-			
-			if(!empty($events)):
-
-				$HELP = EVO()->helper;
-
-				$slug = 'eventon_events';
-				header("Content-Type: text/Calendar; charset=utf-8");
-				header("Content-Disposition: inline; filename={$slug}.ics");
-				echo "BEGIN:VCALENDAR\n";
-				echo "VERSION:2.0\n";
-				echo "PRODID:-//eventon.com NONSGML v1.0//EN\n";
-				echo "CALSCALE:GREGORIAN\n";
-				echo "METHOD:PUBLISH\n";
-
-				// EACH EVENT
-				foreach($events as $event_id=>$event){
-
-					$EVENT = new EVO_Event( $event_id, $event['pmv'], 0, true, false);
-
-					$EVENT->print_get_ics_content();
-
-				}
-				echo "END:VCALENDAR";
-				wp_die();
-
-			endif;
-		}
 
 	
 	// Search results for ajax search of events from search box u2.2.12

@@ -1,6 +1,6 @@
 /*
  * EventON Back end scripts for general backend of wordpress
- * @version L 2.0
+ * @version 2.3
  */
 jQuery(document).ready(function($){	
 
@@ -190,7 +190,7 @@ jQuery(document).ready(function($){
 		// structure
 			const load_html = "<div class='evo_loading_bar_holder h100'><div class='evo_loading_bar wid_50 hi_50'></div><div class='evo_loading_bar hi_100'></div><div class='evo_loading_bar'></div><div class='evo_loading_bar'></div><div class='evo_loading_bar hi_50'></div></div>";
 
-			SP.html("<div class='evosp_in'><span class='evosp_close'><i class='fa fa-multiply'></i></span><div class='evosp_head'>"+OO.sp_title+"</div><div id='evops_content' class='evosp_body'>"+load_html+"</div><div class='evosp_foot'><p class='message'></p></div></div>");
+			SP.html("<div class='evosp_in "+ OO.uid +"'><span class='evosp_close'><i class='fa fa-multiply'></i></span><div class='evosp_head'>"+OO.sp_title+"</div><div id='evops_content' class='evosp_body'>"+load_html+"</div><div class='evosp_foot'><p class='message'></p></div></div>");
 
 			SP.addClass('show');
 
@@ -261,6 +261,8 @@ jQuery(document).ready(function($){
 		if( !(SP.hasClass('show')) ) return;
 
 		var OO = $.extend({}, defaults, opt);
+
+		BB.trigger('evo_sp_closed',[ SP ]);
 
   		SP.removeClass('show');
   		setTimeout(function(){	SP.html('');	}, OO.delay );
@@ -944,12 +946,12 @@ jQuery(document).ready(function($){
 
 	$('.evo_card_designer').evo_card_designer();
 
-// Settings > Support
-	$('.evotrouble_left').on('click','h5',function(){
+// Settings > Support @2.3
+	$('.evotrouble_qas').on('click','h5',function(){
 		$(this).next('p').toggle();
 	});
 
-// LANGUAGE SETTINGS
+// LANGUAGE SETTINGS @2.3
 	// language tab
 		$('.eventon_cl_input').focus(function(){
 			$(this).parent().addClass('onfocus');
@@ -958,12 +960,11 @@ jQuery(document).ready(function($){
 			$(this).parent().removeClass('onfocus');
 		});
 	
-	// change language
-		$('#evo_lang_selection').change(function(){
+	// change language @4.7
+		$('.evo_lang_selection').change(function(){
 			var val = $(this).val();
 			var url = $(this).data('url');
-
-			window.location.replace(url+'?page=eventon-lang&lang='+val);
+			window.location.replace(url+'?page=eventon&tab=evcal_2&lang='+val);
 		});
 
 	// duplicate editing
@@ -973,18 +974,57 @@ jQuery(document).ready(function($){
 				$('body').find('.eventon_cl_input.'+ n).val( $(this).val() );
 			});
 		}
-	
+	// select text string for translation
+		$('body').on('click','.eventon_custom_lang_line',function(){
+			$('.eventon_custom_lang_line').removeClass('select');
+			$(this).addClass('select');
+
+			var textarea = $('.evolang_translatable_textfield');
+			var input = $(this).find('input');
+			var slug = input.attr('name');
+			var value = input.val();
+
+			$('.evolang_translate_original').html( $(this).find('span').html() );
+			textarea.val( value ).data('slug',slug);
+
+			if( value == '' || value === undefined){
+				textarea.attr('placeholder', textarea.data('t1'));
+			}else{
+				textarea.attr('placeholder', textarea.data('t0'));
+			}
+		});
+
+		// Keyup event on translatable text fields
+		$('.evolang_translatable_textfield').on('keyup', function() {
+		    // Get the data-slug attribute
+		    var slug = $(this).data('slug');
+		    
+		    // Find the input with the corresponding name
+		    const input = $('body').find('input[name=' + slug + ']');
+		    
+		    // Get the current field value
+		    var value = $(this).val();
+		    
+		    // Set the input value and update its sibling <em> element
+		    input.val(value);
+		    input.siblings('em').html(value);
+
+		    // Log for debugging
+		    //console.log($(this).val() + ' / ' + slug + ' / ' + value);
+		});
+
 	// toggeling language subheaders
 		$('.evo_settings_toghead').on('click',function(){
 			$(this).next('.evo_settings_togbox').toggle();
-			$(this).toggleClass('open');
+			$(this).toggleClass('close');
 		});
 
-	// search 
-		$('.evo_lang_search_in').on('change keyup paste',function(){
+	// Search text strings in language @4.7
+		$('.evo_lang_search_in').on('input change keyup paste',function(){
 			var searchval = $(this).val();
 
-			$('#evcal_2').find('.eventon_cl_input').each(function(){
+			$('body').find('.evolang_input').each(function(){
+
 				line = $(this).closest('.eventon_custom_lang_line ');
 				box = $(this).closest('.evo_settings_togbox');
 				bar = box.siblings('.evo_settings_toghead');
@@ -993,14 +1033,42 @@ jQuery(document).ready(function($){
 					line.show();
 				}else{
 					line.hide();
-					var thistext = $(this).data('n');
-					if( thistext.indexOf( searchval ) != -1 ){
+					var thistext = $(this).data('label');
+					if( thistext === undefined ) return;
+
+					if( thistext.toLowerCase().indexOf( searchval.toLowerCase() ) != -1 ){
 						line.show();
-						box.toggle();
-						bar.toggleClass('open');
+						//console.log(thistext+' '+searchval);
 					}
-					console.log(thistext+' '+searchval);
 				}
+			});
+
+			// if whole section have no lines showing hide the whole section
+			$('body').find('.evoLANG_subsec').each(function(){
+				// Check if all child elements with class 'eventon_custom_lang_line' are not visible
+			    if ($(this).find('.eventon_custom_lang_line:visible').length === 0) {
+			        // If none of the children are visible, hide the whole section
+			        $(this).hide();
+			    }else{
+			    	$(this).show();
+			    }
+			    if( searchval == ''){
+			    	$(this).show();
+			    }
+			});
+
+			$('body').find('.evo_settings_togbox').each(function(){
+				// Check if all child elements with class 'eventon_custom_lang_line' are not visible
+			    if ($(this).find('.eventon_custom_lang_line:visible').length === 0) {
+			        // If none of the children are visible, hide the whole section
+			        $(this).prev('.evo_settings_toghead').hide();
+			    }else{
+			    	$(this).prev('.evo_settings_toghead').show();
+			    }
+
+			    if( searchval == ''){
+			    	$(this).prev('.evo_settings_toghead').show();
+			    }
 			});
 		});
 

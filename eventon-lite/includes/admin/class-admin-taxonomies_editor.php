@@ -1,7 +1,8 @@
 <?php
 /*
  * EventON Taxonomy Editor
- * @version L2.2.16
+ * @version 2.3
+ * @fullversion 4.7.4
  */
 
 class EVO_Taxonomies_editor{
@@ -389,45 +390,55 @@ function editor_ajax_calls(){
 		}
 
 		// action buttons
-		$data_vals_sel = array(
-			'lbvals'=> array(
-				'lbc'=>'evo_config_term',
-				't'=> esc_html( $text_select_different ),
-				'ajax'=>'yes',
-				'd'=> array(
-					'uid'=>'evo_get_tax_list',
-					'type'=>'list',
-					'event_id'=> esc_html($event_id),
-					'term_id'=> esc_html($string_term_ids),
-					'tax'=> esc_html($tax),
-					'action'=> 'eventon_event_tax_list',
-					'load_new_content'=> true
-				)
-			)
-		);
-		$data_vals_new = array(
-			'lbvals'=> array(
-				'lbc'=>'evo_config_term',
-				't'=> esc_html( $text_create_new ),
-				'ajax'=>'yes',
-				'd'=> array(
-					'uid'=>'evo_get_tax_term_form',
-					'type'=>'new',
-					'event_id'=> esc_html($event_id),
-					'tax'=> esc_html( $tax),
-					'action'=> 'eventon_get_event_tax_term_section',
-					'load_new_content'=> true
-				)
-			)
-		);
+		echo "<div class='evomarb10'>";
 
-		?>
-		<p class='evo_selected_tax_actions evodfx evofx_jc_sb'>
-			<a class='evo_tax_term_list evo_btn grey evolb_trigger' <?php echo $this->helper->array_to_html_data( $data_vals_sel );?> ><?php echo esc_html( $text_select_different);?></a>
-			<a class='evo_tax_term_form evo_btn grey evolb_trigger' <?php echo $this->helper->array_to_html_data( $data_vals_new );?>><?php echo esc_html($text_create_new);?></a>
-		</p>
-		
-		<?php
+		EVO()->elements->get_element(array(
+			'type'=>'detailed_button', '_echo'=> true,
+			'name'=> $text_create_new,
+			'description'=> sprintf(__('Add new %s for the Event','eventon'),  $tax_human_name),	
+			'field_after_content'=> "Add New",
+			'trig_data'=> array(
+				'uid'		=>'evo_get_tax_list',
+				'lb_class' 	=>'evo_config_term',
+				'lb_title'=> sprintf(__('Add new %s for the Event','eventon'),  $tax_human_name),	
+				'ajax_data'=>array(
+					'type'=>'new',
+					'event_id'=> $event_id,
+					'tax'=> $tax,
+					'a'=> 'eventon_get_event_tax_term_section',
+					'load_new_content'=> true
+				),
+			),
+		));
+
+		// if terms exists
+		$terms = get_terms([
+		    'taxonomy'   => $tax,
+		    'hide_empty' => false, // Set to true to hide empty terms
+		]);
+
+		if (!empty($terms) && !is_wp_error($terms)):
+			EVO()->elements->get_element(array(
+				'type'=>'detailed_button', '_echo'=> true,
+				'name'=> $text_select_different,
+				'description'=> sprintf(__('Configure %s for the Event','eventon'),  $tax_human_name),	
+				'field_after_content'=> "Select",
+				'trig_data'=> array(
+					'uid'		=>'evo_get_tax_list',
+					'lb_class' 	=>'evo_config_term',
+					'lb_title'=> sprintf(__('Configure %s for the Event','eventon'),  $tax_human_name),	
+					'ajax_data'=>array(
+						'a'=>'eventon_event_tax_list',
+						'type'=>'list',
+						'event_id'=> $event_id,
+						'term_id'=> $string_term_ids,
+						'tax'=> $tax,
+					),
+				),
+			));
+		endif;
+
+		echo "</div>";
 
 		return ob_get_clean();
 	}

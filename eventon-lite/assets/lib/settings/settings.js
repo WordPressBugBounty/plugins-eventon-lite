@@ -1,10 +1,12 @@
 /**
  * EventON Settings scripts
- * @version  4.5.1
+ * @version  2.3
+ * @version  4.7.4
  */
 jQuery(document).ready(function($){
 
 	init();
+	const BB = $('body');
 
 	function init(){
 		// focusing on correct settings tabs
@@ -16,12 +18,80 @@ jQuery(document).ready(function($){
 			var hashId = hash.split('#');
 
 			$('.nfer').hide();
-			$(hash).show();
+			$('#setting_'+ hashId[1]).show();
 
 			var obj = $('a[data-c_id='+hashId[1]+']');
 			change_tab_position(obj);
 		}
 	}
+
+
+// header save changes button
+	$('body').on('click','.evo_trig_form_save',function(event){
+		event.preventDefault();
+		//$('body').find('.evo_settings_form').submit();
+		$('body').find('.evo_settings_save_btn').trigger('click');
+	});
+
+// Settings
+	// webhooks
+		$.fn.evo_webhooks = function (options){
+
+			var init = function(){
+				interaction();
+			}
+
+			var populate_wh_fields = function(){
+				LB = BB.find('.evo_lightbox.evo_webhooks_config');
+
+				const whdata = LB.find('.evo_elm_webhooks_data').data('whdata');
+				var selected_key = LB.find('select').val();
+
+				var new_content = 'n/a';
+				if( whdata !== undefined && selected_key in whdata ) new_content = whdata[ selected_key ];
+
+				LB.find('.evo_whdata_fields').html( new_content );
+			}
+			var interaction = function(){				
+
+				BB.on('evo_ajax_success_evo_webhook_config',function(event, OO, data, el){
+					populate_wh_fields();
+
+					LB = BB.find('.evo_lightbox.evo_webhooks_config');
+
+					LB.find('select.wh_trigger_point').on('change',function(){
+						populate_wh_fields();
+					});
+				});
+
+				// delete
+				$('body').on('click','.evowh_del',function(){
+					wh_id = $(this).closest('p').data('id');
+					
+					var dataajax = {};
+					dataajax['id']= $(this).closest('p').data('id');
+					dataajax['action']= 'evo_webhook_delete';
+					const PAR = BB.find('#evowhs_container');
+
+					$.ajax({
+						beforeSend: function(){ PAR.addClass('evoloading');},
+						url:	the_ajax_script.ajaxurl,
+						data: 	dataajax,	dataType:'json', type: 	'POST',
+						success:function(data){
+							if( data.status == 'good'){
+								$('body').find('#evowhs_container').html( data.html );
+							}else{
+
+							}
+						},
+						complete:function(){ PAR.removeClass('evoloading');	}
+					});
+				});
+
+			}
+			init();
+		}
+		$('#ajde_customization').evo_webhooks();
 
 
 // Other
@@ -49,7 +119,7 @@ jQuery(document).ready(function($){
 
 			var nfer_id = $(this).data('c_id');
 			$('.nfer').hide();
-			$('#'+nfer_id).show();
+			$('#setting_'+nfer_id).show();
 			
 			change_tab_position($(this));
 
@@ -73,7 +143,6 @@ jQuery(document).ready(function($){
 			obj.addClass('focused');
 
 			var menu_position = obj.position();
-			//console.log(obj);
 			$('#acus_arrow').css({'top':(menu_position.top+3)+'px'}).show();
 		}
 
@@ -98,7 +167,7 @@ jQuery(document).ready(function($){
 			$('#ajde_color_guide').hide();
 		});
 
-	
+
 
 	// hideable section
 		$('body').on('click','.evo_hideable_show',function(){

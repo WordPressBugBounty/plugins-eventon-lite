@@ -1,17 +1,20 @@
 <?php
 /**
   * evo settings class
-  * @version lite 2.2.21
+  * @version lite 2.3
   */
 class evo_settings_settings{
 	
 	public $evcal_opt;
 	
-	function __construct($evcal_opt)	{		
+	public function __construct($evcal_opt)	{		
 		$this->evcal_opt = $evcal_opt;
 	}
 
-	function content(){
+	public function content(){
+
+		$preset_data = EVO()->elements->get_def_css();
+		extract( $preset_data);
 
 		$help = EVO()->helper;
 
@@ -29,12 +32,10 @@ class evo_settings_settings{
 				'fields'=> apply_filters('eventon_settings_general', array(
 					array('id'=>'evcal_cal_hide','type'=>'yesno','name'=>__('Hide Calendars from front-end','eventon'),),
 					
-					//array('id'=>'evcal_only_loggedin','type'=>'yesno','name'=>__('Show calendars only to logged-in Users','eventon'),),
-					
-					
-																			
-									
-					//array('id'=>'evcal_dis_conFilter','type'=>'yesno','name'=>__('Disable Content Filter','eventon'),'legend'=>__('This will disable to use of the_content filter on event details and custom field values.','eventon')),				
+					array('id'=>'evo_header_meta_data',
+						'type'=>'yesno',
+						'name'=>__('Add eventon meta data into website header','eventon'), 
+						'legend'=>__('Add the meta data on your website header with eventon version number for debugging purposes','eventon')),		
 					
 					
 					array('id'=>'evo_login_link',
@@ -121,7 +122,7 @@ class evo_settings_settings{
 			array(
 				'id'=>'evcal_005',
 				'name'=>__('Google Maps API Settings','eventon'),
-				'tab_name'=>__('Google Maps API','eventon'),
+				'tab_name'=>__('Maps API','eventon'),
 				'icon'=>'map-marker',
 				'fields'=>array(
 					array('id'=>'evcal_cal_gmap_api',
@@ -291,26 +292,30 @@ class evo_settings_settings{
 						'name'=>__('Icon Selections','eventon')),
 					array('id'=>'fs_fonti2','type'=>'fontation','name'=>__('EventCard Icons','eventon'),
 						'variations'=>array(
-							array('id'=>'evcal__ecI', 'type'=>'color', 'default'=>'6B6B6B'),
+							array('id'=>'evcal__ecI', 'type'=>'color', 'default'=>$evo_color_1),
 							array('id'=>'evcal__ecIz', 'type'=>'font_size', 'default'=>'18px'),
 						)
 					),
 
 					
-					
-					array('id'=>'evcal__fai_001','type'=>'icon','name'=>__('Event Details Icon','eventon'),'default'=>'fa-align-justify'),
-					array('id'=>'evcal__fai_002','type'=>'icon','name'=>__('Event Time Icon','eventon'),'default'=>'fa-clock'),
-					array('id'=>'evcal__fai_repeats','type'=>'icon','name'=>__('Event Repeat Icon','eventon'),'default'=>'fa-repeat'),
-					array('id'=>'evcal__fai_vir','type'=>'icon','name'=>__('Virtual Event Icon','eventon'),'default'=>'fa-globe'),
-					array('id'=>'evcal__fai_health','type'=>'icon','name'=>__('Health Guidelines Icon','eventon'),'default'=>'fa-heartbeat'),
-					array('id'=>'evcal__fai_003','type'=>'icon','name'=>__('Event Location Icon','eventon'),'default'=>'fa-map-marker'),
-					array('id'=>'evcal__fai_004','type'=>'icon','name'=>__('Event Organizer Icon','eventon'),'default'=>'fa-headphones'),
-					array('id'=>'evcal__fai_005','type'=>'icon','name'=>__('Event Capacity Icon','eventon'),'default'=>'fa-tachometer'),
-					array('id'=>'evcal__fai_006','type'=>'icon','name'=>__('Event Learn More Icon','eventon'),'default'=>'fa-link'),
-					array('id'=>'evcal__fai_relev','type'=>'icon','name'=>__('Related Events Icon','eventon'),'default'=>'fa-calendar-plus'),
-					array('id'=>'evcal__fai_007','type'=>'icon','name'=>__('Event Ticket Icon','eventon'),'default'=>'fa-ticket'),
-					array('id'=>'evcal__fai_008','type'=>'icon','name'=>__('Add to your calendar Icon','eventon'),'default'=>'fa-calendar-o'),
-					array('id'=>'evcal__fai_008a','type'=>'icon','name'=>__('Get Directions Icon','eventon'),'default'=>'fa-road'),
+					array(
+						'type'=>'icon_selection',
+						'icons'=> apply_filters('evo_settings_icons_selection', array(
+							array('id'=>'evcal__fai_001','type'=>'icon','name'=>__('Event Details Icon','eventon'),'default'=>'fa-align-justify'),
+							array('id'=>'evcal__fai_002','type'=>'icon','name'=>__('Event Time Icon','eventon'),'default'=>'fa-clock'),
+							array('id'=>'evcal__fai_repeats','type'=>'icon','name'=>__('Event Repeat Icon','eventon'),'default'=>'fa-repeat'),
+							array('id'=>'evcal__fai_vir','type'=>'icon','name'=>__('Virtual Event Icon','eventon'),'default'=>'fa-globe'),
+							array('id'=>'evcal__fai_health','type'=>'icon','name'=>__('Health Guidelines Icon','eventon'),'default'=>'fa-heartbeat'),
+							array('id'=>'evcal__fai_003','type'=>'icon','name'=>__('Event Location Icon','eventon'),'default'=>'fa-map-marker'),
+							array('id'=>'evcal__fai_004','type'=>'icon','name'=>__('Event Organizer Icon','eventon'),'default'=>'fa-headphones'),
+							array('id'=>'evcal__fai_005','type'=>'icon','name'=>__('Event Capacity Icon','eventon'),'default'=>'fa-tachometer'),
+							array('id'=>'evcal__fai_006','type'=>'icon','name'=>__('Event Learn More Icon','eventon'),'default'=>'fa-link'),
+							array('id'=>'evcal__fai_relev','type'=>'icon','name'=>__('Related Events Icon','eventon'),'default'=>'fa-calendar-plus'),
+							array('id'=>'evcal__fai_007','type'=>'icon','name'=>__('Event Ticket Icon','eventon'),'default'=>'fa-ticket'),
+							array('id'=>'evcal__fai_008','type'=>'icon','name'=>__('Add to your calendar Icon','eventon'),'default'=>'fa-calendar-o'),
+							array('id'=>'evcal__fai_008a','type'=>'icon','name'=>__('Get Directions Icon','eventon'),'default'=>'fa-road'),
+					 ))
+					),
 				))
 			)
 			// event top
@@ -427,53 +432,9 @@ class evo_settings_settings{
 				)
 			),
 
-			array(
-				'id'=>'evcal_003',
-				'name'=>__('Third Party API Support for Event Calendar','eventon'),
-				'tab_name'=>__('Third Party APIs','eventon'),
-				'icon'=>'plug',
-				'fields'=> apply_filters('eventon_settings_3rdparty', array(
-					// paypal
-					array('type'=>'sub_section_open','name'=>__('Paypal','eventon')),
-					array('id'=>'evcal_paypal_pay','type'=>'yesno','name'=>__('Enable PayPal event ticket payments','eventon'),'afterstatement'=>'evcal_paypal_pay', 'legend'=>'This will allow you to add a paypal direct link to each event that will allow visitors to pay for event via paypal.'),
-					array('id'=>'evcal_paypal_pay','type'=>'begin_afterstatement'),
-					array('id'=>'evcal_pp_email','type'=>'text','name'=>__('Your paypal email address to receive payments','eventon')),				
-					array('id'=>'evcal_pp_cur','type'=>'dropdown','name'=>__('Select your currency','eventon'), 'options'=> array(
-							'AUD'=>'Australian Dollar',
-							'BRL'=>'Brazilian Real',
-							'CAD'=>'Canadian Dollar',
-							'CZK'=>'Czech Koruna',
-							'DKK'=>'Danish Krone',
-							'EUR'=>'Euro',
-							'HKD'=>'Hong Kong Dollar',
-							'HUF'=>'Hungarian Forint',
-							'ILS'=>'Israeli New Sheqel',
-							'JPY'=>'Japanese Yen',
-							'MYR'=>'Malaysian Ringgit',
-							'MXN'=>'Mexican Peso',
-							'NOK'=>'Norwegian Krone',
-							'NZD'=>'New Zealand Dollar',
-							'PHP'=>'Philippine Peso',
-							'PLN'=>'Polish Zloty',
-							'GBP'=>'Pound Sterling',
-							'RUB'=>'Russian Ruble',
-							'SGD'=>'Singapore Dollar',
-							'SEK'=>'Swedish Krona',
-							'CHF'=>'Swiss Franc',
-							'TWD'=>'Taiwan New Dollar',
-							'THB'=>'Thai Baht',
-							'TRY'=>'Turkish Lira',
-							'USD'=>'U.S. Dollar',
-						),
-						'legend'=> __('PayPal Currently supports 25 currencies','eventon') 
-					),				
-					array('id'=>'evcal_paypal_pay','type'=>'end_afterstatement'),
-
-					array('type'=>'sub_section_close'),
-				))
-			)
+			
 			// custom meta fields
-			,array(
+			array(
 				'id'=>'evcal_009',
 				'name'=>__('Custom Meta Data fields for events','eventon'),
 				'tab_name'=>__('Custom Meta Data','eventon'),
@@ -556,6 +517,53 @@ class evo_settings_settings{
 					'icon'=>'calendar',
 					'fields'=> $this->single_events()
 				),
+
+				// third party
+				array(
+				'id'=>'evcal_003',
+				'name'=>__('Third Party API Support for Event Calendar','eventon'),
+				'tab_name'=>__('Third Party APIs','eventon'),
+				'icon'=>'plug',
+				'fields'=> apply_filters('eventon_settings_3rdparty', array(
+					// paypal
+					array('type'=>'sub_section_open','name'=>__('Paypal','eventon')),
+					array('id'=>'evcal_paypal_pay','type'=>'yesno','name'=>__('Enable PayPal event ticket payments','eventon'),'afterstatement'=>'evcal_paypal_pay', 'legend'=>'This will allow you to add a paypal direct link to each event that will allow visitors to pay for event via paypal.'),
+					array('id'=>'evcal_paypal_pay','type'=>'begin_afterstatement'),
+					array('id'=>'evcal_pp_email','type'=>'text','name'=>__('Your paypal email address to receive payments','eventon')),				
+					array('id'=>'evcal_pp_cur','type'=>'dropdown','name'=>__('Select your currency','eventon'), 'options'=> array(
+							'AUD'=>'Australian Dollar',
+							'BRL'=>'Brazilian Real',
+							'CAD'=>'Canadian Dollar',
+							'CZK'=>'Czech Koruna',
+							'DKK'=>'Danish Krone',
+							'EUR'=>'Euro',
+							'HKD'=>'Hong Kong Dollar',
+							'HUF'=>'Hungarian Forint',
+							'ILS'=>'Israeli New Sheqel',
+							'JPY'=>'Japanese Yen',
+							'MYR'=>'Malaysian Ringgit',
+							'MXN'=>'Mexican Peso',
+							'NOK'=>'Norwegian Krone',
+							'NZD'=>'New Zealand Dollar',
+							'PHP'=>'Philippine Peso',
+							'PLN'=>'Polish Zloty',
+							'GBP'=>'Pound Sterling',
+							'RUB'=>'Russian Ruble',
+							'SGD'=>'Singapore Dollar',
+							'SEK'=>'Swedish Krona',
+							'CHF'=>'Swiss Franc',
+							'TWD'=>'Taiwan New Dollar',
+							'THB'=>'Thai Baht',
+							'TRY'=>'Turkish Lira',
+							'USD'=>'U.S. Dollar',
+						),
+						'legend'=> __('PayPal Currently supports 25 currencies','eventon') 
+					),				
+					array('id'=>'evcal_paypal_pay','type'=>'end_afterstatement'),
+
+					array('type'=>'sub_section_close'),
+				))
+			),
 
 			// search
 				array(
@@ -756,6 +764,7 @@ class evo_settings_settings{
 				'virtual_physical'=>__('Virtual/ Physical Event','eventon'),
 				'status'=>__('Event Status eg. cancelled, reschedule etc.','eventon'),			
 				'featured'=>__('Featured','eventon'),			
+				'repeating'=>__('Repeating','eventon'),			
 			);
 
 			return $arr;

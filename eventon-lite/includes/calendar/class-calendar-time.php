@@ -3,7 +3,7 @@
  * Calendar Time class.
  *
  * @class 		EVO_Cal_Time
- * @version		4.5.7
+ * @version		2.3
  * @package		EventON/Classes
  * @category	Class
  * @author 		AJDE
@@ -41,8 +41,8 @@ class EVO_Cal_Time {
 				if( $cal_hide_end_time) $_hide_endtime = true; // override by calendar values
 
 			// Get event times in pieces -- evnet time in UTC0
-				$DATE_start_val = eventon_get_formatted_time( $event_start_unix , 'utc' );
-				$DATE_end_val = eventon_get_formatted_time( $event_end_unix , 'utc' );
+				$DATE_start_val = eventon_get_formatted_time( $event_start_unix , $EVENT->tz );
+				$DATE_end_val = eventon_get_formatted_time( $event_end_unix , $EVENT->tz );
 
 
 			// FOCUSED values

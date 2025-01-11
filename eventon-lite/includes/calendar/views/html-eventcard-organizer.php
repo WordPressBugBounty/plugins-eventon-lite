@@ -1,11 +1,14 @@
 <?php 
 /**
  * EventCard Organizer html content
- * @2.2.13
+ * @version 2.3
+ * @version 4.7.4
  */
 
 
 $EO = $event_organizer;
+
+//print_r($EO);
 						
 // image
 $img_src = (!empty($event_organizer->organizer_img_id)? 
@@ -48,15 +51,28 @@ $OT.= "<div class='evo_metarow_organizer evorow evcal_evdata_row evcal_evrow_sm 
 
 				// description
 				if( $description ) 
-					$org_data .= "<div class='evo_card_organizer_description'>".$description."</div>";
+					$org_data .= "<div class='evo_card_organizer_description evomart5'>". apply_filters('the_content', $description ) ."</div>";
 
 				// contact
-				if(!empty($event_organizer->organizer_contact) )
-					$org_data .= "<span class='evo_card_organizer_contact'>". stripslashes($event_organizer->organizer_contact). "</span>";
+				if(!empty($event_organizer->contact_email) || !empty($event_organizer->contact_phone) ){
+					$org_data .= "<div class='evodb evomart10'><p>";
+					if( !empty( $event_organizer->contact_email )) 
+						$org_data .= "<span class='evo_card_organizer_contact evomarr10'>". "<a href='mailto:{$event_organizer->contact_email}'>$event_organizer->contact_email</a>". "</span>";
+					if( !empty( $event_organizer->contact_phone )) 
+						$org_data .= "<span class='evo_card_organizer_contact'>". stripslashes($event_organizer->contact_phone). "</span>";
+					$org_data .= "</p></div>";
+				}
+
+				// other contact
+				if( !empty( $EO->organizer_contact)){
+					$org_data .= "<div class='evodb evomart10'>";
+					$org_data .= apply_filters('the_content', $EO->organizer_contact );
+					$org_data .= "</div>";
+				}
 
 				// address
 				if( !empty($event_organizer->organizer_address) )
-					$org_data .= "<span class='evo_card_organizer_address'>". stripslashes($event_organizer->organizer_address). "</span>";
+					$org_data .= "<span class='evo_card_organizer_address evomart10 evodb'>". stripslashes($event_organizer->organizer_address). "</span>";
 
 			$org_data .= "</div>";
 

@@ -1,7 +1,7 @@
 <?php 
 /**
  * EventON Lightboxes for back and front
- * @version 4.5.3
+ * @version 2.3
  */
 
 class EVO_Lightboxes{
@@ -15,10 +15,13 @@ class EVO_Lightboxes{
 
 	// page footer
 	public function page_footer(){
+
+		if( !EVO()->cal->can_load_eventon_content() ) return;
+
 		echo "<div class='evo_elms'><em class='evo_tooltip_box'></em></div>";
 	}
 
-	// frontend lightbox
+	// frontend lightbox -- Legacy @4.7.3
 		function frontend_page_footer(){
 			$lightboxWindows = apply_filters('evo_frontend_lightbox', array(
 				'eventcard'=> array(
@@ -32,19 +35,17 @@ class EVO_Lightboxes{
 
 			if(is_array($lightboxWindows) && count($lightboxWindows)>0){
 
-				//$display = (EVO()->cal->check_yn('evo_load_scripts_only_onevo','evcal_1') && !EVO()->cal->check_yn('evo_load_all_styles_onpages','evcal_1') )? 'none':'block';
-
 				echo "<div id='evo_lightboxes' class='evo_lightboxes' style='display:none'>";
 				foreach($lightboxWindows as $key=>$lb){
 					?>
-					<div class='evo_lightbox <?php echo esc_attr( $key );?> <?php echo !empty($lb['classes'])? esc_attr( $lb['classes'] ):'';?>' id='<?php echo !empty($lb['id'])? esc_attr( $lb['id'] ):'';?>' >
+					<div class='evo_lightbox <?php echo $key;?> <?php echo !empty($lb['classes'])? $lb['classes']:'';?>' id='<?php echo !empty($lb['id'])? $lb['id']:'';?>' >
 						<div class="evo_content_in">													
 							<div class="evo_content_inin">
 								<div class="evo_lightbox_content">
 									<div class='evo_lb_closer'>
-										<a class='evolbclose <?php echo !empty($lb['CLclosebtn'])? esc_attr( $lb['CLclosebtn'] ):'';?>'>X</a>
+										<span class='evolbclose <?php echo !empty($lb['CLclosebtn'])? $lb['CLclosebtn']:'';?>'>X</span>
 									</div>
-									<div class='evo_lightbox_body <?php echo !empty($lb['CLin'])? esc_attr( $lb['CLin'] ):'';?>'><?php echo !empty($lb['content'])? $lb['content']:'';?> </div>
+									<div class='evo_lightbox_body <?php echo !empty($lb['CLin'])? $lb['CLin']:'';?>'><?php echo !empty($lb['content'])? $lb['content']:'';?> </div>
 								</div>
 							</div>							
 						</div>
@@ -56,16 +57,20 @@ class EVO_Lightboxes{
 		}
 
 	// ADMIN
-	function admin_footer($content=''){
+	public function admin_footer($content=''){
 		echo "<div class='ajde_admin_lightboxes'>";		
 		echo $this->content;
-		echo "</div><div class='evo_elms'><em class='evo_tooltip_box'></em></div>";
+		echo "</div>
+		<div class='evo_elms'>
+			<em class='evo_tooltip_box'></em>
+		</div>
+		<div class='evo_elms2'></div>";
 
 		echo "<div id='evo_lightboxes' class='evo_lightboxes'></div>";	
-		echo "<div id='evo_sp' class='evo_sp'></div>";	
+		echo "<div id='evo_sp' class='evo_sp'></div>";		
 	}
 
-	function admin_lightbox_content($arg){
+	public function admin_lightbox_content($arg){
 		$defaults = array(
 			'content'=>'',
 			'class'=>'regular',
@@ -109,7 +114,9 @@ class EVO_Lightboxes{
 				$innner = ($args['preloading'])? '<p class="loading">Loading</p>':$args['content'];
 
 			$content .= (!empty($args['max_height']))? "<div class='evolb_lightbox_outter ajde_lightbox_outter maxbox' >":null;
-			$content .= "<div class='evolb_content ajde_popup_text'>{$innner}</div>";
+			$content .= "<div class='evolb_content ajde_popup_text'>";
+			$content .= $innner;
+			$content .= "</div>";
 			$content .= (!empty($args['max_height']))? "</div>":null;
 			$content .= "<p class='message'></p>
 				

@@ -1095,7 +1095,9 @@ class EVO_Event extends EVO_Data_Store{
 					'location_city','location_state','location_country',
 					'location_link_target'=>'evcal_location_link_target',
 					'location_getdir_latlng',
-					'location_type'
+					'location_type',
+					'loc_phone',
+					'loc_email'
 				) as $I=>$key){	
 					$K = is_integer($I)? $key: $I;				
 					$output[$K] = (empty($LocTermMeta[$key]))? '': $LocTermMeta[$key];
@@ -1173,13 +1175,46 @@ class EVO_Event extends EVO_Data_Store{
 				// meta values
 				foreach($organizer_meta as $I=>$key){	
 					$K = is_integer($I)? $key: $I;				
-					$R[$K] = (empty($org_term_meta[$key]))? '': $org_term_meta[$key];
+					$R[$K] = (empty($org_term_meta[$key]))? '': $this->_process_social_share_links( $key, $org_term_meta[$key] );
 				}
 
 				return $R;
 			}else{
 				return false;
 			}
+		}
+
+		// process social share return proper link
+		public function _process_social_share_links($field, $val){
+			$social_urls = array(
+		        'facebook' => 'https://www.facebook.com/',
+		        'twitter' => 'https://twitter.com/',
+		        'instagram' => 'https://www.instagram.com/',
+		        'linkedin' => 'https://www.linkedin.com/in/',
+		        'youtube' => 'https://www.youtube.com/channel/',
+		        'whatsapp' => 'https://www.whatsapp.com/',
+		        // Add more social media platforms as needed
+		    );
+
+		    // Check if the field matches a known social media platform
+		    foreach ($social_urls as $key => $base_url) {
+		        if (stripos($field, $key) !== false) {
+		            // If the value contains '@', assume it's a username
+		            if (strpos($val, '@') === 0) {
+		                // Remove the '@' and construct the full URL
+		                return $base_url . ltrim($val, '@');
+		            } elseif (!filter_var($val, FILTER_VALIDATE_URL)) {
+		                // If it's not a valid URL, prepend the base URL
+		                return $base_url . ltrim($val, '/');
+		            } else {
+		                // Ensure the URL has 'https://' if not already present
+		                return (stripos($val, 'http://') === 0 ? 'https://' . substr($val, 7) : $val);
+		            }
+		        }
+		    }
+
+		    // Return the original value if no social media match is found
+		    return $val;
 		}
 		// @4.5
 		public function get_organizer_names(){
@@ -1221,13 +1256,15 @@ class EVO_Event extends EVO_Data_Store{
 
 						foreach( $meta_key_array as $I=>$key){
 							$K = is_integer($I)? $key: $I;				
-							$R[ $tax ][ $term->term_id ]->$K = (empty($term_meta[$key]))? '': $term_meta[$key];
+							$R[ $tax ][ $term->term_id ]->$K = 
+								(empty($term_meta[$key]))? '': 
+								$this->_process_social_share_links( $K, $term_meta[$key]);
 						}
 					}
 
 					// append secondary description to main description
 					if( !empty( $R[ $tax ][ $term->term_id ]->description2 )){
-						$R[ $tax ][ $term->term_id ]->description .= '<div class="evo_sd">'. $R[ $tax ][ $term->term_id ]->description2 .'</div>';
+						$R[ $tax ][ $term->term_id ]->description .= '<div class="evo_sd evomart5">'. $R[ $tax ][ $term->term_id ]->description2 .'</div>';
 					}
 
 					// pass link 
@@ -1256,6 +1293,7 @@ class EVO_Event extends EVO_Data_Store{
 			$meta_data['event_organizer']['organizer_img_id'] = 'evo_org_img';
 			$meta_data['event_organizer']['organizer_contact'] = 'evcal_org_contact';
 			$meta_data['event_organizer']['contact_email'] = 'evcal_org_contact_e';
+			$meta_data['event_organizer']['contact_phone'] = 'evcal_org_contact_phone';
 			$meta_data['event_organizer']['organizer_address'] = 'evcal_org_address';
 			$meta_data['event_organizer']['organizer_link'] = 'evcal_org_exlink';
 			$meta_data['event_organizer']['organizer_link_target'] = '_evocal_org_exlink_target';
@@ -1355,7 +1393,16 @@ class EVO_Event extends EVO_Data_Store{
 				'value'=> $this->get_prop("_evcal_ec_f".$index."a1_cus"),
 				'valueL'=> $this->get_prop("_evcal_ec_f".$index."a1_cusL"),
 				'target'=> $this->get_prop("_evcal_ec_f".$index."_onw"),
+				'img'=> $this->get_prop("_evcal_ec_f".$index."_img"),
 			), $this, $index);
+		}
+		// @since 4.3.3
+		function get_custom_data_value( $index ){
+			return apply_filters(
+				'evodata_custom_data_value', 
+				$this->get_prop("_evcal_ec_f".$index."a1_cus"),
+				$this, $index
+			);
 		}
 	// Single event JSON data
 		function get_event_data_for_gmap( ){
@@ -1371,6 +1418,52 @@ class EVO_Event extends EVO_Data_Store{
 				'maps_load'=> (!EVO()->calendar->google_maps_load ? 'yes':'no'),
 			));
 			return  $sin_event_evodata ;
+		}
+
+	// dynamic tag processing
+	// added v 4.0.3
+		public function process_dynamic_tags($VV){
+			if( strpos($VV, '{') !== false){
+
+				$DTT = new evo_datetime();
+
+				if( strpos($VV, '{startdate}') !== false ){
+					$VV = str_replace('{startdate}', 
+						$DTT->get_readable_formatted_date( $this->start_unix, EVO()->calendar->date_format ),
+						$VV );
+				}
+				if( strpos($VV, '{enddate}') !== false ){
+					$VV = str_replace('{enddate}', 
+						$DTT->get_readable_formatted_date( $this->end_unix, EVO()->calendar->date_format ),
+						$VV );
+				}
+				if( strpos($VV, '{SD}') !== false ){
+					$VV = str_replace('{SD}', 
+						$DTT->get_readable_formatted_date( $this->start_unix, EVO()->calendar->date_format ),
+						$VV );
+				}
+				if( strpos($VV, '{ED}') !== false ){
+					$VV = str_replace('{ED}', 
+						$DTT->get_readable_formatted_date( $this->end_unix, EVO()->calendar->date_format ),
+						$VV );
+				}
+				if( strpos($VV, '{eventid}') !== false ){
+					$VV = str_replace('{eventid}', 
+						$this->ID,
+						$VV );
+				}
+				if( strpos($VV, '{startunix}') !== false ){
+					$VV = str_replace('{startunix}', 
+						$this->start_unix,
+						$VV );
+				}if( strpos($VV, '{endunix}') !== false ){
+					$VV = str_replace('{endunix}', 
+						$this->end_unix,
+						$VV );
+				}
+			}
+
+			return $VV;
 		}
 
 	// ICS file for the event

@@ -1,18 +1,18 @@
 /**
  * EventON Generate Google Maps Function
- * @version  4.2
+ * @version  4.6.1
  */
+
+//return;
+
 (function($){
-
-
-// ADD notes on how to run this after approval
 
 // map loader function 
 	$.fn.evoGenmaps = function(opt){
 
 		var defaults = {
 			delay:	0,
-			fnt:	1,
+			fnt:	5,
 			cal:	'',
 			SC: 	'',
 			map_canvas_id:	'',
@@ -23,8 +23,11 @@
 			mapformat:'',
 			scroll:false,
 			iconURL:'',
+			trigger_point: '',
 		};
 		var options = $.extend({}, defaults, opt); 
+
+		//console.log(options);
 
 		var geocoder;
 
@@ -32,22 +35,40 @@
 		obj = this;
 		code.obj = this;
 
+		mapBox = $('#'+options.map_canvas_id);
+
 		code = {	
-			init:function(){	
+			init:function(){
+
+				//return;
+
+				//console.log( $('#'+options.map_canvas_id).hasClass('mDrawn') ? 'y':'d');
+				//console.log( mapBox.is(':visible') ? 'y':'d');
+
+				// draw map or not
+				if( !(mapBox.is(':visible')) ) return; // if map box is not visible
+				if( mapBox.find('.gm-style').length > 0  ) return;
+
+				mapBox.html( evo_general_params.html.preload_gmap);
+
+				//if( mapBox.hasClass('mDrawn') ) return;	
 
 				// set calendar for event
 				if( obj.closest('.ajde_evcal_calendar').length>0){
 					options.cal = obj.closest('.ajde_evcal_calendar');
 				}
 
-				
-				if( options.cal === undefined){
-					console.log('Cannot find the calendar'); return false;
-				}
-
 				code.process_SC();
 
 				// various methods to draw map
+				// load map on specified elements directly
+				if(options.fnt==5){
+					if(options.delay==0){	code.draw_map();	}else{
+						setTimeout(code.draw_map, options.delay, this);
+					}						
+				}
+
+				// deprecating rest 4.6
 					// multiple maps at same time
 					if(options.fnt==1){
 						code.load_gmap();
@@ -66,13 +87,7 @@
 						if( this.attr('data-gmtrig')=='1' && this.attr('data-gmap_status')!='null'){	
 							code.load_gmap();			
 						}	
-					}
-
-					// load map on specified elements directly
-					// eg. location archive page
-					if(options.fnt==5){
-						code.draw_map();
-					}
+					}				
 			},
 			// add unique id for map area
 			process_unique_map_id: function(){
@@ -105,7 +120,7 @@
 			// load google map
 			load_gmap: function(){
 				SC = options.SC;
-						
+
 				var ev_location = obj.find('.event_location_attrs');
 
 				var location_type = ev_location.attr('data-location_type');
@@ -117,23 +132,24 @@
 					options.location_type = 'latlng';				
 				}
 
-
-
 				// marker icons
 				if( SC !== undefined && SC != '' &&  'mapiconurl' in SC) options.iconURL = SC.mapiconurl;
 
 				// make sure there is address present to draw map
-				if( options.address === undefined || options.address == '') return false;
+				if( options.address === undefined || options.address == ''){
+					console.log( 'Location address missing in options.address'); return false;
+				}
 
 				map_canvas_id = code.process_unique_map_id();
 
-				if(!map_canvas_id || $('#'+map_canvas_id).length == 0) return false;
+				if(!map_canvas_id || $('#'+map_canvas_id).length == 0){
+					console.log( 'Map element with id missing in page'); return false;
+				} 
 
 				var zoom = SC.mapzoom;
 				options.zoomlevel = (typeof zoom !== 'undefined' && zoom !== false)? parseInt(zoom):12;				
 				options.scroll = SC.mapscroll;	
 				options.mapformat = SC.mapformat;	
-
 													
 				code.draw_map();
 			},
@@ -141,7 +157,7 @@
 			// final draw
 			draw_map: function(){
 
-				if(!options.map_canvas_id || $('#'+options.map_canvas_id).length == 0){
+				if(!options.map_canvas_id || $('body').find('#'+options.map_canvas_id).length == 0){
 					console.log( 'Map element with id missing in page'); return false;
 				}
 
@@ -164,7 +180,8 @@
 						scrollwheel: false,
 						styles: options.styles,
 						zoomControl:true,
-						draggable:false
+						draggable:false,
+						mapId: 'DEMO_MAP_ID' 
 					}
 				}else{
 					var myOptions = {	
@@ -174,11 +191,12 @@
 						styles: options.styles,
 						zoomControl:true,
 						scrollwheel: true,
+						mapId: 'DEMO_MAP_ID' 
 					}
 				}
 
 				//console.log(myOptions);
-
+				//console.log(options);
 				
 				var map_canvas = document.getElementById(options.map_canvas_id);
 				map = new google.maps.Map(map_canvas, myOptions);
@@ -192,13 +210,41 @@
 
 					geocoder.geocode({'latLng': latlng}, function(results, status) {
 						if (status == google.maps.GeocoderStatus.OK) {				
+							/*
+							const {AdvancedMarkerElement} = await google.maps.importLibrary("marker");
+
+							const marker = new AdvancedMarkerElement({
+								map: map,
+								position: latlng,
+								icon: options.iconURL
+							});
+
 							var marker = new google.maps.Marker({
 								map: map,
 								position: latlng,
 								icon: options.iconURL
 							});
+							
 							//map.setCenter(results[0].geometry.location);
 							map.setCenter(marker.getPosition());
+							
+							*/
+
+							//console.log(options.iconURL);
+
+							const customIcon = document.createElement('div');
+							customIcon.className = 'custom-marker';
+
+							const marker = new google.maps.marker.AdvancedMarkerElement({
+							    map: map, 
+							    position: latlng, 
+							    //title: 'Marker Title', // Optional: Adds a tooltip on hover
+							   	// content: document.createElement('div'), // Optional: Custom marker HTML content
+							   	//content: customIcon
+							});
+							
+							//map.setCenter(results[0].geometry.location);
+							map.setCenter( marker.position );
 
 						} else {				
 							document.getElementById(options.map_canvas_id).style.display='none';
@@ -210,7 +256,7 @@
 				}else{
 					geocoder.geocode( { 'address': options.address}, function(results, status) {
 						if (status == google.maps.GeocoderStatus.OK) {		
-							//console.log('map '+results[0].geometry.location);
+							console.log('map '+results[0].geometry.location);
 							map.setCenter(results[0].geometry.location);
 							var marker = new google.maps.Marker({
 								map: map,
@@ -223,42 +269,33 @@
 						}
 					});
 				}
+
+				// mark as map drawn
+				$('#'+ options.map_canvas_id).addClass('mDrawn');
 			}
 		}
 
 
 		// INIT
-		code.init();
-
-		
+		code.init();		
 	};
 
-// trigger map load on calendar
-// @since 4.2
-	$('body').on('evo_load_map_on_cals',function (){
-		
-		if( $('body').find('.ajde_evcal_calendar').length < 1 ) return;
 
-		$('body').find('.ajde_evcal_calendar').each(function(){
-			var el = $(this);
-			el.find('.desc_trig').each(function(index){
-				var self = this;
-				setTimeout(function(){
-					$(self).evoGenmaps({'fnt':2,'cal': el});
-				},index*600);					
-			});
-		});
-	});
-
-	// trigger load google map on dynamic map element
+// trigger load google map on dynamic map element u4.6.1
 	$.fn.evo_load_gmap = function(opt){
 		var defs = {
 			'map_canvas_id':'',
 			'delay':0,
+			trigger_point:'',
 		};
 		var OO = $.extend({}, defs, opt);
 
+		//return;
+
 		EL = this;
+		EL_id = EL.attr('id');
+
+		if( ('map_canvas_id' in OO ) && OO.map_canvas_id != '' ) EL_id = OO.map_canvas_id;
 
 		var location_type = 'add';
 		var location_type = EL.data('location_type');
@@ -271,6 +308,26 @@
 		}
 		scrollwheel = EL.data('scroll') == 'yes'? true: false;
 
+		var elms = document.querySelectorAll("[id='"+EL_id+"']");
+
+		// check for unique id
+		if( elms.length > 1){
+			// GEN
+			maximum = 99;
+			minimum = 10;
+			var randomnumber = Math.floor(Math.random() * (maximum - minimum + 1)) + minimum;
+			EL_id = EL_id+'_'+randomnumber;
+			EL.attr('id', EL_id);
+		}
+
+		// get delay
+			__delay = 0;
+			if( EL.data('delay') ) __delay = EL.data('delay');
+			if( OO.delay != 0 ) __delay = OO.delay;
+
+		console.log(EL_id);
+
+		// load the map
 		EL.evoGenmaps({
 			map_canvas_id: EL.attr('id'),
 			fnt: 5,
@@ -279,7 +336,9 @@
 			zoomlevel: parseInt( EL.data('zoom') ),
 			mapformat: EL.data('mty'),
 			scroll: scrollwheel,
-			delay:  EL.data('delay') ? EL.data('delay') : OO.delay
+			iconURL: ( EL.data('mapicon') !== undefined ? EL.data('mapicon') : '') ,
+			delay:  __delay,
+			trigger_point: OO.trigger_point,
 		});
 
 	};

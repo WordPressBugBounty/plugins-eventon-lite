@@ -3,7 +3,8 @@
  * EVO_generator class.
  *
  * @class 		EVO_generator
- * @version		L 2.2.15
+ * @version		2.3
+ * @version		4.7.4
  * @package		EventON/Classes
  * @category	Class
  * @author 		AJDE
@@ -2079,7 +2080,18 @@ class EVO_generator extends EVO_Cal_Time{
 							if( !empty( $LocTermMeta['location_lat']) && !empty( $LocTermMeta['location_lon']) ){
 								$output[$event_id]['location_lat'] = $LocTermMeta['location_lat'];
 								$output[$event_id]['location_lon'] = $LocTermMeta['location_lon'];
-							}								
+							}		
+
+							// location link
+							if(!empty( $LocTermMeta['evcal_location_link']))
+								$output[$event_id]['location_link'] = $LocTermMeta['evcal_location_link']; 
+
+							// location image
+							if(!empty( $LocTermMeta['evo_loc_img']))
+								$output[$event_id]['location_img'] = $LocTermMeta['evo_loc_img']; 
+
+							// location description 
+							$output[$event_id]['location_desc'] = $location_terms[0]->description;							
 						}
 
 					// Organizer

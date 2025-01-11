@@ -1,6 +1,7 @@
-/*
+/**
  * Javascript: EventON functions for all calendars
- * @version: 2.2.16
+ * @version: 2.3
+ * @fullversion 4.8
  */
 (function($){
 
@@ -64,185 +65,399 @@
 			
 		}
 
-	// GENERAL AJAX ACCESS + 4.1.2
+	// GENERAL AJAX ACCESS @4.7.2
 		$.fn.evo_admin_get_ajax = function(opt){
-  			var defs = {
-  				'lightbox_key':'',
-  				'lightbox_loader': true,
-  				'load_new_content': true,
-  				'load_new_content_id': '', // @since 4.3.5
-  				'hide_lightbox':false,	// @since 4.3.5
-  				'hide_message':2000,	// @since 4.3.5
-  				'ajaxdata':{
-  					'load_lbcontent':'',
-  					'load_new_content':''
-  				},
-  				'uid':'',
-  				'end':'admin', // admin or client
-  				'loader_el':'',
-  				'ajax_type':'ajax',
-  				'ajax_action':'',
-  			}
 
-  			var el = $(this);
-  			var OO = $.extend({}, defs, opt);
+			var el = $(this);
 
+  			var OO = this.evo_process_ajax_params( opt );
 
-  			var ajaxdata = OO.ajaxdata;
+  			var _lbdata = OO.lbdata;
+			var _adata = OO.adata;	
+			var _populate_id = OO._populate_id;	
 
-  			// passing nonce
-  			ajaxdata['nn'] = ( OO.end == 'client' ) ? evo_general_params.n : evo_admin_ajax_handle.postnonce; 
+			//console.log( OO );
 
-  			LB = false;
-  			if( OO.lightbox_key != '') LB = $('body').find('.evo_lightbox.'+ OO.lightbox_key);
+			var ajax_url = el.evo_get_ajax_url({a: _adata.a, e: _adata.end, type: _adata.ajax_type});
 
-  			var returnvals = '';
+			// for lightbox
+				var LB = false;
+	  			if( _lbdata.class != '') LB = $('body').find('.evo_lightbox.'+ _lbdata.class );
 
-			$.ajax({
+	  		//console.log( OO );
+
+	  		// Run AJAX
+  			$.ajax({
 				beforeSend: function(){
-					$('body').trigger('evo_ajax_beforesend_' + OO.uid ,[ OO ]);
-					if( LB && OO.lightbox_loader){
-						LB.find('.ajde_popup_text').addClass( 'evoloading loading');
-						LB.find('.evolb_content').addClass( 'evoloading loading');
-					}
+					el.evo_perform_ajax_run_loader( OO, LB, 'start'  );
 				},
-				type: 'POST',
-				url: (OO.end == 'admin')? evo_admin_ajax_handle.ajaxurl : evo_general_params.ajaxurl,
-				data: ajaxdata,
-				dataType:'json',
-				success:function(data){		
-					//console.log(OO);
+				type: 'POST', url: ajax_url, data: _adata.data,	dataType:'json',
+				success:function(data){	
 
-					if( LB ){
-						// show message
-							if( 'msg' in data && data.msg != '' && LB){
-								LB.evo_lightbox_show_msg({'type': data.status, 
-									'message':data.msg, 
-									hide_lightbox: OO.hide_lightbox,	
-									hide_message: OO.hide_message
-								});
-							}							
+					el.evo_perform_ajax_success( OO, data, LB );
 
-						// populate content
-						if( OO.ajaxdata.load_lbcontent || OO.ajaxdata.load_new_content || OO.load_new_content ){
-							// populate a specific dom element with content
-							if( OO.load_new_content_id != '' ){
-								$('body').find('#'+OO.load_new_content_id ).replaceWith( data.content );
-							}else{
-								LB.evo_lightbox_populate_content({content: data.content});
-							}							
-						}					
-					}else{
-						// populate content
-						if( OO.ajaxdata.load_lbcontent || OO.ajaxdata.load_new_content || OO.load_new_content ){
-							// populate a specific dom element inside with content 
-							if( OO.load_new_content_id != '' ){
-								$('body').find('#'+OO.load_new_content_id ).html( data.content );
-							}							
-						}
-					}
-
-					// for SP content @since 4.5.2
-						if( 'sp_content' in data){
-							$("body").find('#evops_content').html( data.sp_content);
-						}
-					// SP footer content @since 4.5.2
-						if( 'sp_content_foot' in data){
-							$("body").find('.evosp_foot').html( data.sp_content_foot);
-						}
-
-					$('body').trigger('evo_ajax_success_' + OO.uid,[ OO, data ]);	
-
-				},
-				complete:function(){
-					$('body').trigger('evo_ajax_complete_' + OO.uid ,[ OO , el ]);
+				},complete:function(){
+					el.evo_perform_ajax_run_loader( OO, LB, 'end'  );
 					
-					if( LB && OO.lightbox_loader){
-						LB.find('.ajde_popup_text').removeClass( 'evoloading loading');
-						LB.find('.evolb_content').removeClass( 'evoloading loading');
-					}
-					if( OO.loader_el){
-						$( OO.loader_el ).removeClass('evoloading loading');
-					}
 				}
-			});	
+			});				
 		}
 
 		// submit forms via ligtbox
-		// @since 4.2.2		@updated 4.3.5
+		// @since 4.2.2		@updated 4.7.2
 		$.fn.evo_ajax_lightbox_form_submit = function(opt){
-			var defs = {
-  				'lightbox_key':'', // lightbox class
-  				'lightbox_loader': true, // show lightbox loading animations
-  				'uid':'',
-  				'end':'admin', // admin or client
-  				'hide_lightbox':false,
-  				'hide_message':false,
-  				'load_new_content':false,
-  				'load_new_content_id':'',
-  				'ajax_type':'ajax',
-  				'ajax_action':'',
-  			}
-
-  			var OO = $.extend({}, defs, opt);
+			
   			const el = this;
 
-  			const form = this.closest('form');
-  			var LB = false;
-  			if( OO.lightbox_key != '') LB = $('body').find('.evo_lightbox.'+ OO.lightbox_key);
+  			var OO = this.evo_process_ajax_params( opt );
 
+  			var _lbdata = OO.lbdata;
+			var _adata = OO.adata;	
+			var _populate_id = OO._populate_id;	
+  			
+  			const form = this.closest('form');
+
+  			// for lightbox
+				var LB = false;
+	  			if( _lbdata.class != '') LB = $('body').find('.evo_lightbox.'+ _lbdata.class );
+
+  			// reset LB message
   			if( LB) LB.evo_lightbox_hide_msg();
 
-  			//console.log(OO);
-
-  			var ajax_url = el.evo_get_ajax_url({a: OO.ajax_action, e: OO.end, type: OO.ajax_type});
-
+  			var ajax_url = el.evo_get_ajax_url({a: _adata.a, e: _adata.end, type: _adata.ajax_type});
+	  			
+  			// Submit form
 			form.ajaxSubmit({
 				beforeSubmit: function(opt, xhr){
-					$('body').trigger('evo_ajax_beforesend_' + OO.uid ,[ OO , xhr, opt]); // 4.4.2
-					if( LB && OO.lightbox_loader) LB.evo_lightbox_start_inloading();
+					el.evo_perform_ajax_run_loader( OO, LB, 'start'  );
 				},
 				dataType: 	'json',	
 				url: ajax_url,	type: 	'POST',
 				success:function(data){
-
-					$('body').trigger('evo_ajax_success_' + OO.uid,[ OO, data, el ]);	
-
-					if( data.status == 'good'){
-						if(LB && 'msg' in data){
-							LB.evo_lightbox_show_msg({'type': 'good', 
-								'message':data.msg, 
-								hide_lightbox: OO.hide_lightbox,
-								hide_message: OO.hide_message
-							});
-						}
-
-						// populate specific element
-						if( OO.load_new_content && OO.load_new_content_id != ''){
-							$('body').find('#'+OO.load_new_content_id ).replaceWith( data.content );
-						}else{
-							// populate current lightbox
-							if( OO.load_new_content ) LB.evo_lightbox_populate_content({content: data.content});
-						}
-						
-						
-						// if ajax data pass dom content to be replaced with run through each and replace - @4.2.3
-						if( 'refresh_dom_content' in data ){
-							$.each(data.refresh_dom_content, function(domid, content){
-								$('body').find('#'+ domid).replaceWith( content);
-							});
-						}
-
-					}else{
-						LB.evo_lightbox_show_msg({'type': 'bad', 'message':data.msg});
-					}
+					el.evo_perform_ajax_success( OO, data, LB );
 				},
 				complete:function(){	
-					$('body').trigger('evo_ajax_complete_' + OO.uid ,[ OO ]);
-					$('body').trigger('evo_ajax_form_complete_' + OO.uid ,[ OO , form]);
-					if( LB && OO.lightbox_loader) LB.evo_lightbox_stop_inloading();	
+					el.evo_perform_ajax_run_loader( OO, LB, 'end'  );
 				}
 			});
+		}
+
+	// perform ajax functions / type = start/end
+		$.fn.evo_perform_ajax_run_loader = function( OO , LB, type ){
+			var el = this;
+			var _lbdata = OO.lbdata;
+			var _adata = OO.adata;	
+
+			var customer_loader_elm = false;
+  			if( _adata.loader_el !='')	customer_loader_elm = _adata.loader_el;
+  			if( 'loader_class' in _adata && _adata.loader_class != '') 
+  				customer_loader_elm = $('.' + _adata.loader_class);
+  			
+  			var LB_loader = false;
+  			if( LB && 'loader' in _lbdata && _lbdata.loader ) LB_loader = true;
+
+  			if( type == 'start'){
+  				$('body').trigger('evo_ajax_beforesend_' + OO.uid ,[ OO, el ]);
+
+				if( LB_loader ){
+					LB.find('.ajde_popup_text').addClass( 'evoloading loading'); // legacy
+					LB.evo_lightbox_start_inloading();
+				}
+				if( customer_loader_elm ) $( customer_loader_elm ).addClass('evoloading loading');
+  			}else{
+  				$('body').trigger('evo_ajax_complete_' + OO.uid ,[ OO , el ]);
+			
+				if( LB_loader ){
+					LB.find('.ajde_popup_text').removeClass( 'evoloading loading');
+					LB.evo_lightbox_stop_inloading();	
+				}
+				if( customer_loader_elm ) $( customer_loader_elm ).removeClass('evoloading loading');
+  			}
+
+			return {
+				'l1': customer_loader_elm,
+				'l2':LB_loader
+			};
+		}
+
+		$.fn.evo_perform_ajax_success = function ( OO, data, LB ){
+			var el = this;
+			var _lbdata = OO.lbdata;
+			var _populate_id = OO._populate_id;	
+
+			//console.log( OO);
+
+			// if inside lightbox
+			if( LB ){
+				// show message
+					if( data && 'msg' in data && data.msg != '' ){
+						LB.evo_lightbox_show_msg({'type': data.status, 
+							'message':data.msg, 
+							hide_lightbox: ( data.status == 'bad' ? false : _lbdata.hide ),	
+							hide_message: _lbdata.hide_msg
+						});
+					}	
+
+				// populate lightbox
+				if( data && _lbdata.new_content && 'content' in data && data.content != '' ){
+					// populate a specific dom element with content
+					if( _populate_id ){
+						$('body').find('#'+_populate_id ).replaceWith( data.content );
+					}else{
+						LB.evo_lightbox_populate_content({content: data.content});
+					}
+				}	
+								
+			}else{
+				// populate content
+				if( data && _populate_id && 'content' in data && data.content != ''){
+					$('body').find('#'+_populate_id ).html( data.content );
+				}						
+			}
+
+			// populate content with matching DOM class names, will set new html @4.7.2
+				if( 'populate_dom_classes' in data){
+					$.each( data.populate_dom_classes, function( domclass, content){
+						$('body').find('.'+ domclass).html( content );
+					} );
+				}
+
+			// if ajax data pass dom content to be replaced with run through each and replace - @4.2.3
+				if( 'refresh_dom_content' in data ){
+					$.each(data.refresh_dom_content, function(domid, content){
+						$('body').find('#'+ domid).replaceWith( content);
+					});
+				}
+
+			// for SP content @since 4.5.2
+				if(data &&  'sp_content' in data){
+					$("body").find('#evops_content').html( data.sp_content);
+				}
+			// SP footer content @since 4.5.2
+				if( data && 'sp_content_foot' in data){
+					$("body").find('.evosp_foot').html( data.sp_content_foot);
+				}
+			// process trumbowyg editors
+				$('body').trigger('evo_elm_load_interactivity');
+
+
+			// assign dynamic vals to DOM element
+				setTimeout(function(){
+					if( 'evoelms' in data ){
+						$.each( data.evoelms , function( uniqueid, elm_data ){
+
+							$('body').find('.has_dynamic_vals').each(function(){
+
+								if( $(this).attr('id') != uniqueid ) return;
+								var dynamic_elm = $(this);
+
+								$.each( elm_data , function( elm_key, elmv){
+									dynamic_elm.data( elm_key, elmv );
+								});
+							});
+						});
+					}
+				},200);
+
+			//console.log(OO);
+			$('body').trigger('evo_ajax_success_' + OO.uid,[ OO, data , el]);	
+		}
+
+	// Process ajax and lightbox values @4.7.2
+		$.fn.evo_process_ajax_params = function ( opt ){
+			// defaults
+			var defz = { 
+				'uid':'',
+
+				// @since 4.7.2
+				'adata':{}, // @4.7.2 include all ajax data in here, type (ajax,rest,endpoint),action/a, other data
+				'lbdata':{},// @4.7.2 lightbox data all in one place, class, title, size, padding
+				'_populate_id':'', // loading new content into matching elements outside of lightbox
+				
+				// legacy values
+				'content':'',// passed on dynamic content
+				'content_id' :'',// id to get dynamic content from page		
+								
+				't':'', //title
+				'lbc':'',// * lightbox class - REQUIRED
+				'lbac':'',// ligthbox additional class 4.6
+				'lbsz':'',// lightbox size = mid small, s400, s500, s700, s800
+				'lightbox_loader': true,
+				'preload_temp_key': 'init', // 4.6
+				'load_new_content': true, // @since 4.3.5
+				'lb_padding': '', // @4.3.5
+				'load_new_content_id':'',
+
+				'ajax':'no',// use ajax to load content yes no
+				'ajax_url':'',// load content from ajax file
+				'end':'admin',// admin or client end
+				'ajax_action':'', // @4.4 pass on ajax endpoint action key
+				'a':'',
+				'ajax_type':'ajax', // @4.4 ajax type, ajax, rest or endpoint
+				'd':'', // data object for ajax
+				'other_data':'',
+				'ajaxdata':'',				
+			};
+
+
+			// extend passed with defaults
+			var OO = $.extend({}, defz, opt);
+
+			// Build processed object
+				var processed = {};
+				processed['uid'] = OO.uid;
+
+			// Ajax	
+				var _adata = ( OO.adata == '') ? {}: OO.adata;
+
+				// type passed value fix
+				var passed_type_val = false;
+				if( 'type' in _adata && _adata.type != '' &&
+					!['ajax', 'rest', 'endpoint'].includes(_adata.type)
+				){
+					passed_type_val = _adata.type;
+					_adata.type = '';
+				}
+
+				// set default needed values
+				var def_avals = { 
+					'a':'',
+					'type':'ajax',
+					'end':'admin',
+					'data': '',
+					'loader_el':'',
+					'loader_class':'',
+					'url':'',
+				}
+				
+				// set default values
+				$.each( def_avals, function(key, value) {					
+					if( key == 'data' && ('data' in _adata ) && 'a' in _adata.data ) return;
+					if( !(key in _adata ) && value != '' ) _adata[ key ] = value;
+				});	
+
+				//console.log( _adata );
+
+				// map old to new
+				var def_adata_mapping = { 
+					'a' : 'a',
+					'ajax_action' : 'a',
+					'ajax_type':'type',
+					'end': 'end',
+					'ajax_url': 'url',
+					'ajaxdata':'data',
+					'd':'data',
+				}
+				$.each( def_adata_mapping, function(oldV, newV) {					
+					if( newV in _adata && _adata[ newV ] != '' ) return;
+
+					if(  oldV in OO && OO[oldV] !== '' ) {
+						_adata[newV] = OO[oldV];
+					}  
+				});	
+
+				//console.log( _adata );			
+
+				// Move additional values in _adata to _adata.data
+					$.each(_adata, function(key, value) {
+						if ( !(key in def_avals)) {
+							//_adata.data[key] = value; // Move any extra values to _adata.data
+							//delete _adata[key]; // Remove them from the main _adata object
+						}
+					});
+
+				if( 'data' in _adata ){
+					//_adata['data']['nn'] = ( _adata.end == 'client' ) ? evo_general_params.n : evo_admin_ajax_handle.postnonce; 
+					
+					_adata['data']['nn'] = (typeof evo_admin_ajax_handle !== 'undefined' && evo_admin_ajax_handle !== null) 
+					    ? evo_admin_ajax_handle.postnonce 
+					    : evo_general_params.n;
+
+
+					_adata['data']['uid'] = processed['uid'];
+					if( passed_type_val ) _adata['data']['type'] = passed_type_val;
+					if( 'action' in _adata.data ) _adata['a'] =  _adata.data.action;
+					if( 'a' in _adata.data ) _adata['a'] =  _adata.data.a;
+					if( 'ajaxdata' in OO ) processed['ajaxdata'] = _adata.data;
+				}		
+
+				processed['adata'] = _adata;
+				
+
+			// lightbox
+				var _lbdata = ( OO.lbdata == '') ? {}: OO.lbdata;
+
+				// if legacy values exists > convert them to new
+				var def_lbdata_mapping = {
+					'lbc':'class',
+				    'lbsz':'size',
+				    'lbac' :'additional_class',
+				    't':'title',
+				    'lb_padding': 'padding',
+				    'load_new_content':'new_content',
+				    'lightbox_loader': 'loader',
+				    'content_id':'content_id',
+				    'content':'content',
+				    'hide_lightbox':'hide',
+				    'hide_message':'hide_msg',
+				    'lightbox_key': 'class',
+				}
+				$.each( def_lbdata_mapping, function(oldV, newV) {
+					// if _lbdata has new value > skip
+					if (newV in _lbdata && _lbdata[newV] !== '' && _lbdata[newV] !== null && _lbdata[newV] !== undefined) {
+				        return; 
+				    }
+					if(  oldV in OO && OO[oldV] !== '' ) {
+						_lbdata[newV] = OO[oldV];
+					} 
+				});	
+
+				// set default needed values
+				var def_lbvals = {
+					'padding':'evopad30',
+					'loader': false,
+					'preload_temp_key':'init',
+					'new_content': true,
+					'additional_class':'',
+					'title':'',
+					'hide':false,
+					'hide_msg':2000,
+					'content':'', // content for lightbox
+					'content_id':'', // content id in DOM to grab content for lightbox
+				}
+				// set default values
+				$.each( def_lbvals, function(key, value) {
+					if(  key in _lbdata )  return;
+					if( value == '') return;
+					_lbdata[ key ] = value;
+				});
+
+
+				//console.log( _lbdata.new_content ) ;
+
+				// load lightbox content legacy
+				if( OO.ajaxdata.load_lbcontent ) _lbdata['new_content'] = true;
+				if( OO.ajaxdata.load_new_content ) _lbdata['new_content'] = true;
+
+				// populate new content @4.7.3
+					processed['_populate_id'] =  false;
+					if( OO.load_new_content_id != '')  processed['_populate_id'] = OO.load_new_content_id;
+					if( 'new_content_id' in _lbdata && _lbdata.new_content_id != '')  processed['_populate_id'] = _lbdata.new_content_id;
+
+				processed['lbdata'] = _lbdata;
+
+			// make sure uid is moved to main level
+				if( processed.uid == '' && 'uid' in processed['lbdata'] ) processed['uid'] = processed['lbdata']['uid'];
+
+			// add legacy variables for backward compatibility
+				$.each(opt, function(oldkey, oldval){
+					if( oldkey in processed ) return;
+					processed[ oldkey ] = oldval;
+				});
+
+			//console.log( processed );
+
+			return processed;
 		}
 
 	// LIGHTBOX version 4.2
@@ -282,36 +497,34 @@
 		});
 		
 
-		$.fn.evo_lightbox_open = function (opt){
-			var defaults = { 
-				'uid':'',
-				't':'', //title
-				'lbc':'',// * lightbox class - REQUIRED
-				'lbsz':'',// lightbox size = mid small
-				'content':'',// passed on dynamic content
-				'content_id' :'',// id to get dynamic content from page
-				'ajax':'no',// use ajax to load content yes no
-				'ajax_url':'',
-				'd':'', // data object for ajax
-				'end':'admin',// admin or client end
-				'other_data':'',
-				'lightbox_loader': true,
-				'load_new_content': true, // @since 4.3.5
-				'lb_padding': 'evopad30', // @4.3.5
-				'ajax_action':'', // @4.4 pass on ajax endpoint action key
-				'ajax_type':'ajax', // @4.4 ajax type, ajax, rest or endpoint
-			};
+		// Lightbox opening
+		$.fn.evo_lightbox_open = function (opt ){
 
-			var OO = $.extend({}, defaults, opt);
+			var OO = this.evo_process_ajax_params( opt );
+			
+			var _lbdata = OO.lbdata;
+			var _adata = OO.adata;
+			var _populate_id = OO._populate_id;
+
+			
+
+			// check if required values missing for lightbox
+			if( !('class' in _lbdata) || _lbdata.class == '' ) return;
+
+
+			const fl_footer = _adata.end == 'client' ? '<div class="evolb_footer"></div>' :'';
 
 			// create lightbox HTML
-			var html = '<div class="evo_lightbox '+OO.lbc+' '+OO.end+'" data-lbc="'+OO.lbc+'"><div class="evolb_content_in"><div class="evolb_content_inin"><div class="evolb_box '+OO.lbc+' '+OO.lbsz +'"><div class="evolb_header"><a class="evolb_backbtn" style="display:none"><i class="fa fa-angle-left"></i></a><p class="evolb_title">' + OO.t + '</p><span class="evolb_close_btn evolbclose "><i class="fa fa-xmark"><i></span></div><div class="evolb_content '+ OO.lb_padding +'"></div><p class="message"></p></div></div></div></div>';
+				var __lb_size = _lbdata.size === undefined ? '' : _lbdata.size;
 
-			$('#evo_lightboxes').append( html );
+				var html = '<div class="evo_lightbox '+_lbdata.class+' '+_adata.end+' '+ ( _lbdata.additional_class !== undefined ? _lbdata.additional_class :'') +'" data-lbc="'+_lbdata.class+'"><div class="evolb_content_in"><div class="evolb_content_inin"><div class="evolb_box '+_lbdata.class+' '+ __lb_size +'"><div class="evolb_header"><a class="evolb_backbtn" style="display:none"><i class="fa fa-angle-left"></i></a>';
+				if( _lbdata.title !== undefined ) html += '<p class="evolb_title">' + _lbdata.title + '</p>';
+				html += '<span class="evolb_close_btn evolbclose "><i class="fa fa-xmark"><i></span></div><div class="evolb_content '+ _lbdata.padding +'"></div><p class="message"></p>'+fl_footer+'</div></div></div></div>';
 
+			$('#evo_lightboxes').append( html );	
+			var LIGHTBOX = $('.evo_lightbox.'+ _lbdata.class );		
 
-			LIGHTBOX = $('.evo_lightbox.'+ OO.lbc);
-
+			
 			// Open lightbox on page
 				setTimeout( function(){ 
 					$('#evo_lightboxes').show();
@@ -320,40 +533,28 @@
 					$('html').addClass('evo_overflow');
 				},300);
 
-			// show loading animation
-			LIGHTBOX.evo_lightbox_show_open_animation();
+				// show loading animation
+				LIGHTBOX.evo_lightbox_show_open_animation(OO);
 				
-			// Load content
-			// dynamic content within the site
-				if(OO.content_id != ''){					
-					var content = $('#'+ OO.content_id ).html();					
-					LIGHTBOX.find('.evolb_content').html( content);
-				}
-			// load passed on content
-				if(OO.content != ''){
-					LIGHTBOX.find('.evolb_content').html( OO.content);
-				}
+			// Load content locally from DOM
+				// dynamic content within the site
+					if(_lbdata.content_id != ''){					
+						var content = $('#'+ _lbdata.content_id ).html();					
+						LIGHTBOX.find('.evolb_content').html( content);
+					}
+				// load passed on content
+					if(_lbdata.content != ''){
+						LIGHTBOX.find('.evolb_content').html( _lbdata.content);
+					}
+
 
 			// run ajax to load content for the lightbox inside
-				if( OO.ajax == 'yes' && OO.d != ''){
-
-					var D = {};
-					D = OO.d;
-
-					LB.evo_admin_get_ajax({
-						ajaxdata: D, 
-						ajax_action: OO.ajax_action,
-						ajax_type: OO.ajax_type,
-						lightbox_key: OO.lbc,
-						uid: ( OO.uid != '' ) ? OO.uid : OO.d.uid,
-						end: OO.end,
-						lightbox_loader: OO.lightbox_loader,
-						load_new_content: OO.load_new_content,
-					});
+				if( 'a' in _adata  && _adata.a != ''){ // @4.7.2
+					LB.evo_admin_get_ajax( OO );
 				}
-
+				
 			// load content from a AJAX file			
-				if( OO.ajax_url != ''){
+				if( 'url' in _adata && _adata.url != '' ){
 					$.ajax({
 						beforeSend: function(){},
 						url:	OO.ajax_url,
@@ -367,7 +568,7 @@
 		}
 
 		$.fn.evo_lightbox_close = function (opt){
-			LB = this;
+			var LB = this;
 			var defaults = { 
 				'delay':500, 
 				'remove_from_dom':true,
@@ -400,56 +601,59 @@
 		}
 
 
-		$.fn.evo_lightbox_populate_content = function(opt){
-			LB = this;
-			var defaults = { 
-				'content':'',
-			}; var OO = $.extend({}, defaults, opt);
-			LB.find('.evolb_content').html( OO.content );
-		}
-		$.fn.evo_lightbox_start_inloading = function(opt){
-			LB = this;
-			LB.find('.evolb_content').addClass('loading');
-		}
-		$.fn.evo_lightbox_stop_inloading = function(opt){
-			LB = this;
-			LB.find('.evolb_content').removeClass('loading');
-		}
-		$.fn.evo_lightbox_show_msg = function(opt){
-			LB = this;
-			var defaults = { 
-				'type':'good',
-				'message':'',
-				'hide_message': false,// hide message after some time pass time or false
-				'hide_lightbox': false, // hide lightbox after some time of false
-			}; var OO = $.extend({}, defaults, opt);
-			LB.find('.message').removeClass('bad good').addClass( OO.type ).html( OO.message ).fadeIn();
+		// Other LB functions
+			$.fn.evo_lightbox_populate_content = function(opt){
+				LB = this;
+				var defaults = { 
+					'content':'',
+				}; var OO = $.extend({}, defaults, opt);
+				LB.find('.evolb_content').html( OO.content );
+			}
+			
+			$.fn.evo_lightbox_show_msg = function(opt){
+				LB = this;
+				var defaults = { 
+					'type':'good',
+					'message':'',
+					'hide_message': false,// hide message after some time pass time or false
+					'hide_lightbox': false, // hide lightbox after some time of false
+				}; var OO = $.extend({}, defaults, opt);
+				LB.find('.message').removeClass('bad good').addClass( OO.type ).html( OO.message ).fadeIn();
 
-			if( OO.hide_message ) setTimeout(function(){  LB.evo_lightbox_hide_msg() }, OO.hide_message );
+				if( OO.hide_message ) setTimeout(function(){  LB.evo_lightbox_hide_msg() }, OO.hide_message );
 
-			if( OO.hide_lightbox ) LB.evo_lightbox_close({ delay: OO.hide_lightbox });
-		}
-		$.fn.evo_lightbox_hide_msg = function(opt){
-			LB = this;
-			LB.find('p.message').hide();
-		}
-
-
-		$.fn.evo_lightbox_show_open_animation = function(opt){
-			LB = this;
-			var defaults = { 
-				'animation_type':'initial', // animation type initial or saving
-			};
-			var OO = $.extend({}, defaults, opt);
-
-			if( OO.animation_type == 'initial'){
-				LB.find('.evolb_content').html('<div class="evo_loading_bar_holder"><div class="evo_loading_bar wid_40 hi_50"></div><div class="evo_loading_bar"></div><div class="evo_loading_bar"></div><div class="evo_loading_bar"></div><div class="evo_loading_bar wid_25"></div></div>');
+				if( OO.hide_lightbox ) LB.evo_lightbox_close({ delay: OO.hide_lightbox });
+			}
+			$.fn.evo_lightbox_hide_msg = function(opt){
+				LB = this;
+				LB.find('p.message').hide();
 			}
 
-			if( OO.animation_type == 'saving')
-				LB.find('.evolb_content').addClass('loading');
 
-		}
+			// add preload animations to lightbox u4.6
+			$.fn.evo_lightbox_show_open_animation = function(opt){
+				LB = this;
+				var defaults = { 
+					'animation_type':'initial', // animation type initial or saving
+					'preload_temp_key': 'init', // 4.6 passed on preload template key
+					'end':'admin',
+				};
+				var OO = $.extend({}, defaults, opt);
+
+				if( OO.animation_type == 'initial'){
+
+					passed_data = (  typeof evo_admin_ajax_handle !== 'undefined') ? evo_admin_ajax_handle: evo_general_params;
+
+					//console.log( passed_data);
+
+					html = passed_data.html.preload_general;
+					if( OO.preload_temp_key != 'init') html = passed_data.html[ OO.preload_temp_key ];
+					LB.find('.evolb_content').html( html );
+				}
+
+				if( OO.animation_type == 'saving')
+					LB.find('.evolb_content').addClass('loading');
+			}
 
 	// Get Ajax url @since 4.4 @u 4.5.5
 		$.fn.evo_get_ajax_url = function(opt){
@@ -461,21 +665,47 @@
 
 			// end point url
 			if( OO.type == 'endpoint'){
-				var evo_ajax_url = ( OO.e == 'client' )? 
+				var evo_ajax_url = ( OO.e == 'client' || typeof evo_general_params !== 'undefined' )? 
 					evo_general_params.evo_ajax_url : evo_admin_ajax_handle.evo_ajax_url;
 				return  evo_ajax_url.toString().replace( '%%endpoint%%', OO.a );
 			// rest api url
 			}else if( OO.type == 'rest' ){
-				var evo_ajax_url = ( OO.e == 'client' )? 
+				var evo_ajax_url = ( OO.e == 'client' || typeof evo_general_params !== 'undefined')? 
 					evo_general_params.rest_url : evo_admin_ajax_handle.rest_url;
 					//console.log(evo_ajax_url);
 					//console.log(OO);
 				return  evo_ajax_url.toString().replace( '%%endpoint%%', OO.a );
 			}else{
 				action_add = OO.a != '' ? '?action='+ OO.a: '';
-				return ( OO.e == 'client' ) ? 
+				return ( OO.e == 'client' || typeof evo_general_params !== 'undefined') ? 
 					evo_general_params.ajaxurl + action_add : evo_admin_ajax_handle.ajaxurl + action_add;
 			}	
+		}
+
+	// loading animations @2.3
+		$.fn.evo_start_loading = function( opt ){
+			var defaults = { type:'1'};
+			var OPT = $.extend({}, defaults, opt);
+			var el = this;
+
+			if( OPT.type == '1') el.addClass('evoloading loading');
+			if( OPT.type == '2') el.addClass('evoloading_2');
+		}
+		$.fn.evo_stop_loading = function( opt ){
+			var el = this;
+			var defaults = { type:'1'};
+			var OPT = $.extend({}, defaults, opt);
+
+			if( OPT.type == '1') el.removeClass('evoloading loading');
+			if( OPT.type == '2') el.removeClass('evoloading_2');
+		}
+		$.fn.evo_lightbox_start_inloading = function(opt){
+			LB = this;
+			LB.find('.evolb_content').addClass('loading');
+		}
+		$.fn.evo_lightbox_stop_inloading = function(opt){
+			LB = this;
+			LB.find('.evolb_content').removeClass('loading');
 		}
 		
 	// Count down	// @+ 4.5

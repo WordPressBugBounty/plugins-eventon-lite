@@ -1,7 +1,7 @@
 <?php
 /**
  * Event Meta box time and date fields
- * @version L2.2.21
+ * @version 2.3
  */
 							
 
@@ -114,11 +114,11 @@ $wp_date_format = $date_format;
 
 		EVO()->elements->print_process_multiple_elements( array(
 			array(
-				'type'=>'dropdown',
+				'type'=>'dropdownS2',
 				'id'=>'_evo_tz',
 				'value'=> esc_attr( $EVENT->get_timezone_key() ),
 				'name'=> esc_html__('Event Timezone','eventon'),
-				'options'=> array_map('esc_html', EVO()->helper->get_timezone_array( ) ),
+				'options'=>  EVO()->helper->get_timezone_array( ) ,
 				'row_style'=>'padding-bottom:10px;',
 			),
 			array(
@@ -467,7 +467,7 @@ $wp_date_format = $date_format;
 				$count =0;
 				if(!empty($ev_vals['repeat_intervals'])){
 
-					$DD = new DateTime( null, EVO()->calendar->timezone0);
+					$DD = new DateTime( 'now', EVO()->calendar->timezone0);
 
 					$repeat_times = (unserialize($ev_vals['repeat_intervals'][0]));
 					

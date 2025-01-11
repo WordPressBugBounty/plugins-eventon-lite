@@ -3,7 +3,7 @@
  * evo_frontend class for front and backend.
  *
  * @class 		evo_frontend
- * @version		L 2.0
+ * @version		2.3
  * @package		EventON/Classes
  * @category	Class
  * @author 		AJDE
@@ -51,7 +51,9 @@ class evo_frontend {
 
 		
 		// Other page meta
-			add_action( 'wp_head', array( $this, 'generator' ) );
+			if( EVO()->cal->check_yn('evo_header_meta_data')){
+				add_action( 'wp_head', array( $this, 'generator' ) );
+			}
 
 		// SINGLE Events related
 			add_action( 'wp_head', array( $this, 'event_headers' ) );	
@@ -72,37 +74,108 @@ class evo_frontend {
 
 		// append to kses
 			add_filter('wp_kses_allowed_html', array($this,'append_tokses'), 10, 1);
+
+		// custom rewrites for download ICS events
+			add_action('init', array($this,'custom_rewrite_rule'));
+			add_filter('query_vars', array($this,'add_custom_query_vars'));
+			add_action('template_redirect', array($this,'handle_export_events_request'));
 				
 	}
 
-	// kses
-		public function append_tokses($allowed_tags){
+	// custom rewrites for download ICS events
+		public function custom_rewrite_rule() {
+		    // Rule for exporting all events
+		    add_rewrite_rule('^export-events/all/?$', 'index.php?export_events=all', 'top');
 
-			$custom_tags = array(
-				'svg' => array(
-		            'class' => true,
-		            'xmlns' => true,
-		            'width' => true,
-		            'height' => true,
-		            'viewbox' => true,
-		            'fill' => true,
-		            'stroke' => true,
-		            'stroke-width' => true,
-		            'enable-background' => true,
-		            'xmlns:xlink' => true, // Allow xlink for use with <use> elements
-            		'version' => true,
-		        ),
-		        'path' => array(
-		            'd' => true,
-		            'fill' => true,
-		            'stroke' => true,
-		            'stroke-width' => true,
-		        ),
-		        
-			);
+		    // Rule for exporting a specific event and repeat index
+		    add_rewrite_rule('^export-events/([^/]+)_([^/]+)/?$', 'index.php?export_events=single&event_id=$matches[1]&repeat_interval=$matches[2]', 'top');
 
-			return array_merge($allowed_tags, $custom_tags);
+
 		}
+		function add_custom_query_vars($vars) {
+		    $vars[] = 'export_events';
+		    $vars[] = 'event_id';
+    		$vars[] = 'repeat_interval';
+		    return $vars;
+		}
+		function handle_export_events_request() {
+		    // Check if the query variable exists
+		    if (get_query_var('export_events')) {
+
+		    	$export_type = get_query_var('export_events');
+		    	$ics_content = '';
+
+		        // Verify the nonce
+		        if (!isset($_GET['nonce']) || !wp_verify_nonce($_GET['nonce'], 'export_event_nonce')) {
+		            wp_die('Invalid nonce.');
+		        }
+
+		        if ($export_type === 'all') {
+		            // Export all events		            
+		            $filename = "all_events.ics";
+
+		            $events = EVO()->calendar->get_all_event_data(array(
+						'hide_past'=>'yes'
+					));
+
+					// EACH EVENT
+					foreach($events as $event_id=>$event){
+
+						$EVENT = new EVO_Event( $event_id, $event['pmv'], 0, true, false);
+						$ics_content .= $EVENT->get_ics_content();
+
+					}
+
+					if(empty($events)) wp_die('No Events.');
+
+
+		        } else if ($export_type === 'single') {
+		            // Get event_id and repeat_interval
+		            $event_id = get_query_var('event_id');
+		            $repeat_interval = get_query_var('repeat_interval');
+
+		            // Fetch the specific event data
+		            $EVENT = new EVO_Event($event_id,'',$ri);
+					$EVENT->get_event_post();
+		            	
+		            // validations
+						// check post type
+						if( 'ajde_events' !== $EVENT->post_type ) wp_die('Not a valid Event!');
+
+						// check event exists
+						if( $EVENT->post_status != 'publish' && !is_user_logged_in() ) wp_die('Not a valid Event!');
+
+						// check password protected event
+						if( $EVENT->is_password_required() ) wp_die('Password Protected Event!');	
+
+		          
+		            // Generate the ICS content for the specific event
+		            $ics_content = $EVENT->get_ics_content();
+		            $filename = $EVENT->post_name .".ics";
+
+		        } else {
+		            wp_die('Invalid export type.');
+		        }
+
+		         // Output the ICS file for download
+		        header('Content-Type: text/calendar; charset=utf-8');
+		        header('Content-Disposition: attachment; filename="' . $filename . '"');
+
+		        echo "BEGIN:VCALENDAR\n";
+				echo "VERSION:2.0\n";
+				echo "PRODID:-//eventon.com NONSGML v1.0//EN\n";
+				echo "CALSCALE:GREGORIAN\n";
+				echo "METHOD:PUBLISH\n";
+
+		        echo $ics_content;
+
+		        echo "END:VCALENDAR";
+
+		        exit;        
+				
+		    }
+		}
+
 
 	// heartbeat
 		public function heartbeat_nopriv($response, $data){
@@ -182,9 +255,20 @@ class evo_frontend {
 					'evo_ajax_url' => evo_ajax::get_endpoint('%%endpoint%%') , 
 					'rurl'=> get_rest_url(),
 					'n' => wp_create_nonce( 'eventon_nonce' ),
+					'nonce' => wp_create_nonce( 'wp_rest' ),
 					'ajax_method' => 'ajax',
 					'evo_v'=> EVO()->version,
 					'text'=> array(),
+					'html'=> array( // 4.6
+						'preload_general' => EVO()->calendar->helper->get_preload_general_html(),
+						'preload_events' => EVO()->calendar->helper->get_preload_events_html(),
+						'preload_event_tiles' => EVO()->calendar->helper->get_preload_events_tile_html(),
+						'preload_taxlb' => EVO()->calendar->helper->get_preload_taxlb_html(),
+						'preload_gmap' => EVO()->elements->get_preload_map(),
+					),
+					'cal'=> array(
+						'lbs'=> EVO()->cal->get_prop('evo_ecard_lbs'),// lightbox scroll style
+					)
 				))
 			);
 
@@ -194,8 +278,11 @@ class evo_frontend {
 			wp_register_script('eventon_gmaps_blank', EVO()->assets_path. 'js/maps/eventon_gen_maps_none.js', array('jquery'), EVO()->version ,true );	
 			
 
-			$apikey = !empty($evo_opt['evo_gmap_api_key'])? '?key='.$evo_opt['evo_gmap_api_key'] :'';
-			wp_register_script( 'evcal_gmaps', apply_filters('eventon_google_map_url', 'https://maps.googleapis.com/maps/api/js'.$apikey), array('jquery'),'1.0',true);
+			$apikey = !empty($evo_opt['evo_gmap_api_key'])? '?key='.$evo_opt['evo_gmap_api_key'] .'&callback=Function.prototype&loading=async&libraries=marker' :'';
+			wp_register_script( 'evcal_gmaps', 
+				apply_filters('eventon_google_map_url', 
+					'https://maps.googleapis.com/maps/api/js'.$apikey), 
+				array('jquery'),'1.0',true);
 			
 
 			// STYLES
@@ -298,7 +385,8 @@ class evo_frontend {
 		public function load_evo_scripts_styles(){
 			$this->load_google_maps_scripts();
 			$this->load_default_evo_scripts();
-			$this->load_default_evo_styles();			
+			$this->load_default_evo_styles();	
+
 		}
 
 		// scripts
@@ -307,6 +395,7 @@ class evo_frontend {
 			wp_enqueue_script('evcal_functions');
 			wp_enqueue_script('evcal_easing');
 			wp_enqueue_script('evo_handlebars');
+
 			
 			// only for frontend
 			if( !is_admin()){				
@@ -351,6 +440,7 @@ class evo_frontend {
 		// load google maps API and scripts to page
 		function load_google_maps_scripts(){
 
+
 			// google maps loading conditional statement
 			if( EVO()->cal->check_yn('evcal_cal_gmap_api','evcal_1')	){
 
@@ -371,6 +461,10 @@ class evo_frontend {
 				}
 
 			}else { // NOT disabled
+
+				if (!wp_script_is('eventon_gmaps', 'enqueued')) {
+			        wp_enqueue_script('eventon_gmaps');
+			    }
 
 				//update_option('evcal_gmap_load',true);
 				EVO()->calendar->google_maps_load = true;
@@ -590,5 +684,33 @@ class evo_frontend {
 
 			do_action('evo_page_footer');
 
+		}
+
+	// kses
+		public function append_tokses($allowed_tags){
+
+			$custom_tags = array(
+				'svg' => array(
+		            'class' => true,
+		            'xmlns' => true,
+		            'width' => true,
+		            'height' => true,
+		            'viewbox' => true,
+		            'fill' => true,
+		            'stroke' => true,
+		            'stroke-width' => true,
+		            'enable-background' => true,
+		            'xmlns:xlink' => true, // Allow xlink for use with <use> elements
+            		'version' => true,
+		        ),
+		        'path' => array(
+		            'd' => true,
+		            'fill' => true,
+		            'stroke' => true,
+		            'stroke-width' => true,
+		        ),		        
+			);
+
+			return array_merge($allowed_tags, $custom_tags);
 		}
 }

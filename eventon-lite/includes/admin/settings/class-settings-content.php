@@ -2,7 +2,7 @@
 /**
  * Settings Content
  * inside EVO_Settings()
- * @version lite 1.0
+ * @version 2.3
  */
 
 ?>
@@ -101,7 +101,8 @@ switch ($this->focus_tab):
 	// LANGUAGE TAB
 	case "evcal_2":		
 			
-		require_once(AJDE_EVCAL_PATH.'/includes/admin/settings/settings_language_tab.php');
+		include_once('class-settings-language.php');
+		include_once('settings_language_tab.php');
 
 		$settings_lang = new evo_settings_lang($evcal_opt);
 		$settings_lang->get_content();

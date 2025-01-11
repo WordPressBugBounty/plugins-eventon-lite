@@ -1,13 +1,16 @@
 <?php
 /**
  * Function ajax for backend
- * @version   L2.3
+ * @version   2.3
+ * @version   4.8
  */
 class EVO_admin_ajax{
 	public $helper;
 	
 	public function __construct(){
-		$ajax_events = array(				
+		$ajax_events = array(		
+			'get_shortcode_generator'=>'get_shortcode_generator',	
+
 			'export_events'			=>'export_events',	
 			'export_settings'		=>'export_settings',
 			'get_import_settings'	=>'get_import_settings',
@@ -15,6 +18,9 @@ class EVO_admin_ajax{
 			
 			'rel_event_list'		=>'rel_event_list',
 			'get_latlng'				=>'get_latlng',
+
+			'get_secondary_settings'=> 'get_secondary_settings',
+			'save_secondary_settings'=> 'save_secondary_settings',
 
 			'config_virtual_event'	=>'config_virtual_event',
 			'select_virtual_moderator'	=>'select_virtual_moderator',
@@ -34,6 +40,89 @@ class EVO_admin_ajax{
 		$this->helper = EVO()->helper;
 	}
 
+	// shortcode generator
+		function get_shortcode_generator(){
+			$sc = isset($this->post_data['sc']) ? stripslashes( $this->post_data['sc'] ): 'add_eventon';
+
+			$content = EVO()->shortcode_gen->get_content();	
+
+			echo json_encode(array(
+				'status'=>'good',
+				'content'=> $content,
+				'sc'=> $sc,
+				'type'=> isset($this->post_data['type']) ? $this->post_data['type']:'',
+				'other_id'=> isset($this->post_data['other_id']) ? $this->post_data['other_id']:'',
+			));exit;	
+		}
+		
+	// get secondary lightbox settings
+		public function get_secondary_settings(){
+
+			// validate if user has permission
+			if( !current_user_can('edit_eventons') ){
+				wp_send_json(array(
+					'status'=>'bad','msg'=> __('You do not have proper permission to access this','eventon')
+				));	wp_die();
+			}
+
+			$post_data = $this->helper->sanitize_array( $_POST);
+
+			$settings_file = $post_data[ 'settings_file' ];
+
+			ob_start();
+
+			include_once( $settings_file );
+
+			wp_send_json(array(
+				'status'=>'good','content'=> ob_get_clean()
+			)); wp_die();
+		}
+		public function save_secondary_settings(){
+			// validate if user has permission
+			if( !current_user_can('edit_eventons') ){
+				wp_send_json(array(
+					'status'=>'bad','msg'=> __('You do not have proper permission to perform this action','eventon')
+				));	wp_die();
+			}
+
+			// nonce validation
+			if( empty($_POST['evo_noncename']) || !wp_verify_nonce( $_POST['evo_noncename'], 'evo_save_secondary_settings' ) ){
+				wp_send_json(array(
+					'status'=>'bad','msg'=> __('Nonce validation failed','eventon')
+				));	wp_die();
+			}
+
+			$post_data = $this->helper->sanitize_array( $_POST);
+
+			// if html fields passed
+			$html_fields = false;
+			if(  isset( $post_data['html_fields'] ) ){
+				$html_fields = json_decode(  stripslashes( $post_data['html_fields']) );
+
+				$html_fields = is_array($html_fields) ? $html_fields : false;
+			}
+
+
+			$EVENT = new EVO_Event( $post_data['event_id']);
+
+			foreach($post_data as $key=>$val){
+
+				// skip fields
+				if( in_array( $key, array('evo_noncename','event_id','_wp_http_referer'))) continue;
+				
+				// html content
+				if( $html_fields &&  in_array($key, $html_fields )){
+					$val = $this->helper->sanitize_html( $_POST[ $key ] );
+				}
+
+				$EVENT->save_meta($key, $val);
+			}
+
+			wp_send_json(array(
+				'status'=>'good','msg'=> __('Event Data Saved Successfully','eventon')
+			)); wp_die();
+		}
+	
 	// virtual events
 		public function config_virtual_event(){
 
@@ -209,13 +298,18 @@ class EVO_admin_ajax{
 			
 		}
 		
-	// Related Events @4.5.5
+	// Related Events @2.3
 		function rel_event_list(){
 
 			// Check User Caps.
 			if ( ! current_user_can( 'edit_eventons' ) ) {
-				wp_send_json_error( 'missing_capabilities' );
-				wp_die();
+				wp_send_json_error( 'missing_capabilities' ); wp_die();
+			}
+
+			// verify nonce
+			if(empty( $_REQUEST['nn'] ) || !wp_verify_nonce( wp_unslash( $_REQUEST['nn'] ), 'eventon_admin_nonce')) {
+				wp_send_json_error('Security Check Failed!','eventon');
+				 wp_die();
 			}
 
 			$post_data = $this->helper->sanitize_array( $_POST);
@@ -227,7 +321,7 @@ class EVO_admin_ajax{
 			$wp_args = array(
 				'posts_per_page'=>-1,
 				'post_type'=>'ajde_events',
-				'exclude'=> $event_id,
+				'post__not_in'=> array( $event_id ),
 				'post_status'=>'publish'
 			);
 			$events = new WP_Query($wp_args );

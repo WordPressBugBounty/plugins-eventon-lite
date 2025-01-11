@@ -323,6 +323,7 @@ class EVO_Settings{
 	
 	public function print_ajde_customization_form($cutomization_pg_array, $ajdePT, $extra_tabs=''){
 		
+		$textdomain = 'eventon';
 		
 		// initial variables
 			$font_sizes = array('10px','11px','12px','13px','14px','16px','18px','20px', '22px', '24px','28px','30px','36px','42px','48px','54px','60px');
@@ -358,28 +359,14 @@ class EVO_Settings{
 				// RIGHT SIDE
 				$display_default = (!empty($cpav['display']) && $cpav['display']=='show')?'':'display:none';
 				
-				$rightside.= "<div id='".$cpav['id']."' style='".$display_default."' class='nfer'>
-					<h3>".  esc_html( $cpav['name'] ) ."</h3>";
+				$rightside.= "<div id='setting_".$cpav['id']."' data-setting='".$cpav['id']."' style='".$display_default."' class='nfer'>
+					<h3>".__($cpav['name'],$textdomain)."</h3>";
 
 					if(!empty($cpav['description']))
 						$rightside.= "<p class='tab_description'>".$cpav['description']."</p>";
 				
 				$rightside.="<em class='hr_line'></em>";					
-					// font awesome
-					require_once(AJDE_EVCAL_PATH.'/assets/fonts/fa_fonts.php');	
-
-					$rightside.= "<div style='display:none' class='fa_icons_selection'><div class='fai_in'><ul class='faicon_ul'>";
 					
-					// $font_ passed from incldued font awesome file above
-					if(!empty($font_)){
-						$C = 1;
-						foreach($font_ as $fa){
-							$rightside.= "<li class='{$C}'><i data-name='".$fa."' class='fa ".$fa."' title='{$fa}'></i></li>";
-							$C++;
-						}
-					}
-					$rightside.= "</ul>";
-					$rightside.= "</div></div>";
 
 				// EACH field
 				foreach($cpav['fields'] as $field){
@@ -427,6 +414,37 @@ class EVO_Settings{
 							$rightside.= "<input type='button' class='ajt_choose_image button' style='display:{$opp}' value='".__('Choose an Image','ajde')."'/>";
 							$rightside.= "</p></div>";
 							
+						break;
+
+						case 'icon_selection':
+
+							$html = '';
+							$html.= "<div class='row_faicons_collection evodfx evogap15 evofx_ww'>";
+
+							
+							// each icon
+							foreach( $field['icons'] as $icon_ar ){
+								$html.= "<div class='evo_settings_icon_box evodfx evobr15 evofx_dr_c evopad20 evocurp evo_transit_all'>";
+
+								$field_value = (!empty($ajdePT[ $icon_ar['id']]) )? 
+								$ajdePT[ $icon_ar['id']]:$icon_ar['default'];
+
+							
+								// code
+								$html .= EVO()->elements->get_element(array(
+									'type'=>'icon_select',
+									'id'=> $icon_ar['id'],
+									'value'=> $field_value,
+									'close'=>false,
+								));
+								$html .= "<p class='fieldname'>".__($icon_ar['name'],$textdomain)."</p>";
+								$html.= "</div>";
+							}
+
+							$html.= "</div>";
+
+							$rightside.= $html;
+
 						break;
 						
 						case 'icon':

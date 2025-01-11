@@ -1,7 +1,7 @@
 <?php
 /**
  * EventON Lite Setup
- * @version 2.2.21
+ * @version 2.3
  * 
  */
 
@@ -11,7 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 class EventON {
 
 	// defines
-		public $version = '2.2.21';
+		public $version = '2.3';
 				
 		public $template_url;
 		public $print_scripts=false;
@@ -98,6 +98,7 @@ class EventON {
 		include_once( EVO_ABSPATH.'includes/class-rest-api.php' );	
 		include_once( EVO_ABSPATH.'includes/calendar/class-data-store.php' );	
 		
+		include_once( EVO_ABSPATH.'includes/elements/class-elements-trigs.php' );	
 		include_once( EVO_ABSPATH.'includes/elements/class-elements-main.php' );	
 		include_once( EVO_ABSPATH.'includes/elements/class-shortcode_generator.php' );	
 		include_once( EVO_ABSPATH.'includes/elements/class-lightboxes.php' );	
@@ -227,7 +228,8 @@ class EventON {
 		
 	/** Activate function to store version.	 */
 		public function activate(){
-			set_transient( '_evo_activation_redirect', 1, 60 * 60 );		
+			set_transient( '_evo_activation_redirect', 1, 60 * 60 );	
+			flush_rewrite_rules();	
 			do_action('eventon_activate');
 		}	
 		

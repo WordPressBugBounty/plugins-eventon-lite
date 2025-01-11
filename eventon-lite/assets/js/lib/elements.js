@@ -1,11 +1,11 @@
 /**
  * EventON elements
- * version: L2.2.9
+ * @version: 2.3
+ * @fullversion 4.8
  */
-
 jQuery(document).ready(function($){
 
-const BB = $('body');	
+const BB = $('body');
 
 // process element interactivity on demand
 	$.fn.evo_process_element_interactivity = function(O){
@@ -15,7 +15,19 @@ const BB = $('body');
 		if( $('body').find('.evoelm_trumbowyg').length > 0 ){
 			$('body').find('.evoelm_trumbowyg').each(function(){
 				if ( $.isFunction($.fn.trumbowyg) ) {
-					$(this).trumbowyg();
+					$(this).trumbowyg({
+						btns: [
+							['viewHTML'],
+					        ['undo', 'redo'], // Only supported in Blink browsers
+					        ['formatting'],
+					        ['strong', 'em'],
+					        ['link'],
+					        ['justifyLeft', 'justifyCenter', 'justifyRight', 'justifyFull'],
+					        ['unorderedList', 'orderedList'],
+					        ['removeformat'],
+					        ['fullscreen']
+						]
+					});
 				}
 			});	
 		}
@@ -25,6 +37,16 @@ const BB = $('body');
 	// on after elements load
 	$('body').on('evo_elm_load_interactivity',function(){
 		$(this).evo_process_element_interactivity();
+	});
+
+/* interactive wysiwyg 4.6*/
+	BB.on('click','.evo_elm_act_on',function(){
+		$(this).siblings('.evo_field_container').show();
+		$(this).hide();
+	});
+	BB.on('click','.evo_field_preview',function(){
+		$(this).siblings('.evo_field_container').show();
+		$(this).hide();
 	});
 
 // angle button
@@ -56,12 +78,108 @@ const BB = $('body');
 		$('body').trigger('evo_angle_set',[$(this), deg]);
 	});
 
-// yes no button		
+// Single Image @4.7.4
+	var file_frame,
+		BOX;	
+  
+    BB.on('click','.evolm_img_select_trig',function(event) {
+    	event.preventDefault();
+
+    	var obj = $(this);
+    	BOX = obj.closest('.evo_metafield_image');
+
+    	if( BOX.hasClass('has_img') ) return;
+
+    	IMG_URL = '';
+    	
+		// If the media frame already exists, reopen it.
+		if ( file_frame ) {
+			file_frame.open();
+			return;
+		}
+		// Create the media frame.
+		file_frame = wp.media.frames.downloadable_file = wp.media({
+			title: 'Choose an Image',
+			button: {text: 'Use Image',},
+			multiple: false
+		});
+
+		// When an image is selected, run a callback.
+		file_frame.on( 'select', function() {
+			attachment = file_frame.state().get('selection').first().toJSON();
+
+			BOX.addClass('has_img');
+			BOX.find('input.evo_meta_img').val( attachment.id );
+			BOX.find('.evoelm_img_holder').css('background-image', 'url('+ attachment.url +')');
+
+		});
+
+		// Finally, open the modal.
+		file_frame.open();
+		
+    });  
+	// remove image
+	BB.on('click','.evoel_img_remove_trig',function(){
+
+		const field = $(this).closest('.evo_metafield_image');
+
+		if( !(field.hasClass('has_img') ) ) return;
+		
+		field.removeClass('has_img');
+		field.find('input').val('');
+		field.find('button').addClass('chooseimg');
+		field.find('.evoelm_img_holder').css('background-image', '' );
+	});
+
+// Multiple images upload 4.6
+	var mulimg_index;
+	BB.on('click','.evo_mul_img_trig',function(){
+		const O = $(this);
+		mulimg_index = O.data('index');
+
+		// remove image
+		if( O.hasClass('on')){
+			O.css('background-image', '').removeClass('on');
+			O.find('input').val( '' );
+		// add image
+		}else{
+			// If the media frame already exists, reopen it.
+			if ( file_frame ) {
+				file_frame.open();
+				return;
+			}
+
+			// Create the media frame.
+			file_frame = wp.media.frames.downloadable_file = wp.media({
+				title: 'Choose an Image',
+				button: {text: 'Use Image',},
+				multiple: false
+			});
+
+			// When an image is selected, run a callback.
+			file_frame.on( 'select', function() {
+				attachment = file_frame.state().get('selection').first().toJSON();
+
+				mulimg_O = BB.find('.evo_mul_img_trig.evo_img_'+ mulimg_index);
+
+				//console.log( attachment.url);
+				mulimg_O.css('background-image', 'url('+ attachment.url +')').addClass('on');
+				mulimg_O.find('input').val( attachment.id );
+	
+			});
+
+			// Finally, open the modal.
+			file_frame.open();
+		}
+	});
+
+// yes no button @4.6.9	
 	$('body').on('click','.ajde_yn_btn', function(){
 
 		var obj = $(this);
 		var afterstatement = obj.attr('afterstatement');
 		var newval = 'yes';
+		var key = obj.attr('id');
 		
 		// yes
 		if(obj.hasClass('NO')){
@@ -88,10 +206,23 @@ const BB = $('body');
 
 		//console.log(newval);
 
-		$('body').trigger('evo_yesno_changed',[newval, obj, afterstatement]);
+		$('body').trigger('evo_yesno_changed',[newval, obj, key, afterstatement]);
 	});
-// yes no button afterstatement hook
-	$('body').on('evo_yesno_changed', function(event, newval, obj, afterstatement){
+
+	// @since 4.5.2
+	$.fn.evo_elm_change_yn_btn = function(val){
+		el = this;
+		el.val( val );
+		if( val == 'no'){
+			el.siblings('.evo_elm').addClass('NO');
+		}else{
+			el.siblings('.evo_elm').removeClass('NO');
+		}
+	}
+	
+
+// yes no button afterstatement hook @4.6.9
+	BB.on('evo_yesno_changed', function(event, newval, obj, key, afterstatement){
 
 		if(afterstatement === undefined) return;
 		
@@ -106,33 +237,40 @@ const BB = $('body');
 	// move the sidepanel to body
 		var SP = $('.evo_sidepanel');
 		$('.evo_sidepanel').remove();
-		$('body').append(SP);
+		BB.append(SP);
 
 
 // ICON font awesome selector	
-	// move icon selector data to body end
-		const FAA = $('#evo_icons_data');
-		$('#evo_icons_data').remove();
-		$('body').append(FAA);
-
-
-	// run icon selector interactive features
 	BB.on('click','.evo_icons', function(){
 
 		const el = $(this);
-		el.addClass('onfocus');
+		
 		el.evo_open_sidepanel({
 			'uid':'evo_open_icon_edit',
 			'sp_title':'Edit Icons',
 			'content_id': 'evo_icons_data',
 			'other_data': el.data('val')
 		});
+		BB.find('.evo_icons').removeClass('onfocus');
+		el.addClass('onfocus');
+
+		BB.find('.evo_settings_icon_box').removeClass('onfocus');
+		el.closest('.evo_settings_icon_box').addClass('onfocus');
 
 		return;
 	})
 	.on('evo_sp_opened_evo_open_icon_edit',function(event, OO){
 		BB.evo_run_icon_selector({icon_val : OO.other_data} );
 	});
+
+	// when icons sidepanel closed
+	BB.on('evo_sp_closed',function(event, SP ){
+		if( $(SP).find('.evo_open_icon_edit')){
+			BB.find('.evo_settings_icon_box').removeClass('onfocus');
+		}
+	});		
+
+
 
 
 	$.fn.evo_run_icon_selector = function(options){
@@ -180,6 +318,8 @@ const BB = $('body');
 				.removeClass('onfocus');
 			icon_on_focus.siblings('input').val(icon);
 
+			BB.find('.evo_settings_icon_box').removeClass('onfocus');
+
 			el.off('click','li');
 			el.evo_close_sidepanel();
 		});
@@ -192,6 +332,8 @@ const BB = $('body');
 		el.on('keyup', '.evo_icon_search',function(event){
 			var keycode = (event.keyCode ? event.keyCode : event.which);
 			var typed_val = $(this).val().toLowerCase();
+
+			console.log('e');
 			
 			el.find('li').each(function(){
 				const nn = $(this).data('v');
@@ -206,7 +348,7 @@ const BB = $('body');
 						$(this).hide();
 					}
 				}				
-			});		
+			});	
 		});
 
 		init();
@@ -218,9 +360,16 @@ const BB = $('body');
 			$(this).parent().siblings('input').val('');
 		});
 	
-
 // select2 dropdown field - 4.0.3
-	if ( $.isFunction($.fn.select2) )  $('.ajdebe_dropdown.evo_select2').select2();
+	if ( $.isFunction($.fn.select2) ){
+		$('.ajdebe_dropdown.evo_select2').select2();
+
+		$('body').on('evo_ajax_complete_eventedit_onload', function(event, OO, data, el){
+			$('body').find('.ajdebe_dropdown.evo_select2').each(function(){
+				$(this).select2();
+			});
+		});
+	}  
 
 // self hosted tooltips
 // deprecating
@@ -233,34 +382,80 @@ const BB = $('body');
 	});
 
 // ELEMENTS
+// @updated 4.7.4
 // tooltips
-	$('body').on('mouseover','.ajdeToolTip',function(event){
-		event.stopPropagation();
-		if($(this).hasClass('show')) return;
 
-		const t = $(this).data('d');
-		var p = $(this).position();
+	$.fn.evo_elm_show_tooltip = function( passed_content, hide_time ){
+		var el = this;
+
+		if( el.hasClass('show')) return;
+
+		var free = el.hasClass('free') ? true: false;
+
+		var content = (passed_content !== undefined) ? passed_content : el.data('d');
+		var tooltipbox = $('.evo_tooltip_box');
+
+		// as backup use title atribute for toolt tip content
+		if( content === undefined || content == ''){
+			content = el.attr('title');
+		}
+
+		if( content == '') return;
+
+		var p = el.position();
 		
 		var cor = getCoords(event.target);
 
-		$('.evo_tooltip_box').removeClass('show').removeClass('L').html(t);
+		tooltipbox.removeClass('show').removeClass('L').html( content );
 		var box_height = $('.evo_tooltip_box').height();
 		var box_width = $('.evo_tooltip_box').width();
 
-		$('.evo_tooltip_box').css({'top': (cor.top - 55 - box_height), 'left': ( cor.left + 5 ) })
+		// box left calculation
+		var _left = cor.left + 5;
+
+		// if center arrow
+		if( el.hasClass('evocenter')){
+			_left = _left - parseInt( box_width / 2 ) - 9;
+			tooltipbox.addClass('evocenter');
+		}
+
+		tooltipbox.css({'top': (cor.top - 55 - box_height - ( free ? 10: 0) ), 'left': _left })
 			.addClass('show');
 
-
 		// left align
-		if( $(this).hasClass('L')){
-			//console.log(box_width);
-			$('.evo_tooltip_box').css({'left': (cor.left - box_width - 15) }).addClass('L');			
+		if( el.hasClass('L')){
+			tooltipbox.css({'left': (cor.left - box_width - 15) }).addClass('L');			
 		}
-	})
-	.on('mouseout','.ajdeToolTip',function(){	
-		$('.evo_tooltip_box').removeClass('show');
-	});
 
+		// hide tooltip in set time
+		if( hide_time !== undefined ){
+			setTimeout(function(){
+				el.evo_elm_hide_tooltip();
+			}, hide_time);	
+		}
+		el.addClass('show');
+	}
+	$.fn.evo_elm_hide_tooltip = function(){
+		this.removeClass('show');
+		$('.evo_tooltip_box').removeClass('show');
+		setTimeout(function(){
+			$('.evo_tooltip_box').removeClass('L center');
+		},200);
+	}
+
+	$('body').on('mouseover','.ajdeToolTip, .colorselector, .evotooltip',function(event){
+		event.stopPropagation();
+
+		var relatedTarget = event.relatedTarget;
+		if( $(relatedTarget).closest('.evotooltip.show').length == 0)
+			$(this).evo_elm_show_tooltip();		
+	})
+	.on('mouseout','.ajdeToolTip, .colorselector, .evotooltip',function(event){	
+		event.stopPropagation();
+		var relatedTarget = event.relatedTarget;
+		if( $(relatedTarget).closest('.evotooltip.show').length == 0)
+	    	$(this).evo_elm_hide_tooltip();
+	});
 
 	function getCoords(elem) { // crossbrowser version
 	    var box = elem.getBoundingClientRect();
@@ -362,6 +557,7 @@ const BB = $('body');
 		var el = this;
 		var el_color = el.find('.evo_set_color');
 
+
 		var init = function(){
 			el.ColorPicker({		
 				color: get_default_set_color(),
@@ -381,7 +577,9 @@ const BB = $('body');
 		var set_hex_values = function(hex,rgb){			
 			el.find('.evcal_color_hex').html(hex);
 			el.find('.evo_color_hex').val(hex);
-			el_color.css({'background-color':'#'+hex});		
+
+			fcl = el.evo_is_hex_dark({hex: hex}) ? '000000':'ffffff';
+			el_color.css({'background-color':'#'+hex, 'color':'#'+ fcl });		
 			
 			// set RGB val
 			rgb_val = $('body').evo_rgb_process({ data : rgb, type:'rgb',method:'rgb_to_val'});
@@ -399,9 +597,6 @@ const BB = $('body');
 	$('body').find('.evo_color_selector').each(function(){
 		$(this).evo_colorpicker_init();	
 	});
-
-
-
 	
 // plus minus changer
 	$('body').on('click','.evo_plusminus_change', function(event){
@@ -435,7 +630,7 @@ const BB = $('body');
         } 
     });
 
-// date time picker L2.2.9
+// date time picker @4.5.5
 	var RTL = $('body').hasClass('rtl');
 
 	// load date picker libs
@@ -458,15 +653,75 @@ const BB = $('body');
 			const this_id = OBJ.attr('id');
 			var rand_id = OBJ.closest('.evo_date_time_select').data('id');			
 			var D = $('body').find('.evo_dp_data').data('d');
+			var startDO, endDO;
+
+			// set start and end date objects
+			if( OBJ.hasClass('start') ){
+				var startDO = OBJ;
+				var endDO = $('body').find('.evo_date_time_select.end[data-id="'+rand_id+'"]').find('input.evo_dpicker.end');
+			}else{
+				var startDO = $('body').find('.evo_date_time_select.start[data-id="'+rand_id+'"]').find('input.evo_dpicker.start');
+				var endDO = OBJ;
+			}
+
+			//console.log( endDO);
 
 			OBJ.addClass('dp_loaded');
 
 			const d = new Date( OBJ.val() );
+			var highlightson = false;
 
 			OBJ.datepicker({
+				beforeShow: function( input , inst){
+					$(inst.dpDiv).addClass('evo-datepicker');
+					//console.log(rand_id);
+					//console.log(startDO.val() +' '+ endDO.val());
+				},
+				beforeShowDay: function(date){
+
+					var dates = [startDO.val(), endDO.val() ];
+
+					// Convert start and end dates to Date objects
+			        let startDate = new Date(dates[0]);
+			        let endDate = new Date(dates[1]);
+
+			        // If start and end dates are not set, return default
+        			if (isNaN(startDate) || isNaN(endDate)) return [true, ''];
+
+        			// if start and end are the same date
+					if( new Date(dates[0]).toString() ==  new Date(dates[1]).toString())
+						 return [true, ''];	
+
+
+        			// Check if the current date is the start date
+			        if (startDate.toDateString() === date.toDateString()) {
+			            highlightson = true;
+			        }
+
+			        // Check if the current date is the day *after* the end date
+			        let endDatePlusOne = new Date(endDate);
+			        endDatePlusOne.setDate(endDatePlusOne.getDate() + 1);
+
+			        if (endDatePlusOne.toDateString() === date.toDateString()) {
+			            highlightson = false;
+			        }
+
+			        // Highlight if the date is within the range (including across months)
+			        if (date >= startDate && date <= endDate) {
+			            highlightson = true;
+			        }
+
+
+
+			        if( highlightson ) return [true, 'highlight','tt'];
+			        return [true, ''];
+				},
+				onChangeMonthYear: function(year,month, inst){
+					highlightson = false;
+				},
 				dateFormat: D.js_date_format,
 				firstDay: D.sow,
-				numberOfMonths: 1,
+				numberOfMonths: 2,
 				altField: OBJ.siblings('input.alt_date'),
 				altFormat: OBJ.siblings('input.alt_date_format').val(),
 				isRTL: RTL,
@@ -478,17 +733,17 @@ const BB = $('body');
 
 					$('body').trigger('evo_elm_datepicker_onselect', [OBJ, selectedDate, date, rand_id]);
 
-					if( OBJ.hasClass('start') ){
-						// update end time
-						var eO = $('body').find('.evo_date_time_select.end[data-id="'+rand_id+'"]').find('input.datepickerenddate');
-						if(eO.length>0){
+					// update end time					
+					if( OBJ.hasClass('start') ){						
+						if(endDO.length>0){
 							
-							eO.datepicker( 'setDate', date);
-							eO.datepicker( "option", "minDate", date );
+							endDO.datepicker( 'setDate', date);
+							endDO.datepicker( "option", "minDate", date );
 						}
 					}
 				}
 			});
+
 
 			var id_match = ( ( OBJ_id !== undefined && OBJ_id == this_id ) || OBJ_id === undefined )
 				? true: false;
@@ -510,18 +765,13 @@ const BB = $('body');
 	});
 
 // Upload data files
-// @version 4.0.2
+// @version 4.6.9
 	$('body').on('click','.evo_data_upload_trigger',function(event){
 		if( event !== undefined ){
 			event.preventDefault();
 			event.stopPropagation();
 		}
 		OBJ = $(this);
-
-		// Ensure the File APIs are supported
-		if (!window.File || !window.FileReader || !window.FileList || !window.Blob) {
-		    alert('The File APIs are not fully supported in this browser.');
-		}
 
 		const upload_box = OBJ.closest('.evo_data_upload_holder').find('.evo_data_upload_window');
 		upload_box.show();
@@ -532,7 +782,8 @@ const BB = $('body');
 
 	$('body').on('click','.upload_settings_button',function(event){
 		//event.preventDefault();
-		const OBJ = $(this);
+		OBJ = $(this);
+
 		const upload_box = OBJ.closest('.evo_data_upload_window');
 
 		// show form
@@ -544,23 +795,19 @@ const BB = $('body');
 		const acceptable_file_type = fileSelect.data('file_type');
 		msg_elm.hide();
 		
-
-		// Unbind any previously bound submit handler
-    	form.off('submit');
-
 		// when form submitted
-		$(form).submit(function(event){
+		$(form).one('submit',function(event){
 			
 			event.preventDefault();
 			msg_elm.html('Processing').show();
 
-			const files = fileSelect.prop('files');
+			var files = fileSelect.prop('files');
 
 			if( !files ){
 			 	msg_elm.html('Missing File.'); return;
 			}
 			
-			const file = files[0];
+			var file = files[0];
 
 			if (!window.File || !window.FileReader || !window.FileList || !window.Blob) {
 		      	alert('The File APIs are not fully supported in this browser.');
@@ -594,41 +841,84 @@ const BB = $('body');
 		$(this).parent().hide();
 	});
 
-// lightbox select
+// lightbox select @updated 4.7.2
 	$('body').on('click','.evo_elm_lb_field input',function(event){
-		const lb = $(this).closest('.evo_elm_lb_select');
-		$('body').find('.evo_elm_lb_window.show').removeClass('show').fadeOut(300);
-		lb.find('.evo_elm_lb_window').show().delay(100).queue(function(){
-		    $(this).addClass("show").dequeue();
-		});
+		const O = $(this);
+		const elm_row = O.closest('.evo_elm_row');
+
+		$('body').find('.evo_elm_lb_on').removeClass('evo_elm_lb_on');
+		O.addClass('evo_elm_lb_on');
+
+		extra_class = '';
+
+		POS = O.offset();
+		pos_top = POS.top;
+		pos_left = POS.left;
+
+		// if menu to show above
+		if( $(window).height() < ( POS.top + 220 ) ){
+			extra_class = 'above';
+
+			pos_top = pos_top - 260;
+		}
+
+		const list = O.closest('.evo_elm_lb_fields').data('d');
+		const setvals = O.closest('.evo_elm_lb_fields').data('v');
+		//console.log(list);
+
+		lbhtml = "<div class='evo_elm_lb_window "+extra_class+"'><div class='eelb_in'><div class='eelb_i_i'>";
+
+		// check if list has values
+		if (typeof list === 'object' && list !== null && typeof list !== 'undefined') {
+
+			$.each( list, function(index, val){
+				select = setvals.includes(index) ? 'select':'';
+				lbhtml += "<span class='"+select+"' value='"+index+"'>"+val+"</span>";
+			});
+		}else{
+			lbhtml += "<span class='' value='all'>--</span>";
+		}
+		lbhtml += "</div></div></div>";
+
+		const elm2 = $('body').find('.evo_elms2');
+
+		elm2.html( lbhtml );
+
+		elm2.find('.eelb_in').css({'top':pos_top,'left':pos_left});
+		elm2.find('.evo_elm_lb_window').addClass('show');
+		
 	});
 
 	// close lightbox
 		$(window).on('click', function(event) {
 			if( !($(event.target).hasClass('evo_elm_lb_field_input')) )
-				$('body').find('.evo_elm_lb_window').removeClass('show').fadeOut(300);
+				$('body').find('.evo_elm_lb_window').removeClass('show above').fadeOut(300);
 		});
-		$(window).blur(function(){
-			//$('body').find('.evo_elm_lb_window').removeClass('show').fadeOut(250);
-		});
+		
 
 	// selecting options in lightbox select field
 	$('body')
 		.on('click','.eelb_in span',function(){
-			const field = $(this).closest('.evo_elm_lb_select').find('input');
+			const field = $('body').find('.evo_elm_lb_on');
+			
 			if($(this).hasClass('select')){
 				$(this).removeClass('select');
 			}else{
 				$(this).addClass('select');
 			}
 
-			var V = '';
+			var V = '', Vo = []; 
 
-			$(this).parent().find('span.select').each(function(){
+			$(this).parent().find('span.select').each(function(index){
 				V += $(this).attr('value')+',';
+				Vo.push( $(this).attr('value') );
 			});
 
 			field.val( V ).trigger('change');
+			field.closest( '.evo_elm_lb_fields' ).data('v', Vo);
+
+			console.log(Vo);
+
 			$('body').trigger('evo_elm_lb_option_selected',[ $(this), V]);
 		})
 		.on('click','.evo_elm_lb_window',function(event){
@@ -638,4 +928,5 @@ const BB = $('body');
 			}
 		})
 	;
+
 });

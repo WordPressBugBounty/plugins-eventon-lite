@@ -1,6 +1,6 @@
 /**
  * all event post types and taxonomy styles
- * @version L2.2.17
+ * @version 2.3
  */
 
 
@@ -141,12 +141,6 @@
 	#evcal_dates .evo_date_time_select .evo_date_edit select:hover{opacity: 0.6}
 
 	
-	#ui-datepicker-div{	border-radius: 0px;border: none;}
-	.ui-datepicker-group .ui-corner-right, .ui-datepicker-group .ui-corner-left{
-		border-radius: 0
-	}
-	.ui-datepicker-calendar .ui-state-default{background: #e6e6e6;	}
-	.ui-datepicker-calendar .ui-state-default.ui-state-highlight{background: #fbf9ee;	}
 
 	.evo_datetimes p.evo_event_time_label{font-size: 16px;}
 	.evo_datetimes p, .evd p{color:#5a5a5a}
@@ -264,7 +258,7 @@
 	}	
 	.evo_editevent_repeat_field, .evo_elm_row.evo_editevent_repeat_field{
 		gap:10px;display: flex;align-items: center;flex-wrap: wrap;padding-bottom: 10px;}
-	.evo_elm_row.evo_editevent_repeat_field .evo_field_plusminus_container{    margin: 0; padding: 5px;}
+	.evo_elm_row.evo_editevent_repeat_field .evo_field_plusminus_container{    margin: 0; padding: 5px;    background-color: #fefefe;}
 
 	/* weekly */
 		.evcalr_2_by_W span{display: inline-block; padding-top: 4px;}
@@ -616,7 +610,7 @@
 		margin:0;
 		padding-top:3px;
 		color:var(--evo_color_1);
-		font:14px var(--evo_main_font)
+		font:14px var(--evo_main_font); font-weight: 700;
 	}
 	.evomb_header span.visibility_type{
 		float: right;

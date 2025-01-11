@@ -15,7 +15,7 @@ jQuery(document).ready(function($){
 		
 		SC = code_field_obj.val();
 
-		$('body').trigger('evo_open_shortcode_generator',[ SC, 'elementor']);		
+		$('body').trigger('evo_trigger_shortcodegenerator',[ SC, 'elementor']);		
 	});
 
 	$('body').on('evo_shortcode_generator_saved',function(event, code, data){  

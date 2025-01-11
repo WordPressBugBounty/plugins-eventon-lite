@@ -3,7 +3,7 @@
  * helper fnctions for calendar
  *
  * @class 		evo_cal_help
- * @version		L 2.1.5
+ * @version		2.3
  * @package		EventON/Classes
  * @category	Class
  * @author 		AJDE
@@ -565,6 +565,85 @@ class evo_cal_help {
 	    	$html = "<p class='no_events' >".$text_1."</p>";
 	    	
 	    	return $html;
+	    }
+
+	// Preloading inside the calendar events section @4.6 
+	    function get_preload_general_html(){
+	    	
+	    	return EVO()->elements->get_preload_html( array(
+	    		'echo'=> false,
+	    		'pclass'=>'loading_e',
+	    		's'=> array(
+	    			array(
+	    				'dr'=>'c',
+	    				array( 'w'=>'50%', 'h'=>'70px'),
+	    				array( 'w'=>'100%', 'h'=>'40px'),
+	    				array( 'w'=>'100%', 'h'=>'40px'),
+	    				array( 'w'=>'100%', 'h'=>'40px'),
+	    				array( 'w'=>'100%', 'h'=>'40px'),
+	    			)
+	    		)
+	    	));
+	    }
+	    function get_preload_events_tile_html(){
+
+	    	return EVO()->elements->get_preload_html( array(
+	    		'echo'=> false,
+	    		'pclass'=>'loading_e_tile',
+	    		's'=> array(
+	    			'multiply'=> 6,
+	    			array(
+	    				'nesting'=>'e',
+	    				array( 'w'=>'50%', 'h'=>'55px'),
+	    				array( 'w'=>'90%', 'h'=>'30px','m'=>2)
+	    			)
+	    		)
+	    	));
+	    }
+
+	    function get_preload_events_html(){	    	
+	    	return EVO()->elements->get_preload_html( array(
+	    		'echo'=> false,
+	    		'pclass'=>'loading_e',
+	    		's'=> array(
+	    			'multiply'=> 5,
+	    			array(
+	    				'nesting'=>'e','dr'=>'r','gap'=>'10',
+	    				array(
+	    					'nesting'=>'e1',
+	    					array( 'w'=>'100px', 'h'=>'95px')
+	    				),
+	    				array(
+	    					'nesting'=>'e2',
+	    					array( 'w'=>'50%', 'h'=>'55px'),
+	    					array( 'w'=>'90%', 'h'=>'30px')
+	    				)
+	    			)
+	    		)
+	    	));	    	
+	    }
+
+	    function get_preload_taxlb_html(){
+	    	return EVO()->elements->get_preload_html( array(
+	    		'echo'=> false,
+	    		'pclass'=>'loading_taxlb',
+	    		's'=> array(
+	    			array( 'w'=>'50%', 'h'=>'95px'),
+	    			array( 'w'=>'30%', 'h'=>'30px','mb'=>30),
+	    			array(
+	    				'dr'=>'r','gap'=>'10',
+	    				array(
+	    					'nesting'=>'e1',
+	    					array( 'w'=>'100%', 'h'=>'150px','m'=>2),
+	    					array( 'w'=>'100%', 'h'=>'95px','m'=>1)
+	    				),
+	    				array(
+	    					'nesting'=>'e2',
+	    					array( 'w'=>'100%', 'h'=>'95px','m'=>4),
+	    				)
+	    			)
+	    		)
+	    	));
 	    }
 
 }

@@ -1,8 +1,7 @@
 <?php
 /**
  * Calendar Data Generator, Calendar Options
- * @version 2.6.14
- * @updated 4.5
+ * @version 2.3
 
  * called using EVO()->cal
  */
@@ -206,5 +205,21 @@ class EVO_Cal_Gen{
 			return $O;
 		}
 
+	// Calendar settings @since 4.7
+		public function can_load_eventon_content(){
+			$this->set_cur('evcal_1');
+			if( $this->check_yn('evo_load_scripts_only_onevo') ) return false;
+
+			return true;
+		}
+
+	// Get eventtop text color values @4.8
+		public function get_ett_color_prop(){
+			$this->set_cur('evcal_1');
+
+			$val = $this->get_prop('evo_ett_colorful_color');
+
+			return $val ? $val : 'custom';
+		}
 		
 }

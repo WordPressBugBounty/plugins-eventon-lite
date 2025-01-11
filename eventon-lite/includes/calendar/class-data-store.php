@@ -35,6 +35,11 @@ class EVO_Data_Store{
 			maybe_unserialize( $this->meta_data[ $key] );
 	}
 
+	// @since 4.7.4 -- retutn null for no values
+	public function get_meta_null( $key){
+		$val = $this->get_meta( $key);
+		return $val ? $val : null;
+	}
 	public function load_all_meta(){
 		$this->meta_data = get_metadata('post',$this->ID);
 

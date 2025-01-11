@@ -260,13 +260,23 @@ class EVO_Taxonomies extends EVO_Taxonomies_editor{
 					),
 					'evcal_location_link'=>array(
 						'type'=>'text',
-						'name'=>'Link for Location',	
+						'name'=>__('Link for Location','eventon'),	
 						'var'=>'evcal_location_link'					
 					),
 					'evcal_location_link_target'=>array(
 						'type'=>'yesno',
 						'name'=>esc_html__('Open location link in new window','eventon'),
 						'var'=> 'evcal_location_link_target'					
+					),
+					'loc_phone'=>array(
+						'type'=>'text',
+						'name'=>'Phone Number',	
+						'var'=>'loc_phone'	,'nesting_start'=> 'evo_elm_row_50'						
+					),
+					'loc_email'=>array(
+						'type'=>'text',
+						'name'=>'Email Address',	
+						'var'=>'loc_email'	, 'nesting_end'=> true					
 					),
 					'evo_loc_img'=>array(
 						'type'=>'image',
@@ -303,26 +313,39 @@ class EVO_Taxonomies extends EVO_Taxonomies_editor{
 						'name'=>esc_html__('Organizer Secondary Description','eventon'),
 						'var'=>'description2',				
 					),
-					'evcal_org_contact'=>array(
-						'type'=>'text',
-						'name'=>esc_html__('Organizer General Contact Details','eventon'),
-						'var'=>'evcal_org_contact'				
+					
+					'evo_org_img'=>array(
+						'type'=>'image',
+						'name'=>esc_html__('Organizer Image','eventon'),
+						'var'=>	'evo_org_img'	
 					),
 					'evcal_org_contact_e'=> array(
 						'var'=> 'evcal_org_contact_e','type'=>'text',
 						'name'=>esc_html__( 'Email Address', 'eventon' ),
-						'desc'=>esc_html__( 'Enter Organizer Email Address','eventon' )
+						'desc'=>esc_html__( 'Enter Organizer Email Address','eventon' ),
+						'nesting_start'=> 'evo_emailX'	
+					),
+					'evcal_org_contact_phone'=> array(
+						'var'=> 'evcal_org_contact_phone','type'=>'text',
+						'name'=>esc_html__( 'Phone Number', 'eventon' ),
+						'desc'=>esc_html__( 'Enter Organizer Phone Number','eventon' ),
+						'nesting_end'=> true	
 					),
 					'evcal_org_address'=>array(
 						'type'=>'text',
 						'name'=>esc_html__('Organizer Physical Address','eventon'),	
-						'var'=> 'evcal_org_address'					
+						'var'=> 'evcal_org_address'	,
+					),
+					'evcal_org_contact'=>array(
+						'type'=>'text',
+						'name'=>esc_html__('Other General Contact Details','eventon'),
+						'var'=>'evcal_org_contact'				
 					),
 					
 					'evcal_org_tw'=> array(
 						'var'=> 'evcal_org_tw','type'=>'text',
-						'name'=>esc_html__( 'Twitter Link', 'eventon' ),
-						'desc'=>esc_html__( 'Link to organizer Twitter page','eventon' ),
+						'name'=>esc_html__( 'Twitter/X Link', 'eventon' ),
+						'desc'=>esc_html__( 'Link to organizer Twitter/X page','eventon' ),
 						'nesting_start'=> 'evo_org'		
 					),
 					'evcal_org_ig'=> array(
@@ -372,11 +395,7 @@ class EVO_Taxonomies extends EVO_Taxonomies_editor{
 						'name'=>esc_html__('Open link in new window','eventon'),	
 						'var'=>'_evocal_org_exlink_target'					
 					),
-					'evo_org_img'=>array(
-						'type'=>'image',
-						'name'=>esc_html__('Organizer Image','eventon'),
-						'var'=>	'evo_org_img'	
-					),
+					
 				)
 
 			), $tax, $event_tax_term);
@@ -515,12 +534,16 @@ class EVO_Taxonomies extends EVO_Taxonomies_editor{
 				</div>
 				
 				<div class="form-field evo_metafield_image">
-					<label for="term_meta[evo_loc_img]"><?php esc_html_e( 'Image', 'eventon' ); ?></label>
-					
-					<input style='width:auto' class="custom_upload_image_button button <?php echo 'chooseimg';?>" data-txt='<?php echo esc_html__('Remove Image','eventon');?>' type="button" value="<?php esc_html_e('Choose Image','eventon');?>" /><br/>
-					<span class='evo_loc_image_src image_src'><img src='' style='display:none'/></span>
-					
-					<input class='evo_loc_img evo_meta_img' type="hidden" name="term_meta[evo_loc_img]" id="term_meta[evo_loc_img]" value="">
+					<label for="term_meta[evo_loc_img]"><?php _e( 'Image', 'eventon' ); ?></label>
+
+					<?php 
+
+						echo EVO()->elements->get_element(array(
+							'type'=>'image',
+							'id'=>'term_meta[evo_loc_img]',
+							'value'=> '',
+						));
+					?>
 					<p class="description"><?php esc_html_e( '(Optional) Location Image','eventon' ); ?></p>
 				</div>
 
@@ -640,22 +663,18 @@ class EVO_Taxonomies extends EVO_Taxonomies_editor{
 				
 				<tr class="form-field">
 					<th scope="row" valign="top"><label for="term_meta[evo_loc_img]"><?php esc_html_e( 'Image', 'eventon' ); ?></label></th>
+
 					<td class='evo_metafield_image'>
 						<?php 
-							if(!empty($term_meta['evo_loc_img'])){
-								$img_url = wp_get_attachment_image_src($term_meta['evo_loc_img'],'medium');
-							}else{ $img_url = array(0=>''); }
 
-							$__button_text = (!empty($term_meta['evo_loc_img']))? esc_html__('Remove Image','eventon'): esc_html__('Choose Image','eventon');
-							$__button_text_not = (empty($term_meta['evo_loc_img']))? esc_html__('Remove Image','eventon'): esc_html__('Choose Image','eventon');
-							$__button_class = (!empty($term_meta['evo_loc_img']))? 'removeimg':'chooseimg';
+						echo EVO()->elements->get_element(array(
+							'type'=>'image',
+							'id'=>'term_meta[evo_loc_img]',
+							'value'=> ( !empty( $term_meta['evo_loc_img'] ) ? $term_meta['evo_loc_img'] : null ),
+						));
+							
 						?>
-						
-						<input style='width:auto' class="custom_upload_image_button button <?php echo esc_attr( $__button_class );?>" data-txt='<?php echo esc_attr($__button_text_not);?>' type="button" value="<?php echo esc_attr($__button_text);?>" /><br/>
-						<span class='evo_loc_image_src image_src'><img src='<?php echo esc_url( $img_url[0] );?>' style='<?php echo !empty($term_meta['evo_loc_img'])?'':'display:none';?>'/></span>
-						
-						<input class='evo_loc_img evo_meta_img' type="hidden" name="term_meta[evo_loc_img]" id="term_meta[evo_loc_img]" value="<?php echo !empty( $term_meta['evo_loc_img'] ) ? esc_attr( $term_meta['evo_loc_img'] ) : ''; ?>">
-						<p class="description"><?php esc_html_e( '(Optional) Location Image','eventon' ); ?></p>
+						<p class="description"><?php _e( '(Optional) Location Image','eventon' ); ?></p>
 					</td>
 				</tr>
 				
@@ -744,14 +763,19 @@ class EVO_Taxonomies extends EVO_Taxonomies_editor{
 						
 						if($value['type'] == 'image'):
 						?>
-							<div class="form-field evo_metafield_image">
-								<label for="term_meta[evo_org_img]"><?php esc_html_e( 'Image', 'eventon' ); ?></label>
+							<div class="form-field ">
+								<div class='evo_tax_img_holder'>
+								<?php
+									EVO()->elements->get_element(array(
+										'_echo'=>true,
+										'type'=>'image',
+										'id'=> 'term_meta[evo_org_img]',
+										'value'=> '',
+										'name'=> __( '(Optional) Organizer Image','eventon' ),
+									));
+									?>
+								</div>								
 								
-								<input style='width:auto' class="custom_upload_image_button button <?php echo 'chooseimg';?>" data-txt='<?php echo esc_html__('Remove Image','eventon');?>' type="button" value="<?php esc_html_e('Choose Image','eventon');?>" /><br/>
-								<span class='evo_org_image_src image_src'><img src='' style='display:none'/></span>
-								
-								<input class='evo_org_img evo_meta_img' type="hidden" name="term_meta[evo_org_img]" id="term_meta[evo_org_img]" value="">
-								<p class="description"><?php esc_html_e( '(Optional) Organizer Image','eventon' ); ?></p>
 							</div>
 						<?php else:?>
 							<div class="form-field">
@@ -827,23 +851,23 @@ class EVO_Taxonomies extends EVO_Taxonomies_editor{
 						<?php if($value['type'] == 'image'):?>
 							<tr class="form-field">
 							<th scope="row" valign="top"><label for="term_meta[evo_org_img]"><?php esc_html_e( 'Image', 'eventon' ); ?></label></th>
-							<td class='evo_metafield_image'>
-								<?php 
-									if(!empty($term_meta['evo_org_img'])){
-										$img_url = wp_get_attachment_image_src($term_meta['evo_org_img'],'medium');
-										$img_url = $img_url[0];
-									}else{ $img_url = '';}
+							<td class=''>
+								<div class='evo_tax_img_holder'>
+								<?php
+									$img_id = !empty($term_meta[ 'evo_org_img' ]) ? $term_meta[ 'evo_org_img' ] : null;						
 
-									$__button_text = (!empty($term_meta['evo_org_img']))? esc_html__('Remove Image','eventon'): esc_html__('Choose Image','eventon');
-									$__button_text_not = (empty($term_meta['evo_org_img']))? esc_html__('Remove Image','eventon'): esc_html__('Choose Image','eventon');
-									$__button_class = (!empty($term_meta['evo_org_img']))? 'removeimg':'chooseimg';
-								?>						
-								<input style='width:auto' class="custom_upload_image_button button <?php echo esc_attr($__button_class);?>" data-txt='<?php echo esc_attr($__button_text_not);?>' type="button" value="<?php echo esc_attr($__button_text);?>" /><br/>
+									EVO()->elements->get_element(array(
+										'_echo'=>true,
+										'type'=>'image',
+										'id'=> "term_meta[evo_org_img]",
+										'value'=> $img_id,
+										'name'=> '',
+									));
+									?>
+								</div>
+
 								
-								<span class='evo_org_image_src image_src'><img src='<?php echo esc_url( $img_url );?>' style='<?php echo !empty($term_meta['evo_org_img'])?'':'display:none';?>'/></span>
-								
-								<input class='evo_org_img evo_meta_img' type="hidden" name="term_meta[evo_org_img]" id="term_meta[evo_org_img]" value="<?php echo !empty( $term_meta['evo_org_img'] ) ? esc_attr( $term_meta['evo_org_img'] ) : ''; ?>">
-								<p class="description"><?php esc_html_e( '(Optional) Organizer Image','eventon' ); ?></p>
+								<p class="description"><?php _e( '(Optional) Organizer Image','eventon' ); ?></p>
 							</td>
 							</tr>
 

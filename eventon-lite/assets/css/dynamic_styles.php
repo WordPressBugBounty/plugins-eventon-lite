@@ -2,7 +2,7 @@
 /**
  * dynamic styles for front end
  *
- * @version		2.2.16
+ * @version		2.3
  * @package		eventon/Styles
  * @author 		AJDE
  */
@@ -95,12 +95,6 @@
 		),array(
 			'item'=>'.ajde_evcal_calendar .evo_sort_btn:hover',
 			'css'=>'color:#$', 'var'=>'evcal__sotH',	'default'=>'d8d8d8'
-		),array(
-			'item'=>'#evcal_list .eventon_list_event .evcal_desc em,  .evo_lightboxes .evcal_desc em',
-			'css'=>'color:#$', 'var'=>'evcal__fc6',	'default'=>$preset_data['evo_color_1']
-		),array(
-			'item'=>'#evcal_list .eventon_list_event .evcal_desc em a',
-			'css'=>'color:#$', 'var'=>'evcal__fc7',	'default'=>$preset_data['evo_color_1']
 		),
 
 		// buttons
@@ -168,16 +162,14 @@
 		array(
 			'item'=>'.evcal_evdata_row .evcal_evdata_icons i, .evcal_evdata_row .evcal_evdata_custometa_icons i',
 			'multicss'=>array(
-				array('css'=>'color:#$', 'var'=>'evcal__ecI',	'default'=>'6B6B6B'),
+				array('css'=>'color:#$', 'var'=>'evcal__ecI',	'default'=> $evo_color_1),
 				array('css'=>'font-size:$', 'var'=>'evcal__ecIz',	'default'=>'18px')
 			)	
 		),array(
 			'item'=>'.evcal_evdata_row .evcal_evdata_cell h3, .evo_clik_row .evo_h3',
-			'css'=>'font-size:$', 'var'=>'evcal_fs_001',	'default'=>'18px'
-		),array(
-			'item'=>'#evcal_list .eventon_list_event .evcal_cblock, .evo_lightboxes .evo_pop_body .evcal_cblock',
-			'css'=>'color:#$', 'var'=>'evcal__fc2',	'default'=>$preset_data['evo_color_1']
-		),array(
+			'css'=>'font-size:$', 'var'=>'evcal_fs_001',	'default'=>'20px'
+		),
+		array(
 			'item'=>'.evcal_evdata_row .evcal_evdata_cell h2, .evcal_evdata_row .evcal_evdata_cell h3, .evorow .evo_clik_row h3, 
 			.evcal_evdata_row .evcal_evdata_cell h3 a',
 			'css'=>'color:#$', 'var'=>'evcal__fc4',	'default'=>$preset_data['evo_color_1']
@@ -186,7 +178,7 @@
 				.ajde_evcal_calendar .eventon_events_list .eventon_desc_in ul,
 				.evo_lightboxes .evo_pop_body .evcal_evdata_row .evcal_evdata_cell p,
 				.evo_lightboxes .evcal_evdata_cell p a' ,
-			'css'=>'color:#$', 'var'=>'evcal__fc5',	'default'=>'656565'
+			'css'=>'color:#$', 'var'=>'evcal__fc5',	'default'=> $evo_color_1
 		),
 		array(
 			'item'=>'.ajde_evcal_calendar #evcal_head.calendar_header #evcal_cur, .ajde_evcal_calendar .evcal_month_line p, .ajde_evcal_calendar .evo_footer_nav p.evo_month_title',
@@ -214,16 +206,16 @@
 				'css'=>'border-color:#$', 'var'=>'evcal__evcbrb',	'default'=>'d5d5d5'
 			)
 		//eventtop
-		,array(
-			'item'=>'.eventon_events_list .eventon_list_event .evcal_list_a.featured_event',
-			'css'=>'background-color:#$', 'var'=>'evcal__bgc5',	'default'=>'fff6e2'
-		),array(
-			'item'=>'.eventon_events_list .eventon_list_event .desc_trig:hover',
-			'css'=>'border-left-width:$', 'var'=>'evcal__ett_borderleft',	'default'=>'7px'
-		),array(
-			'item'=>'.eventon_events_list .eventon_list_event .evcal_list_a.featured_event:hover',
-			'css'=>'background-color:#$', 'var'=>'evcal__bgc5h',	'default'=>'ffecc5'
-		)
+			,array(
+				'item'=>'.eventon_events_list .eventon_list_event .evcal_list_a.featured_event',
+				'css'=>'background-color:#$', 'var'=>'evcal__bgc5',	'default'=>'fff6e2'
+			),array(
+				'item'=>'.eventon_events_list .eventon_list_event .desc_trig:hover',
+				'css'=>'border-left-width:$', 'var'=>'evcal__ett_borderleft',	'default'=>'7px'
+			),array(
+				'item'=>'.eventon_events_list .eventon_list_event .evcal_list_a.featured_event:hover',
+				'css'=>'background-color:#$', 'var'=>'evcal__bgc5h',	'default'=>'ffecc5'
+			)
 			/* featured events tag */
 			,array(
 				'item'=>'.eventon_events_list .eventon_list_event .evcal_desc span.evo_above_title span.featured, .evo_pop_body .evcal_desc span.evo_above_title span.featured',
@@ -240,42 +232,49 @@
 			),array(
 				'item'=>'.evcal_desc3 .evo_ep_bar.evo_completed b',
 				'css'=>'background-color:#$', 'var'=>'evoeventtop_live2',	'default'=>'9a9a9a'
-			)
+			),
 
-		// colorful eventtop text color			
-			,array(
-				'item'=>'.ajde_evcal_calendar.color #evcal_list .eventon_list_event .evcal_cblock, .ajde_evcal_calendar.color #evcal_list .eventon_list_event .evoet_cx span.evcal_event_title, 
-				.ajde_evcal_calendar.color .evoet_cx em i,
-				.ajde_evcal_calendar.color #evcal_list .eventon_list_event .evoet_cx span.evcal_event_subtitle, 
-				.ajde_evcal_calendar.color #evcal_list .eventon_list_event .evoet_cx em, 
-				.ajde_evcal_calendar.color #evcal_list .eventon_list_event .eventon_list_event .evoet_cx .evcal_desc_info, 
-				.ajde_evcal_calendar.color .eventon_events_list .eventon_list_event .evcal_cblock em.evo_day, 
-				.ajde_evcal_calendar.color .evoet_cx .evo_below_title .status_reason, 
-				.ajde_evcal_calendar.color .evoet_cx .evo_tz_time .evo_tz, 
-				.ajde_evcal_calendar.color .evoet_cx .evo_mytime.tzo_trig i, 
-				.ajde_evcal_calendar.color .evoet_cx .evo_mytime.tzo_trig b, 
-				.ajde_evcal_calendar.color .evoet_cx em i, 
-				.ajde_evcal_calendar.color .evoet_cx .evo_ep_pre, 
-				.ajde_evcal_calendar.color .evoet_cx .evo_ep_time, 
-				.ajde_evcal_calendar.color .evoet_cx .evo_mytime.tzo_trig:hover i, 
-				.ajde_evcal_calendar.color .evoet_cx .evo_mytime.tzo_trig:hover b, 
-				.evo_lightboxes .color.eventon_list_event .evoet_cx .evo_below_title .status_reason, 
-				.evo_lightboxes .color.eventon_list_event .evcal_cblock, 
-				.evo_lightboxes .color.eventon_list_event .evoet_cx span.evcal_event_title,
-				 .evo_lightboxes .color.eventon_list_event .evoet_cx span.evcal_event_subtitle, 
-				 .evo_lightboxes .color.eventon_list_event .evoet_cx em, 
-				 .evo_lightboxes .color.eventon_list_event .evoet_cx .evcal_desc_info, 
-				 .evo_lightboxes .color.eventon_list_event .evcal_cblock em.evo_day, 
-				 .evo_lightboxes .color.eventon_list_event .evoet_cx .evo_tz_time > *,
-				  .evo_lightboxes .color.eventon_list_event .evoet_cx .evo_mytime.tzo_trig i,
-				  .evo_lightboxes .color.eventon_list_event .evoet_cx .evo_mytime.tzo_trig b,
-				  .ajde_evcal_calendar.color #evcal_list.eventon_events_list .eventon_list_event p .evoet_cx span.evcal_event_title',
-				'css'=>'color:#$', 'var'=>'evcal__colorful_text',	'default'=>'ffffff',
-			)
+			
+			// text under event title
+			// when ett color is "custom" > use colorful text color for colorful ett only
+				array(
+					'item'=>'.ajde_evcal_calendar.color.etttc_custom, .evo_lightboxes .eventon_list_event.color.etttc_custom',
+					'css'=>'--evo_ett_color:#$; --ett_title_color:#$; --ett_subtitle_color:#$;--ett_dateblock_color:#$;', 'var'=>'evcal__colorful_text',	'default'=> 'ffffff'
+				),
 
+			// custom ett colors, that may also be applied to colorful if set		
+				// general 				
+				array(
+					'item'=>'.ajde_evcal_calendar.clean, 
+						.ajde_evcal_calendar.color.etttc_none,
+						.evo_lightboxes .eventon_list_event.clean, 
+						.evo_lightboxes .eventon_list_event.color.etttc_none',
+					'css'=>'--evo_ett_color:#$;', 'var'=>'evcal__fc6',	'default'=> $evo_color_1
+				),
+				// title
+				array(
+					'item'=>'.ajde_evcal_calendar.clean, 
+						.ajde_evcal_calendar.color.etttc_none, 
+						.evo_lightboxes .clean.eventon_list_event, 
+						.evo_lightboxes .eventon_list_event.color.etttc_none',
+					'css'=>'--ett_title_color:#$', 'var'=>'evcal__fc3',	'default'=> $evo_color_1
+				),
+				// subtitle
+				array(
+					'item'=>'.ajde_evcal_calendar.clean, 
+						.ajde_evcal_calendar.color.etttc_none, 
+						.evo_lightboxes .clean.eventon_list_event, 
+						.evo_lightboxes .eventon_list_event.color.etttc_none',
+					'css'=>'--ett_subtitle_color:#$', 'var'=>'evcal__fc3st',	'default'=> $evo_color_1
+				),
+				// date block color
+				array(
+					'item'=>'.ajde_evcal_calendar, .evo_lightboxes .eventon_list_event',
+					'css'=>'--ett_dateblock_color:#$', 'var'=>'evcal__fc6a',	'default'=>$evo_color_1
+				),
 
 		// close button for eventcard
-		,array(
+		array(
 			'item'=>'.event_description .evcal_close',
 			'css'=>'background-color:#$', 'var'=>'evcal_closebtn',	'default'=>'f7f7f7'
 		),array(
@@ -334,13 +333,7 @@
 			'item'=>'.evo_cal_above span',
 			'multicss'=>array(
 				array('css'=>'color:#$', 'var'=>'evcal__jm001',	'default'=>'ffffff'),
-				array('css'=>'background-color:#$', 'var'=>'evcal__jm002',	'default'=>$preset_data['evo_color_1'])
-			)			
-		),array(
-			'item'=>'.evo_cal_above span:hover',
-			'multicss'=>array(
-				array('css'=>'color:#$', 'var'=>'evcal__jm001H','default'=>'ffffff'),
-				array('css'=>'background-color:#$', 'var'=>'evcal__jm002H',	'default'=>'C8C8C8')
+				array('css'=>'background-color:#$', 'var'=>'evcal__jm002',	'default'=>$evo_color_2)
 			)			
 		),
 		// this month button
@@ -360,27 +353,21 @@
 		array(
 			'item'=>'.ajde_evcal_calendar .calendar_header .evo_j_dates .legend a',
 			'multicss'=>array(
-				array('css'=>'color:#$', 'var'=>'evcal__jm003','default'=>'a0a09f'),
+				array('css'=>'color:#$', 'var'=>'evcal__jm003','default'=>$evo_color_2),
 				array('css'=>'background-color:#$', 'var'=>'evcal__jm004',	'default'=>'f5f5f5')
 			)			
-		)
-		,array(
-			'item'=>'.ajde_evcal_calendar .calendar_header .evo_j_dates .legend a:hover',
-			'multicss'=>array(
-				array('css'=>'color:#$', 'var'=>'evcal__jm003H','default'=>'a0a09f'),
-				array('css'=>'background-color:#$', 'var'=>'evcal__jm004H',	'default'=>'e6e6e6')
-			)			
-		),array(
+		),
+		array(
 			'item'=>'.ajde_evcal_calendar .calendar_header .evo_j_dates .legend a.current',
 			'multicss'=>array(
-				array('css'=>'color:#$', 'var'=>'evcal__jm006','default'=>'ffffff'),
+				array('css'=>'color:#$', 'var'=>'evcal__jm006','default'=>$evo_color_2),
 				array('css'=>'background-color:#$', 'var'=>'evcal__jm007',	'default'=>'CFCFCF')
 			)			
 		),array(
 			'item'=>'.ajde_evcal_calendar .calendar_header .evo_j_dates .legend a.set',
 			'multicss'=>array(
-				array('css'=>'color:#$', 'var'=>'evcal__jm008','default'=>'ffffff'),
-				array('css'=>'background-color:#$', 'var'=>'evcal__jm009',	'default'=>'f79191')
+				array('css'=>'color:#$', 'var'=>'evcal__jm008','default'=>$evo_color_2),
+				array('css'=>'background-color:#$', 'var'=>'evcal__jm009',	'default'=>$evo_color_second)
 			)			
 		),array(
 			'item'=>'.ajde_evcal_calendar .calendar_header .evcal_arrows, .evo_footer_nav .evcal_arrows',
@@ -391,8 +378,7 @@
 		),array(
 			'item'=>'.ajde_evcal_calendar .calendar_header .evcal_arrows:hover, .evo_footer_nav .evcal_arrows:hover',
 			'multicss'=>array(
-				array('css'=>'border-color:#$', 'var'=>'evcal__jm010H','default'=>'e2e2e2'),
-				array('css'=>'background-color:#$', 'var'=>'evcal__jm011H','default'=>'e2e2e2'),			
+				array('css'=>'background-color:#$', 'var'=>'evcal__jm011H','default'=>$evo_color_1),			
 			)			
 		),array(
 			'item'=>'.ajde_evcal_calendar .calendar_header .evcal_arrows:before,
@@ -404,18 +390,20 @@
 	.evo_footer_nav .evcal_arrows.evcal_btn_prev:hover:before,
 	.evo_footer_nav .evcal_arrows.evcal_btn_next:hover:before',
 			'css'=>'border-color:#$', 'var'=>'evcal__jm01AH','default'=>'e2e2e2'
-		)
-		,array(
+		),
+		// general
+		array(
 			'item'=>'.eventon_events_list .eventon_list_event .evcal_desc span.evo_above_title span, .evo_pop_body .evcal_desc span.evo_above_title span',
 			'multicss'=>array(
-				array('css'=>'color:#$', 'var'=>'fs_eventtop_tag_2','default'=>'ffffff'),
+				array('css'=>'color:#$', 'var'=>'fs_eventtop_tag_2','default'=> $evo_color_1),
 				array('css'=>'background-color:#$', 'var'=>'fs_eventtop_tag_1','default'=>'F79191'),			
 			)			
 		),
+		// cancelled
 		array(
 			'item'=>'.eventon_events_list .eventon_list_event .evcal_desc span.evo_above_title span.canceled, .evo_pop_body .evcal_desc span.evo_above_title span.canceled',
 			'multicss'=>array(
-				array('css'=>'color:#$', 'var'=>'evcal__cancel_event_2','default'=>'ffffff'),
+				array('css'=>'color:#$', 'var'=>'evcal__cancel_event_2','default'=>$evo_color_1),
 				array('css'=>'background-color:#$', 'var'=>'evcal__cancel_event_1','default'=>'F79191'),
 			)			
 		),
@@ -423,7 +411,7 @@
 		array(
 			'item'=>'.eventon_events_list .eventon_list_event .evcal_desc span.evo_above_title span.postponed, .evo_pop_body .evcal_desc span.evo_above_title span.postponed',
 			'multicss'=>array(
-				array('css'=>'color:#$', 'var'=>'fs_eventtop_est_1b','default'=>'ffffff'),
+				array('css'=>'color:#$', 'var'=>'fs_eventtop_est_1b','default'=>$evo_color_1),
 				array('css'=>'background-color:#$', 'var'=>'fs_eventtop_est_1a','default'=>'e3784b'),
 			)			
 		),		
@@ -431,7 +419,7 @@
 		array(
 			'item'=>'.eventon_events_list .eventon_list_event .evcal_desc span.evo_above_title span.movedonline, .evo_pop_body .evcal_desc span.evo_above_title span.movedonline',
 			'multicss'=>array(
-				array('css'=>'color:#$', 'var'=>'fs_eventtop_est_2b','default'=>'ffffff'),
+				array('css'=>'color:#$', 'var'=>'fs_eventtop_est_2b','default'=>$evo_color_1),
 				array('css'=>'background-color:#$', 'var'=>'fs_eventtop_est_2a','default'=>'6edccd'),
 			)			
 		),
@@ -439,11 +427,19 @@
 		array(
 			'item'=>'.eventon_events_list .eventon_list_event .evcal_desc span.evo_above_title span.rescheduled, .evo_pop_body .evcal_desc span.evo_above_title span.rescheduled',
 			'multicss'=>array(
-				array('css'=>'color:#$', 'var'=>'fs_eventtop_est_3b','default'=>'ffffff'),
+				array('css'=>'color:#$', 'var'=>'fs_eventtop_est_3b','default'=>$evo_color_1),
 				array('css'=>'background-color:#$', 'var'=>'fs_eventtop_est_3a','default'=>'67ef78'),
 			)			
 		),
-
+		// Repeating
+		array(
+			'item'=>'.eventon_events_list .eventon_list_event .evcal_desc span.evo_above_title span.repeating, .evo_pop_body .evcal_desc span.evo_above_title span.repeating',
+			'multicss'=>array(
+				array('css'=>'color:#$', 'var'=>'fs_eventtop_repeat_1','default'=>$evo_color_1),
+				array('css'=>'background-color:#$', 'var'=>'fs_eventtop_repeat_2','default'=>$evo_color_second),
+			)			
+		),
+		
 		// cancel event eventtop lines		
 		array(
 			'item'=>'.eventon_events_list .eventon_list_event .cancel_event.evcal_list_a',
@@ -487,7 +483,7 @@
 			),array(
 				'item'=>'.evo_metarow_socialmedia a.evo_ss i',
 				'multicss'=>array(
-					array('css'=>'color:#$', 'var'=>'evose_1','default'=>$preset_data['evo_color_2'])
+					array('css'=>'color:#$', 'var'=>'evose_1','default'=>$evo_color_2)
 				)						
 			),array(
 				'item'=>'.evo_metarow_socialmedia a.evo_ss:hover i',

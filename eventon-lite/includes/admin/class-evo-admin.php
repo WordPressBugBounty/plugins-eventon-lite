@@ -48,7 +48,9 @@ class evo_admin {
 	}
 
 // admin init
-	function eventon_admin_init() {				
+	public function eventon_admin_init() {	
+
+		wp_enqueue_script('evcal_functions');						
 		
 		global $pagenow, $typenow, $wpdb, $post;	
 
@@ -275,6 +277,10 @@ class evo_admin {
 					'add_new_item'=> esc_html__('Add new item', 'eventon'),
 					'edit_item'=> esc_html__('Edit item', 'eventon'),
 					'setting_evo_gen_map'=> EVO()->cal->check_yn('evo_gen_map','evcal_1'),
+					'html'=> array(
+						'preload_general' => EVO()->calendar->helper->get_preload_general_html(),
+					),
+					//'shortcode_keys'=> EVO()->shortcode_gen->get_sc_key_assoc()
 				)
 			);
 

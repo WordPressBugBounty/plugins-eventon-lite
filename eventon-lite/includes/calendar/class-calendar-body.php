@@ -3,7 +3,7 @@
  * Calendar body parts class
  *
  * @class  		evo_cal_body
- * @version		2.2.19
+ * @version		2.3
  * @package		EventON/Classes
  * @category	Class
  * @author 		AJDE
@@ -92,6 +92,9 @@ class evo_cal_body{
 
 			// upcoming list
 			if($this->cal->is_upcoming_list)	$__cal_classes[] = 'ul';
+
+			// eventtop text color settings
+				$__cal_classes[] = 'etttc_'. EVO()->cal->get_ett_color_prop();
 
 			// no ajax load on load
 			if( !empty($args['cal_init_nonajax']) && $args['cal_init_nonajax'] =='yes'){
@@ -237,7 +240,7 @@ class evo_cal_body{
 				if($arg_y['sep_month'] == 'yes') $evcal_list_classes[] = 'sep_months';
 				if($this->rtl) $evcal_list_classes[] ='evortl';
 
-				$__class_additions = implode(' ',  apply_filters('eventon_events_list_classnames', $evcal_list_classes, $args)) . $_classes_evcal_list;
+				$__class_additions = implode(' ',  apply_filters('eventon_events_list_classnames', $evcal_list_classes, $args)) . ' '. $_classes_evcal_list;
 
 				// filter added 4.0
 				echo ($_html_evcal_list)? "<!-- Events List --><div id='evcal_list' 
@@ -358,9 +361,7 @@ class evo_cal_body{
 				if(count($above_heade_content)>0){
 					echo "<div class='evo_cal_above_content'>";
 					
-					foreach($above_heade_content as $cc){
-						echo  wp_kses_post( $cc );
-					}
+					foreach($above_heade_content as $cc){	echo   $cc ;	}
 
 					echo "</div>";
 				}
@@ -495,10 +496,11 @@ class evo_cal_body{
 			
 			<?php
 				if(!empty($args['ics']) && $args['ics']=='yes'){
-					
-					$link = admin_url('admin-ajax.php').'?action=eventon_export_events_ics&amp;nonce='. wp_create_nonce('eventon_download_events')."&s={$args['focus_start_date_range']}&e={$args['focus_end_date_range']}";
 
-					echo '<a class="evcal_btn download_ics" href="'.esc_url( $link ) .'" style="margin-top:10px"><em class="fa fa-calendar-plus-o" ></em> '. esc_html( evo_lang('Download all events as ICS file') ).'</a>';
+					$nonce = wp_create_nonce('export_event_nonce');
+					$export_url_all = home_url("/export-events/all/?nonce={$nonce}");
+
+					echo '<a class="evcal_btn download_ics" href="'.esc_url( $export_url_all ) .'" style="margin-top:10px"><em class="fa fa-calendar-plus-o" ></em> '. esc_html( evo_lang('Download all events as ICS file') ).'</a>';
 				}
 			?>
 

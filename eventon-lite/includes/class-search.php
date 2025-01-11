@@ -1,7 +1,7 @@
 <?php
 /**
  * Search Capabilities of events through out eventon
- * @version L 2.2.14
+ * @version 2.3
  */
 if ( ! defined( 'ABSPATH' ) ) exit;
 
@@ -198,6 +198,7 @@ class evo_search{
 				<div class='evo_search_bar <?php echo $search_show ? '' : 'evo_hidden';?>'>
 					<div class='evo_search_bar_in' >
 						<input id='evo_search_bar_in_<?php echo esc_attr( EVO()->calendar->ID );?>' type="text" placeholder='<?php echo esc_attr( eventon_get_custom_language('', 'evoSR_001', 'Search Events') );?>' data-role="none"/>
+
 						<a class="evosr_search_clear_btn"><i class="fa fa-close"></i></a>
 						<a class="evosr_search_btn"><i class="fa fa-search"></i></a>
 					</div>

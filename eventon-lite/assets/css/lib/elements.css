@@ -1,11 +1,8 @@
-/* 
+/**
  * EventON Elements CSS 
- * @version 4.6.5
-    General
-    Lightbox Select Field
-    Select in a row
-    Tool tips
-*/
+ * @version 2.3
+ * @fullversion4.7.4
+ */
 
 :root{
     --evo_color_prime: #00aafb;
@@ -13,20 +10,81 @@
 /* General */
     .evo_elm_row p.evo_field_container input,
     .evo_elm_row p.evo_field_container textarea{
-        border-radius: 10px;
+        border-radius: 8px;
         background-color: #e5e5e5; width:100%;
     }
+    .evo_elm_afterstatement .evo_elm_row p.evo_field_container input,
+    .evo_elm_afterstatement .evo_elm_row p.evo_field_container textarea{background-color:rgb(255 255 255 / 60%) }
     .evo_elm_row p.evo_field_container input:focus{
         box-shadow: 0px 0px 10px 0px #dadada;
         background-color: #fff;
     }
-    .evo_elm_row{display: block;width: 100%;}
+    .evo_elm_row{display: block;width: 100%;box-sizing: border-box;}
+    .evo_elm_row.evodfx{display: flex;}
     .evo_elm_row p.evo_field_label, .evo_elm_row p.evo_field_container{margin:0;}
-    .evo_elm_row p.evo_field_label{margin-bottom: 5px; padding-bottom: 0; font-size: 14px;}
+    .evo_elm_row p.evo_field_label{margin-bottom: 5px; padding-bottom: 0; font-size: 14px;position: relative;}
     .evo_elm_row p.evo_field_container{margin-bottom: 10px;padding:0;}
     .evo_nesting{
         display: flex; gap: 15px;
     }
+/* interactive wysiwyg row */
+    .evo_elm_row.trumbowyg p.evo_field_container{margin-bottom: 1px;}
+    .evo_elm_row.trumbowyg{padding-bottom: 10px;}
+    .evo_elm_row.trumbowyg .evo_elm_act_on.le{margin: 10px 0px;}
+    .evo_elm_row.trumbowyg .evo_elm_act_on:hover, 
+     .evo_elm_row.trumbowyg .evo_field_preview:hover {background-color: #cecece;}
+    .evo_elm_row.trumbowyg .evo_field_preview{    padding: 8px 15px; font-size: 14px; border-radius: 10px;}
+    .evo_elm_row.trumbowyg .evo_field_preview,.evo_elm_row.trumbowyg .evo_elm_act_on{
+        cursor: pointer;
+        background-color: #e8e8e8;
+        padding: 8px 15px;
+    }
+
+/* detailed button 4.7 */
+    .evo_elm_button{
+        height: auto;
+        min-height: 36px;
+        padding:6px 12px; margin: 0 0 5px;
+        text-align: left;
+        width: 100%;
+        border:none;border-radius: 10px;
+        cursor: pointer;
+        display: inline-flex; align-items: center;
+        font-size: 14px; background: none;
+        justify-content: space-between;
+        text-decoration: none;
+        color:var(--evo_color_1);
+        box-sizing: border-box;
+    }
+    .evo_elm_button .evo_btn_item_details{
+        display: flex;
+        flex-direction: column;
+    }
+    .evo_elm_button .evo_btn_item_details .evo_btn_item{}
+    .evo_elm_button .evo_btn_item_details .evo_btn_info{
+        color:#757575; font-size: 12px; margin-top: 2px; white-space: normal;
+    }
+    .evo_elm_button .evo_btn_vis{ color:var(--evo_color_1);}
+    .evo_elm_button .evo_btn_vis i{ font-size: 18px;}
+
+    div.evo_elm_button{
+        cursor: default;
+        border-bottom: 1px solid var(--evo_border_c);
+        border-radius: 0;
+        margin-bottom: 0px; padding:10px 0;
+    }
+    div.evo_elm_button:hover{background-color: transparent;}
+    div.evo_elm_button .evo_btn{border:none;outline;none;}
+
+    div.evo_elm_button.evo_bordern{border:none;}
+    div.evo_elm_button.evomar0{margin: 0px;}
+
+    .evo_elm_button.pre{justify-content: flex-start;}
+    .evo_elm_button .evo_btn_vis.pre{margin-right: 15px;}
+    .evo_elm_button:hover{    background-color: var(--evo_cl_b5);text-decoration: none;}
+    .evo_elm_button:hover .evo_btn_item,
+    .evo_elm_button:hover .evo_btn_vis
+    {color: var(--evo_color_prime);}
 
 /* editable select row value */
     .evo_edittable_sel_val , .evomb_body p.evo_edittable_sel_val{
@@ -53,6 +111,58 @@
     .evo_edittable_sel_val i:hover{    background-color: var(--evo_color_1); color: #fff; }
     .evo_edittable_sel_val i.fa-cross,.evo_edittable_sel_val i.fa-times{}
     .evo_edittable_sel_val i.fa-pencil{}
+
+/* multiple images */  
+    .evo_metafield_images span.evo_img{
+        background-color: #c3c3c3;
+        height: 100px;
+        display: inline-block;
+        width: 100px;
+        border-radius: 15px;
+        margin: 0 5px 5px 0;
+        border: 2px dashed #333;
+        cursor: pointer; position: relative;
+        background-size: cover;
+        background-position: center;
+    }
+    .evo_metafield_images span.evo_img:hover{opacity: 0.7}
+    .evo_metafield_images span.evo_img:before{
+        content:"\2b";
+            font-family: 'evo_FontAwesome','evo_FontAwesomeB';
+        font-weight: 400;
+            -webkit-font-smoothing: antialiased;
+        display: var(--fa-display, inline-block);
+        font-style: normal;
+        font-variant: normal;
+        line-height: 1;
+        text-rendering: auto; border-radius: 20px;
+        height: 30px; width: 30px; position: absolute; top: calc(50% - 15px);left: calc(50% - 15px);
+        display: flex;justify-content: center;align-items: center;
+    }
+    .evo_metafield_images span.evo_img.on{border:2px solid var(--evo_color_1);}
+    .evo_metafield_images span.evo_img.on:before{
+        content:"\2b"; transform: rotate(45deg);
+        background-color: var(--evo_color_second);
+    }
+    .evo_metafield_images span.evo_img.on:hover:before{ transform: scale(1.2) rotate(45deg);}
+    .evo_metafield_images span.evo_img_trig{}
+
+/* single image */
+    .evo_metafield_image{}
+    .evo_metafield_image span.image_src{
+        height: 50px; width: 200px;
+        background-color: #c3c3c3; border:2px dashed #333;
+    }
+    .evo_metafield_image .evolm_img_select_trig{}
+    .evo_metafield_image.has_img .evolm_img_select_trig,
+    .evo_metafield_image .image_src .evoel_img_remove_trig,
+    .evo_metafield_image span.image_src .evoelm_img_holder{display:none}
+
+    .evo_metafield_image.has_img span.image_src{height: 100px; width: 200px;border:none}
+    .evo_metafield_image.has_img span.image_src .evoelm_img_holder{display: flex; }
+    .evo_metafield_image.has_img .image_src .evoel_img_remove_trig{display: flex; 
+        left:calc(50% - 25px); top:calc(50% - 25px); height: 30px; width: 30px;}
+    .evo_metafield_image.has_img .image_src:before{}
 
 /* yes no button */
     .ajde_yn_btn {
@@ -124,6 +234,93 @@
     .evo_inside .yesno_row span.field_name{pointer-events:auto;}
     .yesno_row .ajde_yn_btn { padding: 0;flex: 0 0 auto;}
 
+/* date picker @4.7.4 */
+    .evo-datepicker.ui-datepicker.ui-widget{ 
+        border-radius: 15px !important;
+        padding: 5px;
+        border: none;
+        overflow: hidden;
+        box-shadow: 0px 5px 12px -5px #333;
+        background-color: #fff;
+    }
+    .evo-datepicker .ui-widget-header{background: transparent;border:none;}
+    .evo-datepicker .ui-datepicker-calendar .ui-state-default{
+        background: transparent;
+        border: none;
+        text-align: center;
+        border-radius: 5px;
+        padding: 6px 2px;
+        line-height: 1.5;
+        transition: 0.3s;
+        color:var(--evo_color_2);
+    }
+
+    .evo-datepicker.ui-datepicker .ui-datepicker-title, 
+    .evo-datepicker.ui-datepicker th,
+    .evo-datepicker .ui-datepicker-calendar .ui-state-default
+    {
+        font-family: var(--evo_font_1);
+    }
+
+    .evo-datepicker .ui-datepicker-calendar .ui-state-default.ui-state-highlight{
+        color:var(--evo_color_prime);        
+    }
+    .evo-datepicker .ui-datepicker-calendar .highlight .ui-state-default.ui-state-active,
+    .evo-datepicker .ui-datepicker-calendar .ui-state-default.ui-state-active
+    {background-color: var(--evo_color_second);}
+    .evo-datepicker .ui-datepicker-calendar .highlight .ui-state-default{
+        background-color: #f0f6fc;
+    }
+    .evo-datepicker .ui-datepicker-calendar .ui-state-default:hover{
+        background-color: var(--evo_color_prime);color:#fff;
+    }
+
+    .evo-datepicker.ui-datepicker .ui-datepicker-prev, 
+    .evo-datepicker.ui-datepicker .ui-datepicker-next
+    {
+        border: 1px solid #bbbbbb; border-radius: 50%; cursor: pointer;transition: 0.3s;
+    }
+    .evo-datepicker.ui-datepicker .ui-datepicker-prev.ui-state-hover, 
+    .evo-datepicker.ui-datepicker .ui-datepicker-next.ui-state-hover{
+        background: #bbbbbb;
+    }
+    .evo-datepicker.ui-datepicker .ui-datepicker-prev.ui-state-hover{left:2px; top:2px;}
+    .evo-datepicker.ui-datepicker .ui-datepicker-next.ui-state-hover{right:2px; top:2px;}
+    .evo-datepicker.ui-datepicker .ui-datepicker-prev .ui-icon:before,
+    .evo-datepicker.ui-datepicker .ui-datepicker-next .ui-icon:before{
+        content: "\f053";
+        left: 1px;top:3px;
+        position: absolute;
+        width: 16px;
+        color: #bbbbbb; 
+        /* height: 15px; */
+        text-indent: 0;
+        text-align: center;
+    }
+    .evo-datepicker.ui-datepicker .ui-datepicker-next .ui-icon:before{left:-1px}
+    .evo-datepicker.ui-datepicker .ui-datepicker-prev.ui-state-hover .ui-icon:before,
+    .evo-datepicker.ui-datepicker .ui-datepicker-next.ui-state-hover .ui-icon:before{
+        color:#fff;
+    }
+    .evo-datepicker.ui-datepicker .ui-datepicker-next .ui-icon:before{
+        content:"\f054";
+    }
+    .evo-datepicker.ui-datepicker .ui-datepicker-prev .ui-icon,
+    .evo-datepicker.ui-datepicker .ui-datepicker-next .ui-icon
+    {
+        font-family:  'evo_FontAwesome', 'evo_FontAwesomeB';
+        font-weight: 900;
+        -moz-osx-font-smoothing: grayscale;
+        -webkit-font-smoothing: antialiased;
+        font-style: normal;
+        font-variant: normal;
+        line-height: 1;
+        text-rendering: auto;
+        position: relative;
+        background: none;
+        font-size: 12px;
+    }
+
 /* angle button */
     .evo_elm_row.angle{display: flex;align-items: center;}
     .evo_elm_row.angle .evo_elm_ang_hold{
@@ -173,13 +370,14 @@
         margin: 0;
         padding: 9px;
     }
-    .evo_icon_selector ul li:hover{    background-color: #eeeeee;}
     .evo_icon_selector ul li.selected{background-color: var(--evo_color_prime);}
     .evo_icon_selector ul li.selected i{}
     .evo_icon_selector ul li i{
         font-size: 28px;
         width: 28px;
         transition: all linear 0.1s;
+        display: flex;
+        justify-content: center;
     }
     .evo_icon_selector ul li:hover i{  transform: scale(1.2); color:var(--evo_color_prime);}
     .evo_icon_search_bar{margin-top: 10px}
@@ -243,8 +441,8 @@
         background-color: #fff;
         box-shadow: 0 0 0 1px rgba(136,152,170,.1), 0 15px 35px 0 rgba(49,49,93,.1), 0 5px 15px 0 rgba(0,0,0,.08);
         position: absolute; top:70px;
-        z-index: 9999;
-        border-radius: 8px;   
+        z-index: 99999;
+        border-radius: 15px;   
         transform: scale(.85);
         opacity: 0;
         transition: opacity .25s cubic-bezier(0,1,.4,1),transform .25s cubic-bezier(.18,1.25,.4,1); 
@@ -256,11 +454,11 @@
     }
     .evo_elm_lb_window span{display: block;padding:5px 8px 5px 30px;cursor: pointer;position: relative;}
     .evo_elm_lb_window span:hover{background-color: #f3f3f3}
-    .evo_elm_lb_window span.select{color:#f58787;}
+    .evo_elm_lb_window span.select{color:var(--evo_color_prime);}
     .evo_elm_lb_window span.select:before {
         content: "";
-        border-left: 4px solid #f58787;
-        border-bottom: 4px solid #f58787;
+        border-left: 4px solid var(--evo_color_prime);
+        border-bottom: 4px solid var(--evo_color_prime);
         width: 8px;
         display: block;
         height: 4px;
@@ -269,7 +467,7 @@
         left: 10px;
         margin-top: 3px;
         box-sizing: content-box;
-    }
+    }   
     .eelb_i_i{max-height: 200px; overflow-y: scroll;}
     .evo_elm_lb_window.show .eelb_in:before{
         content: "";
@@ -283,6 +481,12 @@
         background: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMSIgaGVpZ2h0PSI5Ij48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGZpbGw9IiM4ODk4QUEiIGZpbGwtb3BhY2l0eT0iLjEiIGQ9Ik0xIDkuMDkyaDE5bC02LjQwMi02Ljc0Yy0xLjcxNy0xLjgwNi00LjQ4NS0xLjgtNi4xOTYgMEwxIDkuMDkzek0yMC4zNDIgOGwtNi4wMi02LjMzNmMtMi4xMDgtMi4yMi01LjUzOC0yLjIxOC03LjY0NSAwTC42NTggOGgxOS42ODR6Ii8+PHBhdGggZmlsbD0iI0ZGRiIgZD0iTTcuNDAyIDIuMzUzYzEuNzExLTEuODAxIDQuNDgtMS44MDcgNi4xOTYgMEwyMCA5LjA5M0gxbDYuNDAyLTYuNzR6Ii8+PC9nPjwvc3ZnPg==);
         background-repeat: no-repeat;
         background-position: 50%;
+    }
+    .evo_elm_lb_window.above .eelb_in:before {
+            transform: rotate(180deg);
+        top: auto;
+        bottom: 0;
+        margin-bottom: -15px;
     }
 /* plus minus */
     .evo_plusminus_adjuster{display: flex;flex-direction: row}
@@ -342,14 +546,15 @@
     p.evo_row_select span span:hover{ color: #9c9c9c;}
     p.evo_row_select span span.select{   background-color: var(--evo_color_1);color:#fff;border-radius: 20px}
     
-    p.evo_row_select span span{padding:8px 15px;color:#636363;cursor: pointer;line-height: 1 ; margin-bottom: 5px;   }
+    p.evo_row_select span span{padding:8px 15px;color:#636363;cursor: pointer;line-height: 1 ;    }
 
 /* afterstatement field */
     .evo_elm_afterstatement {
-            background-color: #ddd;
-        padding: 8px;margin-bottom: 10px;
-        border-radius: 10px;
+        background-color: #ddd;
+        padding: 20px 20px 15px;margin-bottom: 10px;
+        border-radius: 15px;
     }
+    .evo_elm_afterstatement .evo_elm_afterstatement{background-color: #cdcdcd;}
 
 /* import/upload files */
     .evo_data_upload_window{
@@ -445,6 +650,12 @@
         bottom: 0;left:0;
         margin-bottom: -12px;
     }
+    .evo_elms .evo_tooltip_box.evocenter{border-radius: 10px;}
+    .evo_elms .evo_tooltip_box.evocenter:before{
+        border-width: 12px 9px 0 9px;
+        left:calc(50% - 6px);
+        border-color: #3a4652 transparent transparent transparent;
+    }
     .evo_elms .evo_tooltip_box.L{border-radius: 10px 10px 0px 10px;}
     .evo_elms .evo_tooltip_box.L:before{
         content: "";
@@ -452,8 +663,14 @@
         border-color: transparent #3a4652 transparent  transparent;
         left:auto;right:0px;
     }
-    .ajdeToolTip.free:before{content:none;}
-    .ajdeToolTip:before{
+    .evotooltip.free{
+        color: var(--evo_color_1);
+        width: auto;
+        position: relative;
+        margin: 0;
+    }
+    .evotooltip.free:before, .ajdeToolTip.free:before{content:none;}
+    .evotooltip:before, .ajdeToolTip:before{
         content: "!";
         font-style: normal;
         display: inline-block;
@@ -466,12 +683,14 @@
         height: 16px;
         width: 16px;
         line-height: 10px;
-        opacity: 0.6;
+        opacity: 0.7;
         box-sizing: border-box;
         font-family: var(--evo_font_2); font-weight: bold;
     }
-    .ajdeToolTip:hover:before{opacity: 1;}
-    span.ajdeToolTip, .yesno_row span.ajdeToolTip{
+    .evotooltip.ajdeToolTip:hover:before, .evotooltip:hover:before;{opacity: 1;}
+    .evotooltip, 
+    span.ajdeToolTip, 
+    .yesno_row span.ajdeToolTip{
         padding-left: 0;
         margin-left:4px;
         text-align: center;
@@ -487,7 +706,7 @@
         cursor: pointer;
         display:inline-block;   box-sizing: content-box;    
     }
-    .ajdeToolTip:hover, .yesno_row .ajdeToolTip:hover{opacity: 1}
+    .ajdeToolTip:hover, .yesno_row .ajdeToolTip:hover, .evotooltip:hover;{opacity: 1}
     .ajdeToolTip em{display:none;}
    
     /* overrides */
@@ -495,10 +714,54 @@
     #ajdePOSH_outter label .ajdeToolTip{right: 10px;}
     #ajdePOSH_outter .ajdeToolTip{ right: 0;top: 5px;  padding: 0;}
 
+/* Settings row item */
+    .evoelm_settings_row{}
+    .evoelm_settings_row.evosortable{}
+    .evoelm_settings_row.evosortable li{padding-left: 30px;}
+    .evoelm_settings_row.evosortable li:before{
+        content: "";position: absolute;top: 50%;left: 8px;width: 0.7em; height: 0.125em;border-top: 0.375em double #a0a0a0; border-bottom: 0.125em solid #a0a0a0; margin-top: -0.3em; cursor: move;
+    }
+    .evoelm_settings_row li{
+        position: relative;
+        padding: 5px;
+        padding-left: 20px;
+        margin: 0;
+        position: relative;
+        margin-bottom: 10px;
+        border: 1px solid var(--evo_color_1);
+        border-radius: 20px;
+        align-items: center;
+    }
+    .evoelm_settings_row li:hover{
+        background-color: var(--evo_color_second);
+    }
+    .evoelm_settings_row .actions{}    
+    .evoelm_settings_row .actions i{
+        cursor: pointer;
+        color: var(--evo_color_1);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 30px;
+        width: 30px;
+        margin: 0;
+        border-radius: 40px;
+    }
+    .evoelm_settings_row li.od_row .other_data{
+        flex-direction: row;
+        display: flex;
+        gap: 10px;
+    }
+    .evoelm_settings_row .actions i:hover{
+        background-color: var(--evo_color_1);
+        color: #fff;
+    }
+
+
 /* in event metabox */
     #evo_mb .evo_meta_elements label.ajde_yn_btn_label{margin:0;}
     .evo_meta_elements .evo_elm_row
-        {padding:10px 0px;display: flex;justify-content: space-between;align-items: center;border-bottom: 1px solid #dedede;}
+        {padding:10px 0px;display: flex;justify-content: space-between;align-items: center;}
     .evo_meta_elements .evo_elm_row:last-child{border:none;}
     .evo_meta_elements .evo_elm_row .evo_field_container{margin-bottom: 0px;width:50%;}
     .evo_meta_elements .evo_elm_row .evo_field_container >* {width: 100%; box-sizing: border-box;}

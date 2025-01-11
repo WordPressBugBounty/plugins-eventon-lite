@@ -1,7 +1,8 @@
 <?php
 /**
  * Event Edit Meta box Health Guidance
- * @2.2.16
+ * @version 2.3
+ * @fullversion 4.8
  */
 
 
@@ -9,8 +10,14 @@ $related_events = $EVENT->get_prop('ev_releated');
 
 
 echo "<div class='evcal_data_block_style1'>
-<div class='evcal_db_data evo_rel_events_box'>
-	<input type='hidden' class='evo_rel_events_sel_list' name='ev_releated' value='". esc_attr( $related_events )."' />";
+<div class='evcal_db_data evo_rel_events_box'>";
+	
+	EVO()->elements->print_hidden_inputs( array(
+		'ev_releated' => esc_attr( $related_events ),
+		'ev_related_event_id'=> $EVENT->ID,
+		'ev_related_text' => __('Configure Related Event Details','eventon'),
+	));
+
 
 	if($EVENT->is_repeating_event()){
 		echo "<p>".esc_html__('NOTE: You can not select a repeat instance of this event as related event.','eventon').'</p>';
@@ -40,21 +47,17 @@ echo "<div class='evcal_data_block_style1'>
 		}
 	?></span>
 
-	<?php
-		$btn_data = array(
-			'lbvals'=> array(
-				'lbc'=>'evo_related_events_lb',
-				't'=> esc_html__('Configure Related Event Details','eventon'),
-				'ajax'=>'yes',
-				'd'=> array(					
-					'eventid'=> esc_attr( $EVENT->ID ),
-					'action'=> 'eventon_rel_event_list',
-					'EVs'=> esc_attr( $related_events ),
-					'uid'=>'evo_get_related_events',
-				)
-			)
-		);
-	?>
-	<span class='evo_btn evolb_trigger' <?php echo $this->helper->array_to_html_data($btn_data);?> ><?php esc_html_e('Add related event','eventon');?></span>
+	<div class='evopadt10'>
+		<?php 
+			EVO()->elements->get_element(array(
+				'type'=>'detailed_button', '_echo'=> true,
+				'name'=>__('Add related event','eventon'),
+				'description'=>__('Configure Related Event Details','eventon'),
+				'field_after_content'=> "Confiure",
+				'row_class'=> 'evo_bordern evomarb5',
+				'field_class'=>'evo_configure_related_events'
+			));
+		?>
+	</div>
 
 <?php echo "</div></div>";

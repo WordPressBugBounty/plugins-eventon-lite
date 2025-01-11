@@ -83,6 +83,7 @@ class EVO_Shortcodes {
 
 			if(empty($id)) return;
 
+
 			// if just data parts @4.5
 			if( !empty($ep_display_style) && $ep_display_style == '1' && !empty($event_datavals) && !empty($ep_data_fields) ){
 
@@ -96,13 +97,14 @@ class EVO_Shortcodes {
 				ob_start();
 
 				$fields = explode(',', $ep_data_fields);
+
 				if( is_array($fields)){
 
-					$EVENT = new EVO_Event($event_id,'', $event_ri );
+					$EVENT = new EVO_Event($event_id,'', $event_ri );					
 
-					
 
 					foreach($fields as $ff){
+						echo "<p class=''>";
 						switch ($ff) {
 						case 'event_time':
 							echo esc_attr( $EVENT->get_formatted_smart_time() );
@@ -135,7 +137,9 @@ class EVO_Shortcodes {
 							}
 						break;
 						}
+						echo "</p>";
 					}
+					
 				}
 
 				return ob_get_clean();
