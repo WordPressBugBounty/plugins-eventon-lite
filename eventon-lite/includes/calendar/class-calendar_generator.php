@@ -147,6 +147,24 @@ class EVO_generator extends EVO_Cal_Time{
 			return $this->tax_meta;
 		}
 
+	// date and time for calendar @4.6.3
+		function get_date_time_format(){
+			$this->date_format = get_option('date_format');
+			$this->time_format = get_option('time_format');
+
+			// if custom date time format enabled
+			if( EVO()->cal->check_yn('evo_timeF','evcal_1')){
+
+				$date_format = EVO()->cal->get_prop('evo_timeF_v','evcal_1');
+				$this->date_format = empty( $date_format ) ? 'F j(l)': stripslashes($date_format);
+
+				$time_format = EVO()->cal->get_prop('evo_timeF_tf','evcal_1');
+				$this->time_format = empty( $time_format ) ? 'g:ia': stripslashes( $time_format );
+			}
+
+			return array( 'date_format'=> $this->date_format, 'time_format'=> $this->time_format);
+		}
+
 	// PARSE and process SHORTCODE arguments
 		function process_arguments($args='', $set_date_range = true){
 

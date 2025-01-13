@@ -1,7 +1,7 @@
 <?php
 /**
  * Event Class for one event
- * @version L 2.2.16
+ * @version 2.3.1
  */
 
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
@@ -218,9 +218,30 @@ class EVO_Event extends EVO_Data_Store{
 				// create datetime obj @utc0 using unix
 				$this->DD->setTimezone( EVO()->calendar->timezone0 );
 				$this->DD->setTimestamp( $unix );
-
+				
 				// create new datetime with event tz using date numbers from utc0
 				$newD = new DateTime( $this->DD->format( 'Y/m/d H:i'), $this->tz );
+
+				// adjust the event tz based time to event extended settings @4.7.4
+				$extend_type = $this->get_time_ext_type();
+
+				if( $extend_type == 'yl' ){
+					($time_type == 'start')? $newD->modify( 'first day of january this year') : 
+						$newD->modify( 'last day of december this year');
+					($time_type == 'start')? $newD->setTime(0,0,0): $newD->setTime(23,59,59);
+
+				}else{
+
+					if( $extend_type == 'ml' ){
+						($time_type == 'start') ? $newD->modify('first day of this month'):$newD->modify('last day of this month');
+						($time_type == 'start')? $newD->setTime(0,0,0): $newD->setTime(23,59,59);
+											
+					// if all day event
+					}elseif( $extend_type == 'dl' ){
+						( $time_type == 'start') ? $newD->setTime(0,0,0) : $newD->setTime(23,59,59);
+						
+					}
+				}
 
 				return $newD->format('U');
 
@@ -461,6 +482,30 @@ class EVO_Event extends EVO_Data_Store{
 			);			
 		}
 
+		// return event time in UTC0/ GMT 
+		// @since 4.7.4
+		function get_time_in_GMT(){
+			$this->DD->setTimezone( $this->event_tz );
+			$this->DD->setTimestamp( $this->start_unix);
+
+			$this->DD->setTimezone( new DateTimeZone('UTC'));
+
+			$start_gmt = $this->DD->format('U');
+
+			$this->DD->setTimezone( $this->event_tz );
+			$this->DD->setTimestamp( $this->end_unix);
+
+			$this->DD->setTimezone( new DateTimeZone('UTC'));
+
+			$end_gmt = $this->DD->format('U');
+
+			return array(
+				'start'=> $start_gmt,
+				'end'=> $end_gmt,
+			);
+		}
+
+
 		// return none adjusted event times
 		// added @4.0.6 + 2.2.12
 		function get_non_adjusted_times(){			
@@ -497,6 +542,97 @@ class EVO_Event extends EVO_Data_Store{
 					eventon_get_formatted_time( $unix , $tz )
 				);
 			}
+		}
+
+		// return a translated datetime for give date time format @s4.6 @4.6.3
+		function get_translated_datetime( $format , $unix , $return_array = true ){
+
+			//echo $format;
+			$og_format = $format;
+			$format =  str_split( $format ); 
+
+			//print_r($format);echo '</br>';
+			
+			// process \\ special character
+			foreach($format as $index=>$D2){
+				if( isset( $format[ $index - 1] ) && $format[ $index - 1 ] == '\\'){
+					$format[$index] = '\\'.$D2;
+				}
+			}
+
+			//print_r($format);echo '</br>';
+
+			$og_format_array = $format;
+
+			$format[] = 'n'; // month 1-12
+			$format[] = 'l'; // date sunday 
+			$format[] = 'N'; // day of week 1 (monday) -7(sunday)
+			$format[] = 'a'; // am/pm 
+		
+			$DD = new DateTime('now', $this->tz );
+			$DD->setTimestamp( $unix);
+
+			//print_r( implode('<>', $format ) ); echo '</br>';
+
+
+			$date_vals = explode('<>',$DD->format( implode('<>', $format ) ));
+
+			//print_r($date_vals);echo '</br>';
+
+			$DT2 = array();
+			foreach($date_vals as $index => $dval){
+				if( !isset( $format[ $index ] )) continue; // 4.6.4
+				$DT2[ $format[ $index ]] = $dval;
+			}
+
+			//print_r($DT2);
+			
+			$DT3 = array(); 
+			foreach($DT2 as $kk => $vv){
+
+				if( strpos($kk, '\\') !== false){
+					$DT3[ $kk ] = $vv; continue;
+				}
+
+				switch ($kk) {
+					case 'F':
+						$DT3[ $kk ] = eventon_return_timely_names_('month_num_to_name',$DT2['n']);
+					break;	
+					case 'l':
+						$DT3[ $kk ] = eventon_return_timely_names_('day',$DT2['l']);	break;
+					case 'M':
+						$DT3[ $kk ] = eventon_return_timely_names_('month_num_to_name',$DT2['n']);	break;
+					case 'D':
+						$DT3[ $kk ] = eventon_return_timely_names_('day_num_to_name',$DT2['N']);	break;
+					case 'a':
+					case 'A':
+						$DT3[ $kk ] = eventon_return_timely_names_('ampm',$DT2['a']);	break;
+					
+					default:
+						$DT3[ $kk ] = $vv;
+					break;				
+				}
+			}
+
+			// return string
+			if( !$return_array ){
+				$string = '';
+
+				foreach( $og_format_array as $index => $letter){
+					if( empty($letter) ) $string .= ' ';
+					$string .= isset( $DT3[ $letter ]) ? $DT3[ $letter ] : '';
+				}
+
+				return $string;
+			}
+			
+			// remove additional added values
+				if( strpos($og_format, 'n') == false) unset($DT3['n']);
+				if( strpos($og_format, 'l') == false) unset($DT3['l']);
+				if( strpos($og_format, 'N') == false) unset($DT3['N']);
+				if( strpos($og_format, 'a') == false) unset($DT3['a']);
+						
+			return  $DT3;
 		}
 
 		// updated 4.0.7

@@ -1,6 +1,6 @@
 /**
  * Shortcode Generator
- * @version 4.7.4
+ * @version 4.8
  */
 jQuery(document).ready(function($){
 
@@ -23,6 +23,7 @@ jQuery(document).ready(function($){
 
 			const sc = $(this).data('sc')
 			open_sg_lightbox(  sc ,'general');
+
 			
 		});
 		$('body').on('evo_ajax_success_evo_shortcode_generator',function(event, OO, data){	
@@ -225,7 +226,7 @@ jQuery(document).ready(function($){
 				generator.on('click','.ajdePOSH_btn',function(){
 					data.base = data.sc = $(this).attr('code');		
 					data.vars = {};	
-					goto_inside_step(true );			
+					goto_inside_step(true );		
 				});
 
 				// collapsable fields

@@ -3,7 +3,7 @@
  * Calendar Time class.
  *
  * @class 		EVO_Cal_Time
- * @version		2.3
+ * @version		2.3.1
  * @package		EventON/Classes
  * @category	Class
  * @author 		AJDE
@@ -26,15 +26,20 @@ class EVO_Cal_Time {
 
 		EVO()->cal->set_cur('evcal_1');
 
+		// get date and time format
+			extract( EVO()->calendar->get_date_time_format() );
+			$DT_format = 'YFj'. $date_format . $time_format;
+
+
 		// INITIAL variables
-
-			$evcal_lang_allday = $this->lang( 'evcal_lang_allday', 'All Day');
+			$evcal_lang_allday = $__txt_allday = $this->lang( 'evcal_lang_allday', 'All Day');
 			$SC = $this->shortcode_args;
-			$RTL = (isset($SC['_cal_evo_rtl']) && $SC['_cal_evo_rtl'] == 'yes')? true: false;
 
+			
 			// start and end row times -- UTC0
-				$event_start_unix = $EVENT->start_unix_raw;
+				$event_start_unix = $EVENT->start_unix;
 				$event_end_unix = $event_start_unix + $EVENT->duration;
+				//$event_end_unix = $EVENT->end_unix;
 
 			$_is_allday = $EVENT->is_all_day();
 			$_hide_endtime = $EVENT->is_hide_endtime();
@@ -48,43 +53,31 @@ class EVO_Cal_Time {
 			// FOCUSED values
 			$CURRENT_month_INT = (!empty($FOCUS_month_int))?
 				$FOCUS_month_int: (!empty($focus_month_beg_range)?
-					gmdate('n', $focus_month_beg_range ): gmdate('n')); //
-			$_current_date = (!empty($focus_month_beg_range))? gmdate('j', $focus_month_beg_range ): 1;
+					date('n', $focus_month_beg_range ): date('n')); //
+			$_current_date = (!empty($focus_month_beg_range))? date('j', $focus_month_beg_range ): 1;
 
 			// time format
 			$wp_time_format = get_option('time_format');
 			
 
-			// Universal time format
-			// if activated get time values
-			$__univ_time = false;
-			if( EVO()->cal->check_yn('evo_timeF') && EVO()->cal->get_prop('evo_timeF_v') ){
+			$_ES = $EVENT->get_translated_datetime( $wp_time_format , $EVENT->start_unix , false );
+			$_EE = $EVENT->get_translated_datetime( $wp_time_format , $event_end_unix , false );
 
-				$custom_time_format = EVO()->cal->get_prop('evo_timeF_v');
-			
-				$__univ_time_s = eventon_get_langed_pretty_time($event_start_unix, $custom_time_format);
-
-				if( $_hide_endtime ){
-					$__univ_time = $__univ_time_s;
-				}else{
-					$__univ_time = $__univ_time_s .' - '. eventon_get_langed_pretty_time($event_end_unix, $custom_time_format);
-				}
-			}
-
-			$dateTime = new evo_datetime();	
-
-			$formatted_start = $dateTime->__get_lang_formatted_timestr($wp_time_format,$DATE_start_val);
-			$formatted_end = $dateTime->__get_lang_formatted_timestr($wp_time_format,$DATE_end_val);
+			$ES = $EVENT->get_translated_datetime( $date_format , $EVENT->start_unix, false );
+			$ESt = $EVENT->get_translated_datetime( $time_format , $EVENT->start_unix, false );
+			$EE = $EVENT->get_translated_datetime( $date_format , $event_end_unix, false );
+			$EEt = $EVENT->get_translated_datetime( $time_format , $event_end_unix, false );
 			
 
-		$date_args = array(
-			'cdate'=>$_current_date,
-			'eventstart'=>$DATE_start_val,
-			'eventend'=>$DATE_end_val,
-			'stime'=>$formatted_start,
-			'etime'=>$formatted_end,
-			'_hide_endtime'=>$_hide_endtime
-		);
+		// date values
+			$date_args = array(
+				'cdate'=>$_current_date,
+				'eventstart'=>$DATE_start_val,
+				'eventend'=>$DATE_end_val,
+				'stime'=>$_ES,
+				'etime'=>$_EE,
+				'_hide_endtime'=>$_hide_endtime
+			);
 
 		// validate
 		if(!is_array($DATE_start_val) || !is_array($DATE_end_val)) return array();
@@ -94,16 +87,20 @@ class EVO_Cal_Time {
 			$_start_end_same = false;
 
 		// same start and end months
+		// same start and end months
 		if($DATE_start_val['n'] == $DATE_end_val['n']){
+
+			//print_r($DATE_end_val);
+			//print_r($_EE);
 
 			/** EVENT TYPE = start and end in SAME DAY **/
 			if($DATE_start_val['j'] == $DATE_end_val['j']){
 
 				// check all days event
 				if($_is_allday){
-					$__from_to ="<em class='evcal_alldayevent_text'>(".$evcal_lang_allday.": ".$DATE_start_val['l'].")</em>";
-					$__prettytime = $__univ_time? $__univ_time: $evcal_lang_allday.' ('. ucfirst($DATE_start_val['l']).')';
-					$__time = "<span class='start'>".$evcal_lang_allday."</span>";
+					$__from_to ="<em class='evcal_alldayevent_text'>(".$__txt_allday.": ".$DATE_start_val['l'].")</em>";
+					$__prettytime = $ES.' '. $__txt_allday ;
+					$__time = "<span class='start'>".$__txt_allday."</span>";
 
 					$data_array['start'] = array(
 						'year'=>	$DATE_start_val['Y'],
@@ -112,24 +109,19 @@ class EVO_Cal_Time {
 					);
 					$data_array['end'] = '';
 
+				// NOT all day
 				}else{
-					$__from_to = ($_hide_endtime)?
-						$formatted_start:
-						$formatted_start.' - '. $formatted_end .'';
-
-					$__prettytime = ($__univ_time)? 
-						$__univ_time: 
-						apply_filters('eventon_evt_fe_ptime', '('. ucfirst($DATE_start_val['l']).') '.$__from_to);
-					$__time = "<span class='start'>".$formatted_start."</span>". (!$_hide_endtime ? "<span class='end'>- ".$formatted_end."</span>": null);
+					$__from_to = ($_hide_endtime)?	$_ES:	$_ES.' - '. $_EE;
+					$__time = "<span class='start'>".$_ES."</span>". (!$_hide_endtime ? "<span class='end'>- ".$_EE."</span>": null);
 
 					$data_array['start'] = array(
 						'year'=>	$DATE_start_val['Y'],
 						'month'=>	$DATE_start_val['M'],
 						'date'=>	$DATE_start_val['d'],
 					);
-				}
 
-				//print_r($__univ_time);
+					$__prettytime = $ES .' '. $ESt . (!$_hide_endtime ? ' - ' . $EEt:'');
+				}
 
 
 				$_event_date_HTML = array(
@@ -141,14 +133,14 @@ class EVO_Cal_Time {
 					'start_month'=>$DATE_start_val['M'],
 				);
 
-			}else{
-				// different start and end date
+			}else{ // different start and end date
+
 
 				// check all days event
 				if($_is_allday){
-					$__from_to ="<em class='evcal_alldayevent_text'>(".$evcal_lang_allday.")</em>";
-					$__prettytime = $__univ_time? $__univ_time: ($DATE_start_val['F'].' '.$DATE_start_val['j'].' ('. ucfirst($DATE_start_val['l']) .') - '.$DATE_end_val['j'].' ('. ucfirst($DATE_end_val['l']).')' );
-					$__time = "<span class='start'>".$evcal_lang_allday."</span>";
+					$__from_to ="<em class='evcal_alldayevent_text'>(".$__txt_allday.")</em>";
+					$__prettytime = $ES . (!$_hide_endtime ? ' - '. $EE :'') .' ('. $__txt_allday .')';
+					$__time = "<span class='start'>".$__txt_allday."</span>";
 
 					$data_array['start'] = array(
 						'year'=>	$DATE_start_val['Y'],
@@ -163,12 +155,10 @@ class EVO_Cal_Time {
 					// if start date is before current date
 						$date_inclusion = ($DATE_start_val['j'] < $_current_date) ? ' ('.$DATE_start_val['j'].')':'';
 					$__from_to = ($_hide_endtime)?
-						$formatted_start:
-						$formatted_start. $date_inclusion.' - '.$formatted_end. ' <em class="evo_endday">('.$DATE_end_val['j'].')</em>';
+						$_ES:
+						$_ES. $date_inclusion.' - '.$_EE. ' <em class="evo_endday evomarl5">('.$DATE_end_val['j'].')</em>';
 					
-					$__prettytime =($__univ_time)?
-						$__univ_time:
-						apply_filters('eventon_evt_fe_ptime', $DATE_start_val['j'].' ('. ucfirst($DATE_start_val['l']).') '.$formatted_start.  ( !$_hide_endtime? ' - '.$DATE_end_val['j'].' ('. ucfirst($DATE_end_val['l']).') '.$formatted_end :'') ) ;
+					$__prettytime = $ES .' '. $ESt . (!$_hide_endtime ? ' - '. $EE .' '. $EEt :'');
 
 					$data_array['start'] = array(
 						'year'=>	$DATE_start_val['Y'],
@@ -181,7 +171,7 @@ class EVO_Cal_Time {
 
 				}
 
-				$__time = "<span class='start'>".$formatted_start."</span>". (!$_hide_endtime ? "<span class='end'>- ".$formatted_end."</span>": null);
+				$__time = "<span class='start'>".$_ES."</span>". (!$_hide_endtime ? "<span class='end'>- ".$_EE."</span>": null);
 
 
 				$_event_date_HTML = array(
@@ -196,32 +186,33 @@ class EVO_Cal_Time {
 		}else{
 			/** EVENT TYPE = different start and end months **/
 
-			$__time = "<span class='start'>".$formatted_start."</span>". (!$_hide_endtime ? "<span class='end'>- ".$formatted_end."</span>": null);
+			$__time = "<span class='start'>".$_ES."</span>". (!$_hide_endtime ? "<span class='end'>- ".$_EE."</span>": null);
 
 			/** EVENT TYPE = start month is before current month **/
 			if($CURRENT_month_INT != $DATE_start_val['n']){
 				// check all days event
 				if($_is_allday){
-					$__from_to ="<em class='evcal_alldayevent_text'>(".$evcal_lang_allday.")</em>";
-					$__time = "<span class='start'>".$evcal_lang_allday."</span>";
+					$__from_to ="<em class='evcal_alldayevent_text'>(".$__txt_allday.")</em>";
+					$__time = "<span class='start'>".$__txt_allday."</span>";
 				}else{
-					$__start_this = '('.$DATE_start_val['F'].' '.$DATE_start_val['j'].') '.$formatted_start;
-					$__end_this = (!$_hide_endtime? ' - ('.$DATE_end_val['F'].' '.$DATE_end_val['j'].') '.$formatted_end :'' );
+					$__start_this = '('.$DATE_start_val['F'].' '.$DATE_start_val['j'].') '.$_ES;
+					$__end_this = (!$_hide_endtime? ' - ('.$DATE_end_val['F'].' '.$DATE_end_val['j'].') '.$_EE :'' );
 
 					$__from_to = (($_hide_endtime)?
 						$__start_this:$__start_this.$__end_this);
 				}
 
 			}else{
+
 				/** EVENT TYPE = start month is current month and end month is future month **/
 				// check all days event
 				if($_is_allday){
-					$__from_to ="<em class='evcal_alldayevent_text'>(".$evcal_lang_allday.")</em>";
-					$__time = "<span class='start'>".$evcal_lang_allday."</span>";
+					$__from_to ="<em class='evcal_alldayevent_text'>(".$__txt_allday.")</em>";
+					$__time = "<span class='start'>".$__txt_allday."</span>";
 				}else{
 					$date_inclusion = ($DATE_start_val['j'] < $_current_date) ? ' ('.$DATE_start_val['j'].')':'';
-					$__start_this = $formatted_start.$date_inclusion;
-					$__end_this = ' - ('.$DATE_end_val['F'].' '.$DATE_end_val['j'].') '.$formatted_end;
+					$__start_this = $_ES.$date_inclusion;
+					$__end_this = ' - ('.$DATE_end_val['F'].' '.$DATE_end_val['j'].') '.$_EE;
 
 					$__from_to =($_hide_endtime)? $__start_this:$__start_this.$__end_this;
 				}
@@ -239,10 +230,9 @@ class EVO_Cal_Time {
 
 			// check all days event
 			if($_is_allday){
-				$__prettytime = ucfirst($DATE_start_val['F']) .' '.$DATE_start_val['j'].' ('. ucfirst($DATE_start_val['l']).')'. (!$_hide_endtime? ' - '. ucfirst($DATE_end_val['F']).' '.$DATE_end_val['j'].' ('. ucfirst($DATE_end_val['l']).')' :'' );
+				$__prettytime = $ES . (!$_hide_endtime ? ' - '. $EE :'') .' ('. $__txt_allday .')';
 			}else{
-				$__prettytime =
-					ucfirst($DATE_start_val['F']) .' '.$DATE_start_val['j'].' ('. ucfirst($DATE_start_val['l']).') '.gmdate($wp_time_format,($event_start_unix)). ( !$_hide_endtime? ' - '. ucfirst($DATE_end_val['F']).' '.$DATE_end_val['j'].' ('.ucfirst($DATE_end_val['l']).') '.gmdate($wp_time_format,($event_end_unix)) :'' );
+				$__prettytime = $ES.' '. $ESt . (!$_hide_endtime ? ' - '. $EE .' '. $EEt :'');
 			}
 
 
@@ -255,7 +245,7 @@ class EVO_Cal_Time {
 				'html_date'=> $__this_html_date,
 				'html_time'=>$__time,
 				'html_fromto'=> apply_filters('eventon_evt_fe_time', $__from_to, $DATE_start_val, $DATE_end_val),
-				'html_prettytime'=> ($__univ_time)? $__univ_time: apply_filters('eventon_evt_fe_ptime', $__prettytime),
+				'html_prettytime'=> $__prettytime,
 				'class_daylength'=>"mul_val",
 				'start_month'=>$DATE_start_val['M'],
 			));
@@ -330,7 +320,7 @@ class EVO_Cal_Time {
 
 		// all day event check
 			if($_is_allday){
-				$data_array['start']['time'] = $evcal_lang_allday;					
+				$data_array['start']['time'] = $__txt_allday;					
 			}else{
 				$dv_time = $this->generate_time($date_args);
 				$data_array['start']['time'] = $dv_time['start'];

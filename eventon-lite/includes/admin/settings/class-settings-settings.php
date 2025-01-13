@@ -1,7 +1,8 @@
 <?php
 /**
   * evo settings class
-  * @version lite 2.3
+  * @version 2.3.1
+  * @version 4.8
   */
 class evo_settings_settings{
 	
@@ -1094,12 +1095,12 @@ class evo_settings_settings{
 		}
 
 
-	function content_shortcodes(){
+	public function content_shortcodes(){
 		ob_start();
 		?>
-			<p><?php esc_html_e('Use the "Generate shortcode" button to open lightbox shortcode generator to create your desired calendar shortcode.','eventon');?></p><br/>
+			<p><?php _e('Use the "Configure Calendar" button use shortcode generator to create your desired calendar configurations. Click "< / >" button within the Generator to reveal the shortcode that can be copied and pasted where you like the calendar content to appear.','eventon');?></p><br/>
 			
-			<a id="evo_shortcode_btn" class="ajde_popup_trig evo_admin_btn btn_prime" title="eventON Shortcode generator" data-popc='eventon_shortcode' href="#" data-textbox='evo_set_shortcodes'>[ ] <?php esc_html_e('Generate shortcode','eventon');?></a><br/>
+			<a id="evo_shortcode_btn" class="evolb_trigger_shortcodegenerator evo_admin_btn btn_prime" href="#"><?php _e('Configure Calendar','eventon');?></a><br/>
 			<p id='evo_set_shortcodes'></p>
 
 			<p style='padding-top:10px'><b><?php esc_html_e('Frequently Used Shortcodes','eventon');?></b></p>

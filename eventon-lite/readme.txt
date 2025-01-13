@@ -1,11 +1,11 @@
-=== EventON ===
+=== EventON - Events Calendar ===
 Contributors: ashanjay
 Plugin Name: EventON Lite
 Author URI: http://ashanjay.com/
 Tags: calendar, event calendar, virtual events, events, event management
 Requires at least: 6.0
 Tested up to: 6.7.1
-Stable tag: 2.3
+Stable tag: 2.3.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -71,7 +71,6 @@ Try it now to see how easy it is to manage events on your website!
 * Set custom icons (by fontawesome)
 * Accessibile future repeat instances of event
 * Location & Organizer archive page
-* Organizer archive page
 * Various Widgets for sidebar
 * Learn more link for events
 * Ability to hide event end time
@@ -86,7 +85,6 @@ Try it now to see how easy it is to manage events on your website!
 * Show only featured events in the calendar
 * Hide featured events from calendar
 * Open eventcards on page load or as accordion style
-* Add accordion effect for eventcards on calendar
 * Show month navigation at the bottom of the calendar
 * Hide all cancelled events
 * Hide past events by start or end time
@@ -108,36 +106,30 @@ Stuck? Check out [Documentation Library](https://docs.myeventon.com). You can al
 
 == Ready to Upgrade to EventON Full Version ? ==
 
-Grab **[The EventON Full](https://myeventon.com)**  version to extend EventON Lite features to next level. 
+Ready to Upgrade to EventON Full Version?
+Grab the **[The EventON Full](https://myeventon.com)** version and elevate your event experience to the next level!
 
 Why upgrade to EventON Full version?
 
-* More Event Views: Display events in grid, weekly, or yearly views to suite your needs.
-* Advanced Customizations: Unlock additional layouts, designs, and event features.
-* Full Integration: Use premium addons like Tickets, RSVP, Seats and more.
-* **[Language corresponding event](https://docs.myeventon.com/documentations/setup-language-corresponding-events/)**
-* Autonomous functions - auto move past events to trash and set all past events as completed
-* Advance event post Query method for faster calendar loading
-* Support advance search quering - taxonomies, subtitle and postmeta values
-* Additional event image support for events
-* Multi view switcher support
-* Virtual event after event content
-* Custom google map styles
-* restrict event location info to logged in users
-* Enable edit event icon on eventtop for easy event editing clicks
-* Show custom event meta data on eventtop
-* EventCard designer support 7 layouts
-* EventTop Designer
-* Ability to set default event image for events
-* Support **[multi date types](https://docs.myeventon.com/documentations/setup-use-multi-data-types/)**
-* Zoom OAuth Integration
-* Link to single event from anywhere
-* Assign multiple organizers to an event
-* Event filter reset and active features
-* Additional EventTop Designs
-* Support webhook API
-* Dedicated software support via helpdesk.ashanjay.com 
-* Support all **[EventON Addons](https://www.myeventon.com/addons/)**
+* <strong>Full Integration:</strong> Access premium addons like Tickets, RSVP, Seats, and more to make your events unforgettable.
+* <strong>Advanced Customizations:</strong> Unlock unique layouts, designs, and enhanced event features to personalize your events.
+* <strong>More Event Views:</strong> Enjoy flexible display options with grid, weekly, or yearly views tailored to your needs.
+* <strong>Multi View Switcher:</strong> Seamlessly switch between different event views for versatile event displays.
+* <strong>Advanced Search Capabilities:</strong> Easily find events with advanced search options, including taxonomies, subtitles, and postmeta values.
+* <strong>Quick Event Editing:</strong> Enable the edit event icon for effortless event updates right from the event top.
+* <strong>Zoom OAuth Integration:</strong> Seamlessly integrate with Zoom for smooth virtual event management.
+* <strong>Link from Anywhere:</strong> Direct users to single event pages from anywhere, simplifying navigation.
+* <strong>Multiple Organizers:</strong> Assign several organizers to an event for collaborative planning.
+* <strong>Enhanced Filters:</strong> Use event filter reset and active features for a more dynamic search experience.
+* <strong>Autonomous Functions:</strong> Automate event management by auto-moving past events to trash and marking them as completed.
+* <strong>Virtual Event Content:</strong> Add engaging post-event virtual content to keep your audience connected.
+* <strong>Custom Google Map Styles:</strong> Personalize event locations with unique Google Map styles.
+* <strong>EventCard Designer:</strong> Choose from 7 layouts to create visually appealing event cards.
+* <strong>EventTop Designer:</strong> Customize the top section of your events for a standout look.
+* <strong>**[Multi Data Types](https://docs.myeventon.com/documentations/setup-use-multi-data-types/)** Support:</strong> Create versatile content types that can be reused across multiple events and updated all at once for consistent event management.
+* <strong>**[Language corresponding event](https://docs.myeventon.com/documentations/setup-language-corresponding-events/):**</strong> Assign languages to events and create calendars that display events in specific languages for targeted audience engagement.
+* <strong>Dedicated Support:</strong> Receive expert assistance via helpdesk.ashanjay.com to ensure your events run smoothly.
+* <strong>Support for All EventON Addons:</strong> Maximize your event potential with full compatibility with all EventON addons.
 
 For complete list of features --> **[Comparisons](https://www.myeventon.com/lite/)**
 
@@ -244,6 +236,10 @@ Yes, EventON Lite supports different timezones for each event. You can even disp
 For support with the Lite version, visit [support forum here](https://wordpress.org/support/plugin/eventon-lite/). For premium support or queries related to the Full version, please contact us through [our helpdesk](https://helpdesk.ashanjay.com).
 
 == Changelog ==
+= 2.3.1 (2025-1-13) = 
+FIXED: shortcode generator not working from settings
+FIXED: event time incorrect for certain timezones
+
 = 2.3 (2025-1-10) =
 ADDED: Ability to add eventon version on meta data
 ADDED: event edit timezone to select2 field
