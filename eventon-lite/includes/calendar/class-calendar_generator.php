@@ -1413,7 +1413,7 @@ class EVO_generator extends EVO_Cal_Time{
 						$_eventcard['locImg'] = array();	
 						$_eventcard['location'] = array();	
 						$_eventcard['time'] = array(
-							'timetext'=>$_event_date_HTML['html_prettytime'],
+							'timetext'=> ucfirst( $_event_date_HTML['html_prettytime'] ),
 							'date_times' => $_event_date_HTML,
 							'focus_start' => $focus_month_beg_range,
 							'_evo_tz'=> $EVENT->get_timezone_key(),

@@ -5,7 +5,7 @@ Author URI: http://ashanjay.com/
 Tags: calendar, event calendar, virtual events, events, event management
 Requires at least: 6.0
 Tested up to: 6.7.1
-Stable tag: 2.3.1
+Stable tag: 2.3.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -236,6 +236,10 @@ Yes, EventON Lite supports different timezones for each event. You can even disp
 For support with the Lite version, visit [support forum here](https://wordpress.org/support/plugin/eventon-lite/). For premium support or queries related to the Full version, please contact us through [our helpdesk](https://helpdesk.ashanjay.com).
 
 == Changelog ==
+= 2.3.2 (2025-1-25) = 
+FIXED: event lists with tiles not showing in row
+FIXED: capitalized month name in eventcard
+
 = 2.3.1 (2025-1-13) = 
 FIXED: shortcode generator not working from settings
 FIXED: event time incorrect for certain timezones

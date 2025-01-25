@@ -3474,7 +3474,7 @@
 /* Event List */
 	.ajde_evcal_calendar.boxy.list_cal .eventon_events_list, 
 	.ajde_evcal_calendar.boxy.list_cal .eventon_events_list.sep_months .sep_month_events{
-		flex-direction: column;
+		flex-direction: row;
 	}
 	.ajde_evcal_calendar.boxy.boxstyle1.list_cal .eventon_list_event{
 		min-height: auto;
