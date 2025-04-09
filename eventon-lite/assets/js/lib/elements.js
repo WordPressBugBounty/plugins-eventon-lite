@@ -1,7 +1,6 @@
 /**
  * EventON elements
- * @version: 2.3
- * @fullversion 4.8
+ * @version: 4.9.2
  */
 jQuery(document).ready(function($){
 
@@ -16,11 +15,18 @@ const BB = $('body');
 			$('body').find('.evoelm_trumbowyg').each(function(){
 				if ( $.isFunction($.fn.trumbowyg) ) {
 					$(this).trumbowyg({
+						btnsDef: {
+		                    // Customize the formatting dropdown
+		                    formatting: {
+		                        dropdown: ['p', 'blockquote','h1', 'h2', 'h3', 'h4', 'h5','h6'], 
+		                        ico: 'p' // Default icon for the dropdown
+		                    }
+		                },
 						btns: [
 							['viewHTML'],
 					        ['undo', 'redo'], // Only supported in Blink browsers
-					        ['formatting'],
-					        ['strong', 'em'],
+					        ['formatting', '|', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
+					        ['strong', 'italic','underline'],
 					        ['link'],
 					        ['justifyLeft', 'justifyCenter', 'justifyRight', 'justifyFull'],
 					        ['unorderedList', 'orderedList'],
@@ -47,6 +53,34 @@ const BB = $('body');
 	BB.on('click','.evo_field_preview',function(){
 		$(this).siblings('.evo_field_container').show();
 		$(this).hide();
+	});
+
+/* Multiple input field -- 4.9.2 */
+	$('body').on('click', '.evo_elm_inputmulti_add', function(e) {
+	    e.preventDefault();
+	    const $input = $(this).siblings('input');
+	    const val = $input.val()?.trim();
+	    
+	    if (!val) return;
+
+	    const slug = val.toLowerCase()
+        .replace(/[^a-z0-9\s-]/g, '') // Remove special characters
+        .replace(/\s+/g, '-')         // Replace spaces with hyphens
+        .replace(/-+/g, '-');
+
+	    const $row = $(this).closest('.evo_elm_row');
+	    const id = $row.find('.evo_elm_inputmulti_values').data('id');
+	    
+	    $row.find('.evo_elm_inputmulti_values').append(`
+	        <span class='evo_btn grey evomarb5i'>
+	            ${val}
+	            <input type='hidden' name='${id}[${slug}]' value='${val}'/>
+	            <i class='evo_elm_inputmulti_remove fa fa-times'></i>
+	        </span>
+	    `);
+	    $input.val('');
+	}).on('click', '.evo_elm_inputmulti_remove', function() {
+	    $(this).parent().remove();
 	});
 
 // angle button
@@ -78,41 +112,58 @@ const BB = $('body');
 		$('body').trigger('evo_angle_set',[$(this), deg]);
 	});
 
-// Single Image @4.7.4
-	var file_frame,
-		BOX;	
+// Attach an image
+
+// Image Attachment @4.8.1
+	var file_frame;	
+	var __img_index;
+	var __img_obj;
+	var __img_box;
+	var __img_type;
   
     BB.on('click','.evolm_img_select_trig',function(event) {
     	event.preventDefault();
 
-    	var obj = $(this);
-    	BOX = obj.closest('.evo_metafield_image');
+    	__img_obj = $(this);
+    	__img_box = __img_obj.closest('.evo_metafield_image');
+    	__img_type = __img_box.hasClass('multi')? 'multi': 'single';
 
-    	if( BOX.hasClass('has_img') ) return;
+    	if( __img_type == 'single' &&  __img_box.hasClass('has_img') ) return;
 
-    	IMG_URL = '';
-    	
-		// If the media frame already exists, reopen it.
-		if ( file_frame ) {
-			file_frame.open();
-			return;
-		}
+    	if( __img_type == 'multi'){
+    		__img_index = __img_obj.data('index');
+
+    		// remove image
+			if( __img_obj.hasClass('on')){
+				__img_obj.css('background-image', '').removeClass('on');
+				__img_obj.find('input').val( '' );
+				return;
+			}
+    	}
+
+    	// If the media frame already exists, reopen it.
+			if ( file_frame ) {	file_frame.open();	return;			}
+
 		// Create the media frame.
-		file_frame = wp.media.frames.downloadable_file = wp.media({
-			title: 'Choose an Image',
-			button: {text: 'Use Image',},
-			multiple: false
-		});
+			file_frame = wp.media.frames.downloadable_file = wp.media({
+				title: 'Choose an Image', button: {text: 'Use Image',},	multiple: false
+			});
 
+    	
 		// When an image is selected, run a callback.
-		file_frame.on( 'select', function() {
-			attachment = file_frame.state().get('selection').first().toJSON();
+			file_frame.on( 'select', function() {
+				const attachment = file_frame.state().get('selection').first().toJSON();
 
-			BOX.addClass('has_img');
-			BOX.find('input.evo_meta_img').val( attachment.id );
-			BOX.find('.evoelm_img_holder').css('background-image', 'url('+ attachment.url +')');
+				if( __img_type == 'single'){
+					__img_box.addClass('has_img');
+					__img_box.find('input.evo_meta_img').val( attachment.id );
+					__img_box.find('.evoelm_img_holder').css('background-image', 'url('+ attachment.url +')');
+				}else{
+					__img_obj.css('background-image', 'url('+ attachment.url +')').addClass('on');
+					__img_obj.find('input').val( attachment.id );
+				}
 
-		});
+			});
 
 		// Finally, open the modal.
 		file_frame.open();
@@ -129,48 +180,6 @@ const BB = $('body');
 		field.find('input').val('');
 		field.find('button').addClass('chooseimg');
 		field.find('.evoelm_img_holder').css('background-image', '' );
-	});
-
-// Multiple images upload 4.6
-	var mulimg_index;
-	BB.on('click','.evo_mul_img_trig',function(){
-		const O = $(this);
-		mulimg_index = O.data('index');
-
-		// remove image
-		if( O.hasClass('on')){
-			O.css('background-image', '').removeClass('on');
-			O.find('input').val( '' );
-		// add image
-		}else{
-			// If the media frame already exists, reopen it.
-			if ( file_frame ) {
-				file_frame.open();
-				return;
-			}
-
-			// Create the media frame.
-			file_frame = wp.media.frames.downloadable_file = wp.media({
-				title: 'Choose an Image',
-				button: {text: 'Use Image',},
-				multiple: false
-			});
-
-			// When an image is selected, run a callback.
-			file_frame.on( 'select', function() {
-				attachment = file_frame.state().get('selection').first().toJSON();
-
-				mulimg_O = BB.find('.evo_mul_img_trig.evo_img_'+ mulimg_index);
-
-				//console.log( attachment.url);
-				mulimg_O.css('background-image', 'url('+ attachment.url +')').addClass('on');
-				mulimg_O.find('input').val( attachment.id );
-	
-			});
-
-			// Finally, open the modal.
-			file_frame.open();
-		}
 	});
 
 // yes no button @4.6.9	
@@ -220,7 +229,6 @@ const BB = $('body');
 		}
 	}
 	
-
 // yes no button afterstatement hook @4.6.9
 	BB.on('evo_yesno_changed', function(event, newval, obj, key, afterstatement){
 
@@ -231,6 +239,28 @@ const BB = $('body');
 		}else{
 			obj.closest('.evo_elm_row').next().hide();
 		}
+	});
+/* block button @4.9.2 */
+	BB.on('click','.evoelm_blockbtn',function(e){
+		e.preventDefault();
+		const $el = $(this);
+		var afterstatement = $el.attr('afterstatement');
+		let afterstatementObj = afterstatement ? BB.find('.evo_elm_afterstatement.'+ afterstatement): false;
+		let newVal = 'yes';	
+
+		if( $el.find('input').val() == 'yes'){			
+			$el.find('input').val('no');
+			newVal = 'no';
+		}else{
+			$el.find('input').val('yes');
+		}
+		$el.find('i.evofz18i').toggleClass('far fa-circle fa fa-circle-check');
+		$el.toggleClass('on');
+
+		if( afterstatementObj ) afterstatementObj.toggle();
+
+
+		$('body').trigger('evo_blockbtn_trigged',[newVal, $el, $el.data('id'), afterstatement]);
 	});
 
 // Side panel @4.5.1
@@ -360,7 +390,8 @@ const BB = $('body');
 			$(this).parent().siblings('input').val('');
 		});
 	
-// select2 dropdown field - 4.0.3
+// select2 dropdown field - 4.0.3 @updated 4.9
+	// this is deprecating 4.9
 	if ( $.isFunction($.fn.select2) ){
 		$('.ajdebe_dropdown.evo_select2').select2();
 
@@ -370,6 +401,169 @@ const BB = $('body');
 			});
 		});
 	}  
+
+	// Helper to get row and list
+    const getRowAndList = $el => ({
+        $row: $el.closest('.evo_elm_row'),
+        $list: $el.closest('.evo_elm_row').find('.evoelm_sel2_opt_list')
+    });
+
+    // Event handlers with event types in selector keys
+    const handlers = {
+        '.evoelm_sel2_cur_val:click': e => {
+            e.stopPropagation();
+            const { $list } = getRowAndList($(e.currentTarget));
+            $('.evoelm_sel2_opt_list').not($list).hide();
+            $list.toggle();
+        },
+        '.evoelm_sel2_opt:click': e => {
+            e.stopPropagation();
+            const $option = $(e.currentTarget);
+            const { $row, $list } = getRowAndList($option);
+            const key = $option.data('value');
+            const text = $option.text();
+
+            $row.find('.evoelm_sel2_val').val(key);
+            $row.find('.evoelm_sel2_cur_v').html(text);
+            $option.addClass('selected').siblings().removeClass('selected');
+            $list.hide();
+        },
+        '.evoelm_sel2_search:input search': e => {
+            const $input = $(e.currentTarget);
+            const { $list } = getRowAndList($input);
+            const search = $input.val().toLowerCase();
+            $list.find('.evoelm_sel2_opt').each((_, opt) => {
+                const $opt = $(opt);
+                $opt.toggle(search === '' || $opt.text().toLowerCase().includes(search));
+            });
+        },
+        ':click': e => {
+
+            const $target = $(e.target);
+            if ($target.closest('#wp-content-wrap').length > 0) return
+            if (!$target.closest('.evoelm_sel2').length || $target.is('.evoelm_sel2_hide')) {
+                //e.stopPropagation();
+                $('.evoelm_sel2_opt_list').hide();
+            }
+        }
+    };
+
+    // Bind all events efficiently with multi-event support
+    Object.entries(handlers).forEach(([key, handler]) => {
+        const [selector, events] = key.split(/:(.+)/); // Split on first colon, events after
+        const eventList = events ? events.split(' ') : ['click']; // Split events by space
+        BB.on(eventList.join(' '), selector || null, handler); // Join events for .on()
+    });
+
+// select 3 - 4.9
+	$('body')
+	// create new item
+		.on('click','.evoelm_sel3_new_item_trig',function(event){	event.preventDefault();
+			const elm = $(this).closest('.evoelm_sel3');
+			var _data = elm.find('.evoelm_sel3_container').data();
+			
+			$('body').trigger('evoelm_sel3_new_trig',[ $(this), elm, _data]);
+		})
+	// show items list
+		.on('click','.evoelm_sel3_sel_trig',function(event){	event.preventDefault();
+			const elm = $(this).closest('.evoelm_sel3');
+			elm.find('.evoelm_sel3_list').toggleClass('show');	
+		})
+	
+	// click on new item from list
+		.on('click','.evoelm_sel3_item_trig',function(event){	event.preventDefault();
+			const item_id = $(this).data('id');
+			const elm = $(this).closest('.evoelm_sel3');			
+			
+			if( elm.hasClass('sin') ){
+				elm.find('input.evoelm_sel3_val').val( item_id );
+
+				let itemName = $(this).clone()    // Clone the element to work with its contents without altering the DOM
+				    .children()                   // Select all children of the cloned element
+				    .remove()                     // Remove all children from the clone
+				    .end()                        // Go back to the clone itself
+				    .text()                       // Get the text of what's left (the content before child elements)
+				    .trim();
+
+				elm.find('.evoelm_sel3_option_1').html(`
+					<div class='evoelm_sel3_sel_trig evofx_1' data-id='`+item_id+`'>`+ itemName +`</div>
+					<i class='evoelm_sel3_edit_trig fa fa-pencil evomarr10' data-id='`+item_id+`'></i>
+					<i class='evoelm_sel3_del_trig fa fa-times' data-id='`+item_id+`'></i>
+				`);
+			}
+
+			elm.find('.evoelm_sel3_list').toggleClass('show');
+		})	
+
+	// re-load items list
+		.on('evoelm_sel3_reload_list', function(event, elm, data){
+			const list = $(elm).find('.evoelm_sel3_list');
+			if( !list.length ) return;
+			
+			list.html('');
+
+			if( Object.keys(data).length == 0){
+
+				$(elm).find('.evoelm_sel3_options').addClass('evodni');
+				$(elm).find('.evoelm_sel3_sel_trig').addClass('evodni');
+				return;
+			}
+
+			$(elm).find('.evoelm_sel3_options').removeClass('evodni');
+			$(elm).find('.evoelm_sel3_sel_trig').removeClass('evodni');
+			list.removeClass('show');
+
+			$.each(data, function(index, val){
+				list.append(`
+					<span class='evoelm_sel3_item_trig evodfx evopad10-20 evocurp evo_borderb evofx_jc_sb evofx_ai_c ' data-id='`+index +`'>
+					`+ val +`<i class='fa fa-trash evoelm_sel3_del_item_trig evocurp evohoop7'></i>
+					</span>
+				`);
+			});
+		})
+
+	
+	// edit an item
+		.on('click','.evoelm_sel3_edit_trig',function(event){	event.preventDefault();
+			let elm = $(this).closest('.evoelm_sel3');
+			var data = elm.find('.evoelm_sel3_container').data();
+			
+			$('body').trigger('evoelm_sel3_edit_item',[ $(this), elm, data ]);
+		})
+	// delete an item from data
+		.on('click','.evoelm_sel3_del_item_trig',function(event){	event.preventDefault();
+			event.stopPropagation();
+
+			var item_id = $(this).closest('.evoelm_sel3_item_trig').data('id');
+			const elm = $(this).closest('.evoelm_sel3');	
+			var _data = elm.find('.evoelm_sel3_container').data();
+			
+			$('body').trigger('evoelm_sel3_del_item_conf_trig',[ elm, item_id, _data]);
+		})
+	// remove item
+		.on('click','.evoelm_sel3_del_trig',function(event){	event.preventDefault();
+			let elm = $(this).closest('.evoelm_sel3');		
+			
+			if( elm.hasClass('sin') ){
+				elm.find('.evoelm_sel3_val').val('');
+
+				elm.find('.evoelm_sel3_option_1').html(`
+					<div class='evofx_1 evoelm_sel3_sel_trig evohoop7'>`+ elm.find('.evoelm_sel3_options').data('t') +`<i class='fa fa-chevron-down evomarl20'></i></div>
+				`);
+			}	
+		})
+	
+	;
+
+// Checkbox @4.9
+	$('body').on('click', '.evoelm_check_trig', function() {
+	    var id = $(this).data('id');
+	    var iObj = $(this).find('i');
+	    
+	    iObj.toggleClass('fa-circle-check fa-circle far fa');
+	    $(this).find('input').val(iObj.hasClass('fa-circle-check') ? id : '');
+	});
+
 
 // self hosted tooltips
 // deprecating
@@ -381,82 +575,88 @@ const BB = $('body');
 		$(this).append('<em>' +tipContent +'</em>').addClass(classes[1]);
 	});
 
-// ELEMENTS
-// @updated 4.7.4
+// @updated 4.9
 // tooltips
-
 	$.fn.evo_elm_show_tooltip = function( passed_content, hide_time ){
 		var el = this;
 
 		if( el.hasClass('show')) return;
 
-		var free = el.hasClass('free') ? true: false;
+		var free = el.hasClass('free') || el.hasClass('evotooltipfree');
+	    var content = passed_content !== undefined ? passed_content : el.data('d') || el.attr('title') || '';
 
-		var content = (passed_content !== undefined) ? passed_content : el.data('d');
-		var tooltipbox = $('.evo_tooltip_box');
+	    if (!content) return;
 
-		// as backup use title atribute for toolt tip content
-		if( content === undefined || content == ''){
-			content = el.attr('title');
-		}
+	    var tooltipbox = $('.evo_tooltip_box');
+	    var cor = getCoords(event.target); // Assuming getCoords() is defined elsewhere
+	    tooltipbox.html(content).removeClass('show L evocenter'); // Reset classes
 
-		if( content == '') return;
+		var box_height = tooltipbox.height();
+	    var box_width = tooltipbox.width();
+	    var top = cor.top - 55 - box_height - (free ? 10 : 0);
+	    var left;
 
-		var p = el.position();
-		
-		var cor = getCoords(event.target);
+	    // Base left position
+	    if (el.hasClass('evocenter')) {
+	        left = cor.left - parseInt(box_width / 2) - 9;
+	        tooltipbox.addClass('evocenter');
+	    } else if (el.hasClass('L')) {
+	        left = cor.left - box_width - 15; // Left-aligned tooltip
+	        tooltipbox.addClass('L');
+	    } else {
+	        left = cor.left + 5; // Default right-aligned
+	    }
 
-		tooltipbox.removeClass('show').removeClass('L').html( content );
-		var box_height = $('.evo_tooltip_box').height();
-		var box_width = $('.evo_tooltip_box').width();
+	    // Apply position and show
+	    tooltipbox.css({ 'top': top, 'left': left }).addClass('show');
+	    el.addClass('show');
 
-		// box left calculation
-		var _left = cor.left + 5;
-
-		// if center arrow
-		if( el.hasClass('evocenter')){
-			_left = _left - parseInt( box_width / 2 ) - 9;
-			tooltipbox.addClass('evocenter');
-		}
-
-		tooltipbox.css({'top': (cor.top - 55 - box_height - ( free ? 10: 0) ), 'left': _left })
-			.addClass('show');
-
-		// left align
-		if( el.hasClass('L')){
-			tooltipbox.css({'left': (cor.left - box_width - 15) }).addClass('L');			
-		}
-
-		// hide tooltip in set time
-		if( hide_time !== undefined ){
-			setTimeout(function(){
-				el.evo_elm_hide_tooltip();
-			}, hide_time);	
-		}
-		el.addClass('show');
+	    // Hide after delay if specified
+	    if (hide_time !== undefined) {
+	        setTimeout(() => el.evo_elm_hide_tooltip(), hide_time);
+	    }
 	}
 	$.fn.evo_elm_hide_tooltip = function(){
 		this.removeClass('show');
-		$('.evo_tooltip_box').removeClass('show');
-		setTimeout(function(){
-			$('.evo_tooltip_box').removeClass('L center');
-		},200);
-	}
+		$('.evo_tooltip_box').removeClass('show L evocenter');
+	}	
 
-	$('body').on('mouseover','.ajdeToolTip, .colorselector, .evotooltip',function(event){
-		event.stopPropagation();
+	$('body')
+		.on('mouseover','.ajdeToolTip, .colorselector, .evotooltip, .evotooltipfree',function(event){
+			event.stopPropagation();
 
-		var relatedTarget = event.relatedTarget;
-		if( $(relatedTarget).closest('.evotooltip.show').length == 0)
-			$(this).evo_elm_show_tooltip();		
-	})
-	.on('mouseout','.ajdeToolTip, .colorselector, .evotooltip',function(event){	
-		event.stopPropagation();
-		var relatedTarget = event.relatedTarget;
-		if( $(relatedTarget).closest('.evotooltip.show').length == 0)
-	    	$(this).evo_elm_hide_tooltip();
-	});
+			var relatedTarget = event.relatedTarget;
+			var target = $(event.target);
+			var target_ = $(this);
 
+
+			if( target.hasClass('evotooltipfree') && !( target.hasClass('show') ) )  target.evo_elm_show_tooltip();
+			if( target.hasClass('evotooltip') && !( target.hasClass('show')) )  target.evo_elm_show_tooltip();					
+		})
+		.on('mouseout','.ajdeToolTip, .colorselector, .evotooltip, .evotooltipfree',function(event){	
+			event.stopPropagation();
+			var relatedTarget = $(event.relatedTarget);
+			var target = $(this);
+
+			// Don’t hide if moving to tooltip box or its descendants
+	        if (relatedTarget.closest('.evo_tooltip_box').length > 0 || 
+	        	relatedTarget.closest('.evotooltip, .evotooltipfree').length > 0) {
+	            return;
+	        }
+
+			//console.log('out');
+			if( target.hasClass('evotooltipfree') && target.hasClass('show') ) 	target.evo_elm_hide_tooltip();
+			if( target.hasClass('evotooltip') && target.hasClass('show') ) 	target.evo_elm_hide_tooltip();	        
+		})
+		.on('evoelm_hideall_tooltips',function(){
+			$('.evo_tooltip_box').removeClass('show L evocenter');
+			$('.evotooltipfree').removeClass('show');
+			$('.evotooltip').removeClass('show');
+		});
+
+
+
+// get coordinates
 	function getCoords(elem) { // crossbrowser version
 	    var box = elem.getBoundingClientRect();
 	    //console.log(box);
@@ -480,34 +680,130 @@ const BB = $('body');
 	 $('body').on('click','span.evo_row_select_opt',function(){
 
 	 	var O = $(this);
-	 	var P = O.closest('p');
-	 	const multi = P.hasClass('multi')? true: false;
+	    var P = O.closest('p.evo_row_select');
+	    const multi = P.hasClass('multi') ? true : false;
+	    const parentId = P.data('id');
 				
-		if(multi){
-			if(O.hasClass('select')){
-				O.removeClass('select');
-			}else{
-				O.addClass('select');
-			}
+		// Handle selection
+	    if(multi){
+	        O.toggleClass('select');
+	    } else {
+	        P.find('span.opt').removeClass('select');
+	        O.addClass('select');
+	    }
 
-		}else{
-			P.find('span.opt').removeClass('select');
-			O.addClass('select');
-		}
+		// Update values
+	    var val = '';
+	    P.find('.opt.select').each(function(){
+	        val += $(this).attr('value') + ',';
+	    });
+	    val = val.substring(0, val.length-1);
+	    P.find('input').val(val);
 
-		var val = '';
-		P.find('.opt').each(function(){
-			if( $(this).hasClass('select')) val += $(this).attr('value')+',';
-		});
+	    // Handle CSF visibility
+	    var csfContainer = P.next('.evoelm_CSF');
+	    if(csfContainer.length) {
+	        csfContainer.find('.evoelm_csf_section').each(function(){
+	            var section = $(this);
+	            var triggerValues = section.data('values');
+	            var shouldShow = false;
 
-		val = val.substring(0, val.length-1);
+	            if(multi) {
+	                // For multi-select, show if any selected value matches
+	                var selectedValues = val.split(',');
+	                shouldShow = triggerValues.some(value => selectedValues.includes(value));
+	            } else {
+	                // For single select, show if exact match
+	                shouldShow = triggerValues.includes(val);
+	            }
+	            console.log(shouldShow);
 
-		P.find('input').val( val );		
+	            section.css('display', shouldShow ? 'block' : 'none');
+	        });
+	    }
 
-		$('body').trigger('evo_row_select_selected',[P, $(this).attr('value'), val]);			
+	    $('body').trigger('evo_row_select_selected', [P, O.attr('value'), val]);		
 	});
 
-// Color picker @+4.5
+//* Date duration selector */
+	$(document).on('click', '.evoelm_durationselect_item', function(e) {
+        e.stopPropagation();
+        
+        const $this = $(this);
+        const $parent = $this.closest('.evoelm_durationselect_box');
+    	const $list = $parent.find('.evoelm_durationselect_list');
+        
+        // Close all other open lists
+	    $('.evoelm_durationselect_list').not($list).hide();
+	    $('.evoelm_durationselect_item').not($this).removeClass('evoboxsh1');
+	    
+	    // Toggle current list
+	    if ($list.is(':visible')) {
+	        $list.hide();
+	        $this.removeClass('evoboxsh1');
+	        return;
+	    }
+        
+        var dataVals = $(this).data('vals') || {};
+        var currentVal = $(this).data('val') || '0';
+        
+        var listHtml = `<div class="evoelm_durationselect_list evoposa evobgc3 evoscrollbh evoofh evobr10" style="max-height: 300px;overflow-y:scroll;z-index: 9990;box-shadow: 0px 3px 10px -5px #000; margin-top:10px;"><div class="">`;
+        $.each(dataVals, function(key, value) {
+            var selectedClass = (key == currentVal) ? ' evoclw evobgclp' : '';
+            listHtml += '<div class="evoborderb evopad5-15 evocurp evohoop7' + selectedClass + '" data-val="' + key + '" style="white-space: nowrap;text-overflow: ellipsis;">' + value + '</div>';
+        });
+        listHtml += '</div></div>';
+
+        if ($list.length === 0) {
+            $parent.append(listHtml);
+        } else {
+            $list.replaceWith(listHtml);
+        }
+        
+        var $newList = $parent.find('.evoelm_durationselect_list');
+        $newList.show();
+        $(this).addClass('evoboxsh1');
+        
+        var $selectedItem = $newList.find('.evoclw.evobgclp');
+        if ($selectedItem.length) {
+            $newList.scrollTop(
+                $selectedItem.position().top + 
+                $newList.scrollTop() - 
+                $newList.height()/2 + 
+                $selectedItem.height()/2
+            );
+        }
+    });
+    
+    $(document).on('click', '.evoelm_durationselect_list div', function(e) {
+        e.stopPropagation();
+    
+	    const $this = $(this);
+	    const $parent = $this.closest('.evoelm_durationselect_box');
+	    const $display = $parent.find('.evoelm_durationselect_item');
+	    const $displayVal = $display.find('.evoelm_durationselect_item_val');
+	    const $list = $parent.find('.evoelm_durationselect_list');
+	    const $input = $parent.find('input[type="hidden"]');
+	    
+	    // Update display and input
+	    $displayVal.text($this.text());
+	    $display.data('val', $this.data('val')).removeClass('evoboxsh1');
+	    $input.val($this.data('val'));
+	    
+	    $list.hide();
+    });
+    
+    $(document).on('click', function(e) {
+        const $target = $(e.target);
+	    if (!$target.closest('.evoelm_durationselect_box').length) {
+	        $('.evoelm_durationselect_list').hide();
+	        $('.evoelm_durationselect_item').removeClass('evoboxsh1'); // Ensure shadow class is removed
+	    }
+    });
+
+
+
+// Color picker @+4.5 @updated 4.9
 	setup_colorpicker();
 	$('body').on('evo_page_run_colorpicker_setup',function(){
 		setup_colorpicker();
@@ -515,11 +811,14 @@ const BB = $('body');
 	function setup_colorpicker(){
 		$('body').find('.evo_elm_color').each(function(){
 			var elm = $(this);
+			const saved_color = elm.siblings('input').val();
+			const color_to_use = saved_color || '#888888';
+
 
 			if( typeof elm.ColorPicker ==='function'){
 				elm.ColorPicker({
 					onBeforeShow: function(){
-						$(this).ColorPickerSetColor( '#888888');
+						$(this).ColorPickerSetColor( color_to_use );
 					},
 					onChange:function(hsb, hex, rgb,el){
 						elm.css({'background-color':'#'+hex});		
@@ -557,7 +856,6 @@ const BB = $('body');
 		var el = this;
 		var el_color = el.find('.evo_set_color');
 
-
 		var init = function(){
 			el.ColorPicker({		
 				color: get_default_set_color(),
@@ -594,11 +892,13 @@ const BB = $('body');
 
 		init();
 	}
-	$('body').find('.evo_color_selector').each(function(){
-		$(this).evo_colorpicker_init();	
+	$('body').on('evo_eventedit_dom_loaded_evo_color',function(event, val){
+		$('body').find('.evo_color_selector').each(function(){
+			$(this).evo_colorpicker_init();	
+		});					
 	});
 	
-// plus minus changer
+// plus minus changer @updated 4.9
 	$('body').on('click','.evo_plusminus_change', function(event){
 
         OBJ = $(this);
@@ -615,8 +915,9 @@ const BB = $('body');
         if( NEWQTY == 0 && OBJ.hasClass('min') ){    return;    }
 
         NEWQTY = (MAX!='' && NEWQTY > MAX)? MAX: NEWQTY;
+        if( isNaN( NEWQTY ) ) NEWQTY = 0;
 
-        OBJ.siblings('input').val(NEWQTY);
+        OBJ.siblings('input').val(NEWQTY).attr('value',NEWQTY);
 
         if( QTY != NEWQTY) $('body').trigger('evo_plusminus_changed',[NEWQTY, MAX, OBJ]);
        
@@ -840,6 +1141,51 @@ const BB = $('body');
 	$('body').on('click','.evo_data_upload_window_close',function(){
 		$(this).parent().hide();
 	});
+
+// Show a snackbar message for eventON
+	$.fn.evo_snackbar = function(opt){
+		var defaults = { 
+			'message':'',
+			'classnames':'',
+			'visible_duration':5000,
+		}; var OO = $.extend({}, defaults, opt);
+
+		var snackbar = $('#evo_snackbar');
+	    if (snackbar.length === 0) {
+	        $('.evo_elms').append('<div id="evo_snackbar"></div>');
+	        snackbar = $('#evo_snackbar');
+	    }
+
+	    // Clear existing timeout and handlers
+	    clearTimeout(snackbar.data('timeoutId'));
+	    snackbar.off('mouseenter mouseleave');
+
+	    // Show snackbar
+	    snackbar.html(OO.message).attr('class',  OO.classnames);
+	    setTimeout(function(){	snackbar.addClass('show');  },200);
+
+	    // Hide function
+	    function hideSnackbar() {
+	        snackbar.addClass('hide').removeClass('show');
+	        clearTimeout(snackbar.data('timeoutId'));
+	    }
+
+	    // Set initial timeout
+	    var timeoutId = setTimeout(hideSnackbar, OO.visible_duration);
+	    snackbar.data('timeoutId', timeoutId);
+
+	    // Mouse events
+	    snackbar.on('mouseenter', function() {
+	        clearTimeout(snackbar.data('timeoutId'));
+	    }).on('mouseleave', function() {
+	        var newTimeoutId = setTimeout(hideSnackbar, OO.visible_duration);
+	        snackbar.data('timeoutId', newTimeoutId);
+	    });
+
+	    return this;
+
+	}
+
 
 // lightbox select @updated 4.7.2
 	$('body').on('click','.evo_elm_lb_field input',function(event){

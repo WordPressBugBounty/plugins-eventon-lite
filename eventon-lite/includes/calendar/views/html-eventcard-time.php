@@ -1,15 +1,14 @@
 <?php
 /**
  * EventCard Time
- * @version 2.3
- * @fullversion 4.7.4
+ * @version 2.4
  */
 
 $iconTime = "<span class='evcal_evdata_icons'><i class='fa ". esc_attr( get_eventON_icon('evcal__fai_002', 'fa-clock-o',$evOPT ) ) ."'></i></span>";
 						
 						
 // time for event card
-$timezone = (!empty($object->timezone)? ' <em class="evo_eventcard_tiemzone">'. $object->timezone.'</em>':null);
+$timezone = (!empty($object->timezone)? ' <em class="evo_eventcard_tiemzone evomarl5 evoop7">'. $object->timezone.'</em>':null);
 
 // event time
 $evc_time_text = "<span class='evo_eventcard_time_t'>". apply_filters('evo_eventcard_time', $object->timetext. $timezone, $object) . "</span>";

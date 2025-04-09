@@ -1,7 +1,6 @@
 /**
  * Single Event Styles for event individual page and for other
- * @version 4.2
- * @mod 2.0
+ * @version 2.4
  */
 	.evo_page_body .evo_sin_page .evcal_eventcard{	display:block}
 	.evo_page_body .evcal_eventcard{display:none}
@@ -29,14 +28,9 @@
 
 /* eventtop style = color */
 	.color.evo_sin_page #evcal_list .eventon_list_event a.desc_trig >*,
-	.color.evo_sin_page #evcal_list .eventon_list_event .evcal_desc_info em,
-	.color.evo_sin_page #evcal_list .eventon_list_event .evcal_desc_info span,
-	.color.evo_sin_page #evcal_list .eventon_list_event .evcal_desc_info b,
-	.color.evo_sin_page #evcal_list .eventon_list_event .evcal_desc3 em,
-	.color.evo_sin_page #evcal_list .eventon_list_event .evcal_desc3 span,
 	.color.evo_sin_page #evcal_list .eventon_list_event .evcal_event_title,
 	.color.evo_sin_page #evcal_list .eventon_list_event .evcal_desc span.evcal_event_subtitle
-	{color:#fff!important;}
+	{color:#fff;}
 	.color.evo_sin_page #evcal_list .eventon_list_event .evcal_list_a{border:none;}
 
 /* overrides */

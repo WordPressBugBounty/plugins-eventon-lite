@@ -5,7 +5,7 @@
  * @author 		AJDE
  * @category 	Admin
  * @package 	eventON/Admin/ajde_events
- * @version     2.3
+ * @version     2.3.3
  */
 
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
@@ -17,9 +17,11 @@ class evo_ajde_events{
 
 		// custom filters
 		add_action('restrict_manage_posts',array($this,'evo_restrict_manage_posts'));
-		add_filter('query_vars', array($this,'wpse57344_register_query_vars' ));
+		add_filter('query_vars', array($this,'_register_query_vars' ));
 		add_filter('months_dropdown_results', array($this,'remove_date_filter' ),10,2);
-		add_action( 'pre_get_posts', array($this,'wpse57351_pre_get_posts' ));
+		add_action( 'pre_get_posts', array($this,'_pre_get_posts' ));
+
+		add_filter('update_postmeta_cache', array($this,'limit_meta_cache_for_events'), 10, 3);
 
 		add_action('manage_ajde_events_posts_custom_column', array($this,'eventon_custom_event_columns'), 10, 2 );
 		add_filter( 'manage_edit-ajde_events_sortable_columns', array($this,'eventon_custom_events_sort'));
@@ -72,108 +74,138 @@ class evo_ajde_events{
 		}
 
 	// Custom filters for all events
+		function limit_meta_cache_for_events($meta_type, $object_ids, $meta_keys) {	
+		    if ($meta_type === 'post' && is_admin() && isset($_GET['post_type']) && $_GET['post_type'] === 'ajde_events') {	
+		        return ['_edit_lock']; // Only cache _edit_lock to satisfy wp_check_post_lock
+		    }
+		    return $meta_keys;
+		}
 		function remove_date_filter($A, $post_type){
 			if($post_type == 'ajde_events') return array();
 			return $A;
 		}
-		function evo_restrict_manage_posts() {
-			global $typenow;
-
-			if ($typenow=='ajde_events'){
-	           	$event_date_type = (isset($_GET['event_date_type'])? sanitize_text_field( $_GET['event_date_type'] ):null);
-				?>
-				<select name="event_date_type">
-					<option value="all"><?php esc_html_e('Past and Future Events','eventon');?></option>
-					<option value="past" <?php echo ($event_date_type=='past')?"selected='selected'":'';?>><?php esc_html_e('Past Events','eventon');?></option>
-					<option value="live" <?php echo ($event_date_type=='live')?"selected='selected'":'';?>><?php esc_html_e('Current Events','eventon');?></option>
-				</select>
-				<?php
-
-				$ev_month = (isset($_GET['ev_month'])? sanitize_text_field( $_GET['ev_month'] ):null);
-				?>
-				<select name="ev_month">
-					<option value="all"><?php esc_html_e('All Months','eventon');?></option>
-					<?php
-					$DD = EVO()->calendar->DD;
-					
-					$DD->setTimestamp( EVO()->calendar->current_time );	
-					$DD->modify('-12 months');
-
-					for($x=0; $x<25; $x++){						
-						$DD->setTime(0,0,0);
-						$DD->modify('first day of this month');
-						$DD->modify('+1 month');
-
-						$SU = $DD->format('U');
-						$DD->modify('last day of this month');
-						$DD->setTime(23,59,59);
-
-						$range = $SU.'-'. $DD->format('U');
-
-						?><option <?php echo $ev_month == $range? esc_html( "selected='selected'") :'';?> value="<?php echo esc_html( $range );?>"><?php echo esc_html( $DD->format('Y-m') );?></option><?php						
-					}
-					?>					
-				</select>
-				<?php
-	        }
-		}
-		function wpse57344_register_query_vars( $Q ){
+		function _register_query_vars( $Q ){
 		    //Add these query variables
 		    $Q[] = 'event_date_type';
 		    $Q[] = 'ev_month';
+		     $Q[] = 'event_status';
 		    return $Q;
 		}
-		function wpse57351_pre_get_posts( $query ) {
+		function evo_restrict_manage_posts() {
+			global $typenow;
+
+			if ($typenow !=='ajde_events') return;
+			// event date type
+	           	$event_date_type = (isset($_GET['event_date_type'])? sanitize_text_field($_GET['event_date_type']):null);
+				?>
+				<select name="event_date_type">
+				    <?php foreach([
+				        'all' => __('All (Past and Future)', 'eventon'),
+				        'past' => __('Past Events', 'eventon'),
+				        'live' => __('Current Events', 'eventon'),
+				    ] as $value => $label): ?>
+				        <option value="<?= esc_attr($value) ?>" <?= $event_date_type === $value ? 'selected' : '' ?>><?= esc_html($label) ?></option>
+				    <?php endforeach; ?>
+				</select>				
+				<?php
+
+			// event status
+				$_es_val = (isset($_GET['event_status'])? sanitize_text_field($_GET['event_status']):null);		           	
+				?>
+				<select name="event_status">
+				    <?php
+				    // Start with 'All Event Statuses' as the first option
+					$_es_options = ['all' => __('All Statuses', 'eventon')] + EVO()->cal->get_status_array('back');
+				    
+				    foreach ($_es_options as $value => $label) {
+				        printf(
+				            '<option value="%s"%s>%s</option>',
+				            esc_attr($value), $_es_val === $value ? ' selected' : '', esc_html($label)
+				        );
+				    }
+				    ?>
+				</select>
+			<?php 
+
+			// event month
+				$ev_month = (isset($_GET['ev_month'])? sanitize_text_field($_GET['ev_month']):null);
+				?>
+				<select name="ev_month">
+				    <option value="all"><?= esc_html__('All Months', 'eventon') ?></option>
+				    <?php
+				    $ev_month = isset($_GET['ev_month']) ? sanitize_text_field($_GET['ev_month']) : null;
+				    $DD = EVO()->calendar->DD;
+				    $DD->setTimestamp(EVO()->calendar->current_time);
+				    $DD->modify('-12 months');
+
+				    for ($x = 0; $x < 25; $x++) {
+				        $DD->modify('first day of next month')->setTime(0, 0, 0);
+				        $start_unix = $DD->format('U');
+				        $DD->modify('last day of this month')->setTime(23, 59, 59);
+				        $range = "$start_unix-{$DD->format('U')}";
+				        $label = $DD->format('Y-m');
+				        ?>
+				        <option value="<?= esc_attr($range) ?>" <?= $ev_month === $range ? 'selected' : '' ?>><?= esc_html($label) ?></option>
+				        <?php
+				    }
+				    ?>
+				</select>
+			<?php
+		}
+		
+		function _pre_get_posts( $query ) {
+
+		    // Only modify main query for 'ajde_events' in admin
+		    if (is_admin() && $query->is_main_query() && $query->get('post_type') === 'ajde_events') :
+		    
+		    $query->set('update_post_meta_cache', false);
+
+		    $meta_query = $query->get('meta_query') ?: []; // Default to empty array
 
 		    //Only alter query if custom variable is set.
-		    $event_date_type = $query->get('event_date_type');
-		    if( !empty($event_date_type) ){
-
-		         //Be careful not override any existing meta queries.
-		        $meta_query = $query->get('meta_query');
-		        if( empty($meta_query) )    $meta_query = array();
-
-		        //Get posts with date between the first and last of given month
-		        $timenow = EVO()->calendar->current_time;
-
-		        if($event_date_type=='past'){
-		        	$meta_query[] = array(
-			            'key' => 'evcal_erow',
-			            'value' => $timenow,
-			            'compare' => '<',
-			        );
-		        }elseif($event_date_type=='live'){
-		        	$meta_query[] = array(
-			            'key' => 'evcal_erow',
-			            'value' => $timenow,
-			            'compare' => '>=',
-			        );
+			    $event_date_type = $query->get('event_date_type');
+		        if (!empty($event_date_type)) {
+		            $timenow = EVO()->calendar->current_time;
+		            $compare = $event_date_type === 'past' ? '<' : ($event_date_type === 'live' ? '>=' : '');
+		            if ($compare) {
+		                $meta_query[] = [
+		                    'key' => 'evcal_erow',
+		                    'value' => $timenow,
+		                    'compare' => $compare,
+		                ];
+		            }
 		        }
-		        
-		        $query->set('meta_query',$meta_query);
-		    }
 
 		    // date range filter
-		    $ev_month = $query->get('ev_month');
-		    if( !empty($ev_month) && $ev_month != 'all'){
-		    	$range = explode('-', $ev_month);
+			    $ev_month = $query->get('ev_month');
+		        if (!empty($ev_month) && $ev_month !== 'all') {
+		            $range = explode('-', $ev_month);
+		            $meta_query[] = [
+		                'key' => 'evcal_erow',
+		                'value' => $range[1],
+		                'compare' => '<=',
+		            ];
+		            $meta_query[] = [
+		                'key' => 'evcal_srow',
+		                'value' => $range[0],
+		                'compare' => '>=',
+		            ];
+		        }
 
-		    	$meta_query = $query->get('meta_query');
-		        if( empty($meta_query) )    $meta_query = array();
+			// Event status filter
+        		$event_status = $query->get('event_status');
+		        if (!empty($event_status) && $event_status !== 'all') {
+		            $meta_query[] = [
+		                'key' => '_status',
+		                'value' => $event_status,
+		                'compare' => '=',
+		            ];
+		        }
 
-		        $meta_query[] = array(
-		            'key' => 'evcal_erow',
-		            'value' => $range[1],
-		            'compare' => '<=',
-		        );
-		        $meta_query[] = array(
-		            'key' => 'evcal_srow',
-		            'value' => $range[0],
-		            'compare' => '>=',
-		        );
+		    // Apply meta query if not empty
+	        if (!empty($meta_query))  $query->set('meta_query', $meta_query);
 
-		        $query->set('meta_query',$meta_query);
-		    }
+	    	endif;
 		}
 
 	// Custom Columns for event page
@@ -622,11 +654,19 @@ class evo_ajde_events{
 			// start end time
 			$proper_time = 	evoadmin_get_unix_time_fromt_post($post_id);
 
+			EVO_Debug($proper_time);
+
 			if ( !empty($proper_time['unix_start']) )
 				$EVENT->set_prop('evcal_srow',  $proper_time['unix_start'] );
 			
 			if ( !empty($proper_time['unix_end']) )
 				$EVENT->set_prop('evcal_erow', $proper_time['unix_end']);
+
+			// save adjusted event times
+				foreach( array( 'unix_start_ev', 'unix_end_ev', 'unix_vend_ev') as $f){
+					if ( !empty($proper_time[ $f ]) ) 
+						$EVENT->set_meta(  '_'.$f , $proper_time[ $f ]);
+				}
 
 			// yes no fields
 			foreach( apply_filters('eventon_quick_save_fields', array(

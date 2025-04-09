@@ -278,7 +278,7 @@ class evo_frontend {
 			wp_register_script('eventon_gmaps_blank', EVO()->assets_path. 'js/maps/eventon_gen_maps_none.js', array('jquery'), EVO()->version ,true );	
 			
 
-			$apikey = !empty($evo_opt['evo_gmap_api_key'])? '?key='.$evo_opt['evo_gmap_api_key'] .'&callback=Function.prototype&loading=async&libraries=marker' :'';
+			$apikey = !empty($evo_opt['evo_gmap_api_key'])? '?key='.$evo_opt['evo_gmap_api_key'] .'&callback=Function.prototype&loading=async&libraries=marker,places' :'';
 			wp_register_script( 'evcal_gmaps', 
 				apply_filters('eventon_google_map_url', 
 					'https://maps.googleapis.com/maps/api/js'.$apikey), 
@@ -536,10 +536,9 @@ class evo_frontend {
 
 			
 			// foreach event type upto activated event type categories
-			for( $x=1; $x< (evo_get_ett_count($options)+1); $x++){
-				$ab = ($x==1)? '':$x;
-
-				$_tax_lang_field = 'evcal_lang_et'.$x;
+			foreach(eventon_get_valid_ett() as $key => $val ){
+				$_tax_lang_field = 'evcal_lang_et'. ( $key == 1 ? '': $key );
+				$ab = ($key==1)? '':$key;
 
 				// check on eventon language values for saved name
 				$lang_name = (!empty($options2[$_lang_variation][$_tax_lang_field]))? 
@@ -550,8 +549,9 @@ class evo_frontend {
 					$output[$x] = $lang_name;
 				}else{
 					$output[$x] = (!empty($options['evcal_eventt'.$ab]))? $options['evcal_eventt'.$ab]:'Event Type '.$ab;
-				}			
+				}	
 			}
+			
 			return $output;
 		}
 		function get_localized_event_tax_names_by_slug($slug, $lang=''){

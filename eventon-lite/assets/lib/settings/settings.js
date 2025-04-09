@@ -1,36 +1,97 @@
 /**
  * EventON Settings scripts
- * @version  2.3
- * @version  4.7.4
+ * @version  2.4
  */
 jQuery(document).ready(function($){
 
 	init();
 	const BB = $('body');
 
-	function init(){
-		// focusing on correct settings tabs
-		var hash = window.location.hash;
-		//console.log(hash);
+	function init() {
+	    var hash = window.location.hash;
+	    if (!hash) return;
 
-		if(hash=='' || hash=='undefined'){
-		}else{
-			var hashId = hash.split('#');
-
-			$('.nfer').hide();
-			$('#setting_'+ hashId[1]).show();
-
-			var obj = $('a[data-c_id='+hashId[1]+']');
-			change_tab_position(obj);
-		}
+	    var hashId = hash.split('#')[1];
+	    $('.nfer').hide();
+	    $('#setting_' + hashId).show();
+	    change_tab_position($('a[data-c_id=' + hashId + ']'));
 	}
 
 
 // header save changes button
+	// Function to get query parameter by name
+	function getQueryParam(name) {
+	    let urlParams = new URLSearchParams(window.location.search);
+	    return urlParams.get(name);
+	}
+
 	$('body').on('click','.evo_trig_form_save',function(event){
 		event.preventDefault();
 		//$('body').find('.evo_settings_form').submit();
-		$('body').find('.evo_settings_save_btn').trigger('click');
+
+		var el = $(this);
+		
+		var form = $('body').find('.evo_settings_box form');		
+
+	    // Serialize form data with proper handling for checkbox arrays
+	    var formData = form.serializeArray();
+
+	    // Convert form data to JSON, handling checkboxes with multiple values
+	    var dataObject = {};
+	    
+	    formData.forEach(function(item) {
+	        var name = item.name;
+	        var _is_item_arr = false;
+
+	        // Strip [] from checkbox field names
+	        if (name.endsWith('[]')) {
+
+	        	if( item.value === undefined ) return;
+
+	        	_is_item_arr = true;
+	            name = name.slice(0, -2);
+	        }
+
+	        // Handle array fields
+	        if ( _is_item_arr ) {
+	            if (Array.isArray(dataObject[name])) {
+	                dataObject[name].push(item.value);
+	                //console.log(dataObject[name]);
+	            } else {
+	                dataObject[name] = [ item.value];
+	                //console.log(dataObject[name]);
+	            }
+	        } else {
+	            dataObject[name] = item.value;
+	        }
+	    });
+
+	    var jsonData = JSON.stringify(dataObject);
+
+		el.evo_admin_get_ajax({
+			adata:{
+				a:'eventon_general_settings_save',
+				data: {
+					formData: jsonData,
+					lang: $('body').find('.evo_lang_selection').val(),	
+					page: 	getQueryParam('page'),				
+				},
+				loader_btn_el:true,
+				show_snackbar: {duration:2000},
+			},
+			uid:'evo_save_lang_settings',
+			onSuccess:function( OO, data, LB){
+				// Check if the message div already exists
+			    if ($('.evo_updated.updated.fade').length === 0) {
+			        var messageDiv = $("<div class='evo_updated updated fade'><p>Settings Saved</p></div>").insertBefore(this);
+
+			        setTimeout(function() {
+			            // Remove message
+			            messageDiv.remove();
+			        }, 5000);
+			    }
+			}
+		} );
 	});
 
 // Settings
@@ -152,21 +213,8 @@ jQuery(document).ready(function($){
 				var item = $(this).siblings('input');
 				item.attr({'value': item.attr('default') });
 			});
-			
+			$('body').evo_snackbar({'message':'Default colors applied.'});
 		});
-
-	// color circle guide popup
-		$('#ajde_customization .hastitle').hover(function(){
-			var poss = $(this).position();
-			var title = $(this).attr('alt');
-			//alert(poss.top)
-			$('#ajde_color_guide').css({'top':(poss.top-33)+'px', 'left':(poss.left+11)}).html(title).show();
-			//$('#ajde_color_guide').show();
-
-		},function(){
-			$('#ajde_color_guide').hide();
-		});
-
 
 
 	// hideable section

@@ -1,7 +1,7 @@
 <?php
-/*
+/**
  * Taxonomy Settings
- * @version L2.2.10
+ * @version 2.4
  */
 
 $settings = new EVO_Settings();
@@ -83,4 +83,4 @@ $data_array =  array(
 );
 
 
-echo $settings->get_event_edit_settings( apply_filters('evo_eventedit_taxonomy_fields_array', $data_array, $post_data, $settings ) );
+echo EVO()->elements->_get_settings_content( apply_filters('evo_eventedit_taxonomy_fields_array', $data_array, $post_data, $settings ) );

@@ -5,7 +5,7 @@
  * @author 		AJDE
  * @category 	Admin
  * @package 	EventON/Admin/ajde_events
- * @version     L 2.2.21
+ * @version     2.4
  */
 
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
@@ -150,39 +150,7 @@ class evo_event_metaboxes{
 						
 		// array of all meta boxes
 			$metabox_array = apply_filters('eventon_event_metaboxs', array(
-				array(
-					'id'=>'ev_subtitle',
-					'name'=>esc_html__('Event Subtitle','eventon'),
-					'variation'=>'customfield',	
-					'hiddenVal'=>'',	
-					'iconURL'=>'fa-pencil',
-					'iconPOS'=>'',
-					'type'=>'code',
-					'content'=>'',
-					'slug'=>'ev_subtitle'
-				),
-				array(
-					'id'=>'ev_status',
-					'name'=>esc_html__('Event Status','eventon'),
-					'variation'=>'customfield',	
-					'hiddenVal'=>'',	
-					'iconURL'=>'fa-signal',
-					'iconPOS'=>'',
-					'type'=>'code',
-					'content'=>'',
-					'slug'=>'ev_status'
-				),
-				array(
-					'id'=>'ev_attendance',
-					'name'=>esc_html__('Event Attendance Mode','eventon'),
-					'variation'=>'customfield',	
-					'hiddenVal'=>'',	
-					'iconURL'=>'fa-clipboard',
-					'iconPOS'=>'',
-					'type'=>'code',
-					'content'=>'',
-					'slug'=>'ev_attendance'
-				),
+				
 				array(
 					'id'=>'ev_timedate',
 					'name'=>esc_html__('Time and Date','eventon'),	
@@ -191,6 +159,17 @@ class evo_event_metaboxes{
 					'type'=>'code',
 					'content'=>'',
 					'slug'=>'ev_timedate'
+				),
+				array(
+					'id'=>'ev_otherdata',
+					'name'=>__('Other Event Data','eventon'),
+					'variation'=>'customfield',	
+					'hiddenVal'=>'',	
+					'iconURL'=>'fa-pencil',
+					'iconPOS'=>'',
+					'type'=>'code',
+					'content'=>'',
+					'slug'=>'ev_otherdata'
 				),
 				array(
 					'id'=>'ev_virtual',
@@ -319,60 +298,10 @@ class evo_event_metaboxes{
 								include_once 'class-meta_boxes-health.php';
 							break;
 
-							// Event Status
-							case 'ev_status':
-								?><div class='evcal_data_block_style1 event_status_settings'>
-									<div class='evcal_db_data'>
-										<?php
-										$_status = $EVENT->get_event_status();
-										
-										EVO()->elements->print_element( array(
-											'type'=>'select_row',
-											'row_class'=>'es_values',
-											'name'=>'_status',
-											'value'=> esc_attr( $_status ),
-											'options'=> array_map('esc_html', $EVENT->get_status_array() )
-										));
-										?>
-										<div class='cancelled_extra' style="display:<?php echo $_status =='cancelled'? 'block':'none';?>">
-											<p><label><?php esc_html_e('Reason for cancelling','eventon');?></label><textarea name='_cancel_reason'><?php echo esc_textarea( $EVENT->get_prop('_cancel_reason') );?></textarea>
-										</div>
-										<div class='movedonline_extra' style="display:<?php echo $_status =='movedonline'? 'block':'none';?>">
-											<p><label><?php esc_html_e('More details for online event','eventon');?></label><textarea name='_movedonline_reason'><?php echo esc_textarea( $EVENT->get_prop('_movedonline_reason') );?></textarea>
-										</div>
-										<div class='postponed_extra' style="display:<?php echo $_status =='postponed'? 'block':'none';?>">
-											<p><label><?php esc_html_e('More details about postpone','eventon');?></label><textarea name='_postponed_reason'><?php echo esc_textarea( $EVENT->get_prop('_postponed_reason') );?></textarea>
-										</div>
-										<div class='rescheduled_extra' style="display:<?php echo $_status =='rescheduled'? 'block':'none';?>">
-											<p><label><?php esc_html_e('More details about reschedule','eventon');?></label><textarea name='_rescheduled_reason'><?php echo esc_textarea( $EVENT->get_prop('_rescheduled_reason') );?></textarea>
-
-											<?php /*
-											<p>
-												<label><?php esc_html_e('Previous start date (for SEO)','eventon');?></label></p>
-											<div class='prev_start_date' style='background-color: #c3c3c3;padding: 10px; border-radius: 10px;'>
-											<?php
-
-												$wp_time_format = get_option('time_format');
-
-												echo EVO()->elements->print_date_time_selector( array(
-													'type'=>'prev',
-													'unix'=> $EVENT->get_prop('_prevstartdate'),
-													'time_format'=>$wp_time_format
-												));
-
-											?>	
-											</div>
-											*/?>
-										</div>
-									</div>
-								</div>
-								<?php
-							break;
-
-							// event attendance mode
-							case 'ev_attendance':
-								include_once 'class-meta_boxes-attendance.php';
-							break;
+							// Other Data
+							case 'ev_otherdata':
+								include_once 'class-meta_boxes-other-data.php';
+							break;	
 
 							case 'ev_releated':
 								include_once 'class-meta_boxes-related.php';								
@@ -404,28 +333,7 @@ class evo_event_metaboxes{
 									echo "</div>";
 							break;
 							case 'ev_learnmore':
-								echo "<div class='evo_meta_elements'>";
-									
-									EVO()->elements->print_process_multiple_elements(
-										array(
-											array(
-												'type'=>'text',
-												'name'=> esc_html__('Learn More Link','eventon'),
-												'tooltip'=>'Type in your complete event link with http.',
-												'id'=>'evcal_lmlink',
-												'value'=> esc_attr( $EVENT->get_prop('evcal_lmlink') )
-											),
-											array(
-												'type'=>'yesno_btn',
-												'label'=> esc_html__('Open in New window','eventon'),
-												'id'=>'evcal_lmlink_target',
-												'value'=> esc_attr( $EVENT->get_prop('evcal_lmlink_target') ),
-											),
-										)
-									);
-								
-								echo "</div>";
-
+								include_once ('class-meta_boxes-learnmore.php');
 							break;
 							case 'ev_lang':
 								echo "<div class='evcal_data_block_style1'>
@@ -470,11 +378,6 @@ class evo_event_metaboxes{
 								
 								include_once ('class-meta_boxes-timedate.php');
 								
-							break;
-
-							case 'ev_subtitle':
-								?><div class='evcal_data_block_style1'><input type='text' id='evcal_subtitle' name='evcal_subtitle' value="<?php echo esc_html( $EVENT->get_prop('evcal_subtitle'));?>" style='width:100%'/></div>
-								<?php
 							break;
 						}
 						
@@ -567,7 +470,50 @@ class evo_event_metaboxes{
 		}
 		
 	// Save the Event data meta box
-		function eventon_save_meta_data($post_id, $post){
+		public function event_save_datetime( $EVENT){
+
+			$proper_time = 	evoadmin_get_unix_time_fromt_post($EVENT->ID);
+
+			// if Repeating event save repeating intervals
+				if( eventon_is_good_repeat_data()  ){
+
+					if(!empty($proper_time['unix_start'])){
+
+						$unix_E = $end_range = (!empty($proper_time['unix_end']))? $proper_time['unix_end']: $proper_time['unix_start'];
+						$repeat_intervals = eventon_get_repeat_intervals($proper_time['unix_start'], $unix_E);
+
+						// save repeat interval array as post meta
+						if ( !empty($repeat_intervals) ){
+
+							$E = end($repeat_intervals);
+							$end_range = $E[1];
+
+							$EVENT->set_meta( 'repeat_intervals', $repeat_intervals);
+						}else{
+							$EVENT->del_prop( 'repeat_intervals');
+						}
+					}
+				}
+			// full time converted to unix time stamp
+				if ( !empty($proper_time['unix_start']) )
+					$EVENT->set_meta( 'evcal_srow', $proper_time['unix_start']);
+				
+				if ( !empty($proper_time['unix_end']) )
+					$EVENT->set_meta( 'evcal_erow', $proper_time['unix_end']);
+
+
+			// save virtual end time
+				if( isset($proper_time['unix_vir_end']) && !empty($proper_time['unix_vir_end'])){
+					$EVENT->set_meta( '_evo_virtual_erow', $proper_time['unix_vir_end']);
+				}
+
+			// save adjusted event times
+				foreach( array( 'unix_start_ev', 'unix_end_ev', 'unix_vend_ev') as $f){
+					if ( !empty($proper_time[ $f ]) ) 
+						$EVENT->set_meta(  '_'.$f , $proper_time[ $f ]);
+				}
+		}
+		public function eventon_save_meta_data($post_id, $post){
 			if($post->post_type!='ajde_events')
 				return;
 				
@@ -608,7 +554,7 @@ class evo_event_metaboxes{
 					'evcal_exlink','evcal_lmlink','evcal_subtitle',
 					'evcal_hide_locname','evcal_gmap_gen','evcal_name_over_img', 'evo_access_control_location',
 					'evcal_mu_id','evcal_paypal_item_price','evcal_paypal_text','evcal_paypal_email',
-					'evcal_repeat','_evcal_rep_series','_evcal_rep_endt','_evcal_rep_series_clickable','evcal_rep_freq','evcal_rep_gap','evcal_rep_num',
+					'evcal_repeat','_evcal_rep_series','_evcal_rep_endt','_evcal_rep_series_clickable','evcal_rep_freq','evcal_rep_gap','evcal_rep_num','evo_event_timezone',
 					'evp_repeat_rb','evo_repeat_wom','evo_rep_WK','evp_repeat_rb_wk','evo_rep_WKwk',
 					'evcal_lmlink_target','_evcal_exlink_target','_evcal_exlink_option',
 					'evo_hide_endtime','evo_span_hidden_end','evo_year_long','_evo_month_long',
@@ -643,8 +589,8 @@ class evo_event_metaboxes{
 					}
 				}
 
-			// process the time pieces into unix values
-				$proper_time = 	evoadmin_get_unix_time_fromt_post($post_id);
+			// process event date and time pieces into unix values @4.9	
+				$this->event_save_datetime( $EVENT);
 			
 
 			// if Repeating event save repeating intervals

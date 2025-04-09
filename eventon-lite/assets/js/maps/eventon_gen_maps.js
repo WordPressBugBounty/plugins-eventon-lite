@@ -1,6 +1,6 @@
 /**
  * EventON Generate Google Maps Function
- * @version  4.6.1
+ * @version  2.4
  */
 
 //return;
@@ -18,7 +18,6 @@
 			map_canvas_id:	'',
 			location_type:'',
 			address:'',
-			styles:'',
 			zoomlevel:'',
 			mapformat:'',
 			scroll:false,
@@ -39,26 +38,16 @@
 
 		code = {	
 			init:function(){
-
-				//return;
-
-				//console.log( $('#'+options.map_canvas_id).hasClass('mDrawn') ? 'y':'d');
-				//console.log( mapBox.is(':visible') ? 'y':'d');
-
-				// draw map or not
-				if( !(mapBox.is(':visible')) ) return; // if map box is not visible
-				if( mapBox.find('.gm-style').length > 0  ) return;
+				// Skip if map box isn’t visible or already drawn
+                if (!mapBox.is(':visible') || mapBox.find('.gm-style').length > 0) return;
 
 				mapBox.html( evo_general_params.html.preload_gmap);
 
 				//if( mapBox.hasClass('mDrawn') ) return;	
 
-				// set calendar for event
-				if( obj.closest('.ajde_evcal_calendar').length>0){
-					options.cal = obj.closest('.ajde_evcal_calendar');
-				}
-
-				code.process_SC();
+				// Set calendar if present
+                options.cal = obj.closest('.ajde_evcal_calendar').length ? obj.closest('.ajde_evcal_calendar') : options.cal;
+                code.process_SC();
 
 				// various methods to draw map
 				// load map on specified elements directly
@@ -92,114 +81,74 @@
 			// add unique id for map area
 			process_unique_map_id: function(){
 				var map_element = obj.closest('.eventon_list_event').find('.evo_metarow_gmap');
+                if (!map_element.length || !map_element.attr('id')) return false;
 
-				if(map_element === undefined ) return false;
+				var map_element = obj.closest('.eventon_list_event').find('.evo_metarow_gmap');
 
-				var old_map_canvas_id = map_element.attr('id');	
-				if(old_map_canvas_id === undefined) return false;
-
-				// GEN
-				maximum = 99;
-				minimum = 10;
-				var randomnumber = Math.floor(Math.random() * (maximum - minimum + 1)) + minimum;
-
-				map_canvas_id = old_map_canvas_id+'_'+randomnumber;
-				map_element.attr('id', map_canvas_id).addClass('test');
-				
-				options.map_canvas_id = map_canvas_id;
-
-				return map_canvas_id;
+				var randomnumber = Math.floor(Math.random() * (99 - 10 + 1)) + 10;
+                options.map_canvas_id = map_element.attr('id') + '_' + randomnumber;
+                map_element.attr('id', options.map_canvas_id);
+                return options.map_canvas_id;
 			},
 			process_SC: function(){
-				CAL = options.cal;
-				if( options.SC !== '') return;
-				if(CAL == '') return false;
-				options.SC = CAL.evo_shortcode_data();
+				if (options.SC || !options.cal) return;
+                options.SC = options.cal.evo_shortcode_data();
 			},
 
 			// load google map
 			load_gmap: function(){
-				SC = options.SC;
+				var SC = options.SC,
+                    ev_location = obj.find('.event_location_attrs'),
+                    location_type = ev_location.attr('data-location_type');
 
-				var ev_location = obj.find('.event_location_attrs');
+				options.address = location_type == 'address' ? ev_location.attr('data-location_address') : ev_location.attr('data-latlng');
+                options.location_type = location_type == 'address' ? 'add' : 'latlng';
+                options.iconURL = SC && SC.mapiconurl ? SC.mapiconurl : options.iconURL;
 
-				var location_type = ev_location.attr('data-location_type');
-				if(location_type=='address'){
-					options.address = ev_location.attr('data-location_address');
-					options.location_type = 'add';
-				}else{			
-					options.address = ev_location.attr('data-latlng');
-					options.location_type = 'latlng';				
-				}
+                if (!options.address) {
+                    console.log('Location address missing in options.address');
+                    return false;
+                }
 
-				// marker icons
-				if( SC !== undefined && SC != '' &&  'mapiconurl' in SC) options.iconURL = SC.mapiconurl;
+                var map_canvas_id = code.process_unique_map_id();
+                if (!map_canvas_id || !$('#' + map_canvas_id).length) {
+                    console.log('Map element with id missing in page');
+                    return false;
+                }
 
-				// make sure there is address present to draw map
-				if( options.address === undefined || options.address == ''){
-					console.log( 'Location address missing in options.address'); return false;
-				}
+                options.zoomlevel = SC && SC.mapzoom ? parseInt(SC.mapzoom) : 12;
+                options.scroll = SC.mapscroll;
+                options.mapformat = SC.mapformat;
 
-				map_canvas_id = code.process_unique_map_id();
-
-				if(!map_canvas_id || $('#'+map_canvas_id).length == 0){
-					console.log( 'Map element with id missing in page'); return false;
-				} 
-
-				var zoom = SC.mapzoom;
-				options.zoomlevel = (typeof zoom !== 'undefined' && zoom !== false)? parseInt(zoom):12;				
-				options.scroll = SC.mapscroll;	
-				options.mapformat = SC.mapformat;	
-													
-				code.draw_map();
+                code.draw_map();
 			},
 
 			// final draw
 			draw_map: function(){
-
-				if(!options.map_canvas_id || $('body').find('#'+options.map_canvas_id).length == 0){
-					console.log( 'Map element with id missing in page'); return false;
-				}
+				if (!options.map_canvas_id || !$('#' + options.map_canvas_id).length) {
+                    console.log('Map element with id missing in page');
+                    return false;
+                }
 
 				// map styles
 				if( typeof gmapstyles !== 'undefined' && gmapstyles != 'default'){
 					options.styles = JSON.parse(gmapstyles);
-				}
-
-				geocoder = new google.maps.Geocoder();					
-				//var latlng = new google.maps.LatLng(45.524732, -122.677031);
-
-				var latlng = 0;
+				}		
 				
-				if(options.scroll == 'false' || options.scroll == false){
+				var myOptions = {
+                    mapTypeId: options.mapformat,
+                    zoom: options.zoomlevel,
+                    scrollwheel: options.scroll != 'false',
+                    zoomControl: true,
+                    draggable: options.scroll != 'false',
+                    mapId: 'DEMO_MAP_ID' 
+                    // Removed mapId to allow custom styles
+                };
 
-					var myOptions = {			
-						//center: latlng,	
-						mapTypeId: 	options.mapformat,	
-						zoom: 		options.zoomlevel,	
-						scrollwheel: false,
-						styles: options.styles,
-						zoomControl:true,
-						draggable:false,
-						mapId: 'DEMO_MAP_ID' 
-					}
-				}else{
-					var myOptions = {	
-						//center: latlng,	
-						mapTypeId: options.mapformat,	
-						zoom: options.zoomlevel,
-						styles: options.styles,
-						zoomControl:true,
-						scrollwheel: true,
-						mapId: 'DEMO_MAP_ID' 
-					}
-				}
-
-				//console.log(myOptions);
-				//console.log(options);
 				
-				var map_canvas = document.getElementById(options.map_canvas_id);
-				map = new google.maps.Map(map_canvas, myOptions);
+				var map_canvas = document.getElementById(options.map_canvas_id),
+                    map = new google.maps.Map(map_canvas, myOptions),
+                    geocoder = new google.maps.Geocoder();
 		
 				// address from latlng
 				if(options.location_type=='latlng' && options.address !== undefined){
@@ -209,64 +158,30 @@
 					var latlng = new google.maps.LatLng(lat, lng);
 
 					geocoder.geocode({'latLng': latlng}, function(results, status) {
-						if (status == google.maps.GeocoderStatus.OK) {				
-							/*
-							const {AdvancedMarkerElement} = await google.maps.importLibrary("marker");
+						if (status == google.maps.GeocoderStatus.OK) {	
 
-							const marker = new AdvancedMarkerElement({
-								map: map,
-								position: latlng,
-								icon: options.iconURL
-							});
-
-							var marker = new google.maps.Marker({
-								map: map,
-								position: latlng,
-								icon: options.iconURL
-							});
-							
-							//map.setCenter(results[0].geometry.location);
-							map.setCenter(marker.getPosition());
-							
-							*/
-
-							//console.log(options.iconURL);
-
-							const customIcon = document.createElement('div');
-							customIcon.className = 'custom-marker';
-
-							const marker = new google.maps.marker.AdvancedMarkerElement({
-							    map: map, 
-							    position: latlng, 
-							    //title: 'Marker Title', // Optional: Adds a tooltip on hover
-							   	// content: document.createElement('div'), // Optional: Custom marker HTML content
-							   	//content: customIcon
-							});
-							
-							//map.setCenter(results[0].geometry.location);
-							map.setCenter( marker.position );
+							map.setCenter(latlng);
+                            new google.maps.marker.AdvancedMarkerElement({
+                                map: map,
+                                position: latlng
+                            });
 
 						} else {				
-							document.getElementById(options.map_canvas_id).style.display='none';
+							map_canvas.style.display = 'none';
 						}
 					});
 					
-				}else if(options.address==''){
-					//console.log('t');
-				}else{
+				}else if(options.address ){
 					geocoder.geocode( { 'address': options.address}, function(results, status) {
 						if (status == google.maps.GeocoderStatus.OK) {		
-							console.log('map '+results[0].geometry.location);
 							map.setCenter(results[0].geometry.location);
-							var marker = new google.maps.Marker({
-								map: map,
-								position: results[0].geometry.location,
-								icon: options.iconURL
-							});				
+                            new google.maps.Marker({
+                                map: map,
+                                position: results[0].geometry.location,
+                                icon: options.iconURL
+                            });		
 							
-						} else {
-							document.getElementById(options.map_canvas_id).style.display='none';				
-						}
+						} else {	map_canvas.style.display = 'none';		}
 					});
 				}
 
@@ -283,63 +198,39 @@
 
 // trigger load google map on dynamic map element u4.6.1
 	$.fn.evo_load_gmap = function(opt){
-		var defs = {
-			'map_canvas_id':'',
-			'delay':0,
-			trigger_point:'',
-		};
-		var OO = $.extend({}, defs, opt);
 
-		//return;
+		var defs = { map_canvas_id: '', delay: 0, trigger_point: '' },
+            OO = $.extend({}, defs, opt),
+            EL = this,
+            EL_id = OO.map_canvas_id || EL.attr('id'),
+            location_type = EL.data('location_type') == 'add' ? 'add' : 'latlng',
+            address = location_type == 'add' ? EL.data('address') : EL.data('latlng'),
+            scrollwheel = EL.data('scroll') == 'yes',
+            elms = document.querySelectorAll("[id='" + EL_id + "']");
 
-		EL = this;
-		EL_id = EL.attr('id');
+        // Ensure unique ID
+        if (elms.length > 1) {
+            var randomnumber = Math.floor(Math.random() * (99 - 10 + 1)) + 10;
+            EL_id = EL_id + '_' + randomnumber;
+            EL.attr('id', EL_id);
+        }
 
-		if( ('map_canvas_id' in OO ) && OO.map_canvas_id != '' ) EL_id = OO.map_canvas_id;
-
-		var location_type = 'add';
-		var location_type = EL.data('location_type');
-
-		if(location_type=='add'){
-			var address = EL.data('address');				
-		}else{			
-			var address = EL.data('latlng');
-			var location_type = 'latlng';				
-		}
-		scrollwheel = EL.data('scroll') == 'yes'? true: false;
-
-		var elms = document.querySelectorAll("[id='"+EL_id+"']");
-
-		// check for unique id
-		if( elms.length > 1){
-			// GEN
-			maximum = 99;
-			minimum = 10;
-			var randomnumber = Math.floor(Math.random() * (maximum - minimum + 1)) + minimum;
-			EL_id = EL_id+'_'+randomnumber;
-			EL.attr('id', EL_id);
-		}
-
-		// get delay
-			__delay = 0;
-			if( EL.data('delay') ) __delay = EL.data('delay');
-			if( OO.delay != 0 ) __delay = OO.delay;
-
-		console.log(EL_id);
+        // Determine delay
+        var __delay = OO.delay || EL.data('delay') || 0;		
 
 		// load the map
 		EL.evoGenmaps({
-			map_canvas_id: EL.attr('id'),
-			fnt: 5,
-			location_type:	location_type,
-			address: address,
-			zoomlevel: parseInt( EL.data('zoom') ),
-			mapformat: EL.data('mty'),
-			scroll: scrollwheel,
-			iconURL: ( EL.data('mapicon') !== undefined ? EL.data('mapicon') : '') ,
-			delay:  __delay,
-			trigger_point: OO.trigger_point,
-		});
+            map_canvas_id: EL_id,
+            fnt: 5,
+            location_type: location_type,
+            address: address,
+            zoomlevel: parseInt(EL.data('zoom')),
+            mapformat: EL.data('mty'),
+            scroll: scrollwheel,
+            iconURL: EL.data('mapicon') || '',
+            delay: __delay,
+            trigger_point: OO.trigger_point
+        });
 
 	};
 

@@ -1,6 +1,6 @@
 /**
  * Javascript code that is associated with the front end of the calendar
- * version: 2.3
+ * version: 2.4
  */
 
 jQuery(document).ready(function($){
@@ -904,6 +904,7 @@ jQuery(document).ready(function($){
 				SC['event_id'] = parseInt(event_id);
 				SC['ajax_eventtop_show_content'] = true;
 				SC['additional_class'] = etttc_class;
+
 
 				// since 4.2
 				eventon_open_event_lightbox( SC , obj, CAL);

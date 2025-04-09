@@ -4,8 +4,6 @@
  * @version 2.3
  */
 
-
-
 $_lang_1 = evo_lang_get('evcalL_getdir_placeholder','Type your address to get directions');
 $_lang_2 = evo_lang_get('evcalL_getdir_title','Click here to get directions');
 

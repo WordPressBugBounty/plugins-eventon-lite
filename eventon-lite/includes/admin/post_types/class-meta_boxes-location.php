@@ -1,8 +1,7 @@
 <?php 
 /**
  * Event Edit Meta box Location
- * @version 2.3
- * @fullversion 4.7.4
+ * @version 2.4
  */
 
 ?>
@@ -19,14 +18,26 @@
 		<?php
 
 			// if generate gmap enabled in settings
-				$gen_gmap = !$EVENT->check_yn('evcal_gmap_gen') ? true: false;
+				$gen_gmap = (EVO()->cal->check_yn('evo_gen_map') && !$EVENT->check_yn('evcal_gmap_gen') ) ? true: false;
 
 			// yea no options for location
 			foreach(array(
-				'evo_access_control_location'=>array('evo_access_control_location',esc_html__('Make location information only visible to logged-in users','eventon')),
-				'evcal_hide_locname'=>array('evo_locname',esc_html__('Hide Location Name from Event Card','eventon')),
-				'evcal_gmap_gen'=>array('evo_genGmap',esc_html__('Generate Google Map from the address','eventon')),
-				'evcal_name_over_img'=>array('evcal_name_over_img',esc_html__('Show location information over location image (If location image exist)','eventon')),
+				'evo_access_control_location'=>array('evo_access_control_location',
+					__('Visible Only to Users','eventon'), 
+					__('Make location only visible to registered users of your website.','eventon')
+				),
+				'evcal_hide_locname'=>array('evo_locname',
+					__('Hide Location Name','eventon'),
+					__('THis will hide location name from eventcard','eventon')
+				),
+				'evcal_gmap_gen'=>array('evo_genGmap',
+					__('Generate Google Map','eventon'),
+					__('Generate google map from the address in eventcard','eventon')
+				),
+				'evcal_name_over_img'=>array('evcal_name_over_img',
+					__('Location Info over Location Image','eventon'),
+					__('Show location information over the location image if you have set location image.','eventon')
+				),
 			) as $key=>$val){
 
 				$variable_val = $EVENT->get_prop($key)? $EVENT->get_prop($key): 'no';
@@ -34,19 +45,22 @@
 				if($variable_val == 'no' && $gen_gmap && $key=='evcal_gmap_gen')
 						$variable_val = 'yes';
 
-				EVO()->elements->print_element(
-					array(
-						'type'=>'yesno_btn',
-						'label'=> esc_attr( $val[1] ), 
-						'id'=> esc_attr( $key ),
-						'value'=> esc_attr( $variable_val )
-					)
-				);
+				$elm_args = [
+					'type'=>'block_button',
+					'label'=> $val[1], 'id'=> $key,
+					'value'=> $variable_val,
+				];
+
+				if( $key == 'evo_access_control_location') $elm_args['nesting_start'] = 'loc evofxww';
+				if( $key == 'evcal_name_over_img') $elm_args['nesting_end'] = true;
+				if( !empty($val[2]) ) $elm_args['tooltip'] = $val[2];
+
+				echo EVO()->elements->get_element( $elm_args );
 			}
 
 			// check google maps API key
 			if( !EVO()->cal->get_prop('evo_gmap_api_key','evcal_1')){
-				echo "<p class='evo_notice'>".esc_html__('Google Maps API key is required for maps to show on event. Please add them via ','eventon') ."<a href='". esc_url( get_admin_url() ) .'admin.php?page=eventon#evcal_005'."'>".esc_html__('Settings','eventon'). "</a></p>";
+				echo "<p class='evo_notice'>".__('Google Maps API key is required for maps to show on event. Please add them via ','eventon') ."<a href='". get_admin_url() .'admin.php?page=eventon#evcal_005'."'>".__('Settings','eventon'). "</a></p>";
 			}
 		?>									
 	</div>

@@ -1,8 +1,7 @@
 <?php
 /**
  * Function ajax for backend
- * @version   2.3
- * @version   4.8
+ * @version   2.4
  */
 class EVO_admin_ajax{
 	public $helper;
@@ -19,6 +18,12 @@ class EVO_admin_ajax{
 			'rel_event_list'		=>'rel_event_list',
 			'get_latlng'				=>'get_latlng',
 
+			'generate_custom_repeat_unix' =>'generate_custom_repeat_unix',
+
+			'admin_get_environment'		=>'admin_get_environment',
+			'admin_system_log'		=>'admin_system_log',
+			'admin_system_log_flush'		=>'admin_system_log_flush',
+
 			'get_secondary_settings'=> 'get_secondary_settings',
 			'save_secondary_settings'=> 'save_secondary_settings',
 
@@ -27,6 +32,9 @@ class EVO_admin_ajax{
 			'get_virtual_users'	=>'get_virtual_users',
 			'save_virtual_mod_settings'	=>'save_virtual_mod_settings',
 			'save_virtual_event_settings'	=>'save_virtual_event_settings',
+
+			// save general settings
+			'general_settings_save'			=> 'settings_save', // 4.8
 		);
 		foreach ( $ajax_events as $ajax_event => $class ) {
 
@@ -53,6 +61,72 @@ class EVO_admin_ajax{
 				'type'=> isset($this->post_data['type']) ? $this->post_data['type']:'',
 				'other_id'=> isset($this->post_data['other_id']) ? $this->post_data['other_id']:'',
 			));exit;	
+		}
+
+	// generate custom repeat instance unix
+		public function generate_custom_repeat_unix(){
+
+			$msg = '';
+
+			// verify nonce
+			if(empty( $_REQUEST['nn'] ) || !wp_verify_nonce( wp_unslash( $_REQUEST['nn'] ), 'eventon_admin_nonce')) {
+				$output['msg'] = __('Security Check Failed!','eventon');
+				wp_send_json($output); wp_die();
+			}
+
+			$PD = $this->post_data;
+
+
+			// required data check
+			if( empty($PD['event_new_repeat_start_date_x']) || empty( $PD['event_new_repeat_end_date_x'])){
+				$output['msg'] = __('Missing required data!','eventon');
+				wp_send_json($output); wp_die();
+			}
+
+			// generate unix from passed data
+			$timezone = EVO()->calendar->timezone0 ?: new DateTimeZone('UTC');
+			$_is_24h = (!empty($PD['_evo_time_format']) && $PD['_evo_time_format']=='24h')? true:false;
+			$time_format = $_is_24h ? 'H:i':'g:ia';
+
+
+			$new_index = (int)$PD['new_index'] +1;
+
+			// time strings
+			$start_time_string = $PD['_new_repeat_start_hour'].':'.$PD['_new_repeat_start_minute']. ( isset($PD['_new_repeat_start_ampm'])? $PD['_new_repeat_start_ampm']:'');
+			$end_time_string = $PD['_new_repeat_end_hour'].':'.$PD['_new_repeat_end_minute']. ( isset($PD['_new_repeat_end_ampm'])? $PD['_new_repeat_end_ampm']:'');
+
+			// generate unix from passed time Y/m/d (H:i / g:ia)
+			$start_unix = DateTime::createFromFormat('Y/m/d '. $time_format, $PD["event_new_repeat_start_date_x"].$start_time_string, $timezone );
+			$end_unix = DateTime::createFromFormat('Y/m/d '. $time_format, $PD["event_new_repeat_end_date_x"]. $end_time_string, $timezone );
+
+			// check if unix generated
+			$start_unix_val = $end_unix_val = null;
+			if ($start_unix && $end_unix) {
+		       	$start_unix_val = $start_unix->format('U');
+		        $end_unix_val = $end_unix->format('U');
+		        
+		    } else {
+		        error_log('Failed to parse interval: ' . print_r($PD, true));
+		        $output['msg'] = __('Failed to parse interval','eventon');
+				wp_send_json($output); wp_die();
+		    }
+			
+
+			$start_dt = $PD["event_new_repeat_start_date"] .' '. $start_time_string;
+			$end_dt = $PD["event_new_repeat_end_date"] .' '. $end_time_string;
+
+			$_html =  '<li data-cnt="'.$new_index.'" style="display:flex" class="'.($new_index==0?'initial':'').($new_index>3?' over':'').'">'. ($new_index==0? '<dd>'.__('Initial','eventon').'</dd>':'').'<i>'.$new_index.'</i><span>'.__('from','eventon').'</span> '. $start_dt .' <span class="e">End</span> '. $end_dt .'<em class="evo_rep_del" alt="Delete"><i class="fa fa-times"></i></em>
+						<input type="hidden" name="repeat_intervals['.$new_index.'][0]" value="'.$start_unix_val.'"/><input type="hidden" name="repeat_intervals['.$new_index.'][1]" value="'.$end_unix_val.'"/>'
+						.'</li>';
+			$msg = __('Repeat Instance Added','eventon');
+			
+			wp_send_json(array(
+				'status'=> 'good',
+				'content'=> $_html,
+				'msg'=> $msg
+			));
+			wp_die();
+
 		}
 		
 	// get secondary lightbox settings
@@ -923,6 +997,188 @@ class EVO_admin_ajax{
 			wp_reset_postdata();
 		}
 
+	// saving general settings -- @added 4.8 @updated 4.8.1		
+		
+		// loadin new language
+		public function settings_load_new_lang(){
+
+		}
+
+		// save language settings
+		public function settings_save(){
+
+			// Check for nonce validation
+	        if (!isset($_POST['nn']) || !wp_verify_nonce($_POST['nn'], 'eventon_admin_nonce')) {
+	            wp_send_json_error(array('message' => 'Invalid nonce')); wp_die();
+	        }
+
+	        // Decode JSON data and validate it
+		    $form_data = json_decode(stripslashes($_POST['formData']), true);
+		    
+		    if (json_last_error() !== JSON_ERROR_NONE) {
+		        wp_send_json_error(array('message' => 'Invalid JSON data'));
+		        wp_die();
+		    }
+
+		    // get current tab
+		    $page_tabs = array(
+				'eventon'=>'evcal_1',
+				'eventon-lang'=>'evcal_2',
+				'eventon-styles'=>'evcal_3',
+				'eventon-extend'=>'evcal_4',
+				'eventon-support'=>'evcal_5',
+			);
+		    $current_page = (!empty($_POST['page']))? sanitize_text_field($_POST['page']): 'eventon';
+		    $current_tab = $page_tabs[ $current_page ];
+
+		    $help = new evo_helper();
+		    $new_settings = array();
+
+		    // load existing settings values
+		    	EVO()->cal->set_cur( $current_tab );
+
+		    	$saved_settings = EVO()->cal->get_op( $current_tab );
+				$saved_settings = !empty($saved_settings) && is_array($saved_settings)? $saved_settings : array();
+
+		    // for language settings
+			    if( $current_tab == 'evcal_2'):
+					$_lang_version = (!empty($_POST['lang']))? sanitize_text_field($_POST['lang']): 'L1';
+
+					// Process duplicates and sanitize each value
+				    foreach ($form_data as $item) {
+				        if (isset($item['name']) && isset($item['value'])) {
+				            $key = sanitize_text_field($item['name']);
+				            $value = sanitize_text_field($item['value']);
+
+				            if (strpos($key, '_v_') !== false) {
+				                $key = str_replace('_v_', '', $key);
+				            }
+
+				            $form_data[$key] = $value;
+				        }
+				    }
+
+					$lang_opt = get_option('evcal_options_evcal_2');
+					if(!empty($lang_opt) ){
+						$new_settings[$_lang_version] = $form_data;
+						$new_settings = array_merge($lang_opt, $new_settings);
+					}else{
+						$new_settings[$_lang_version] = $form_data;
+					}
+
+					// Update the option with sanitized data
+    				update_option('evcal_options_evcal_2', $new_settings);
+
+    		// all other settings
+				else:
+					
+
+					// fields to skip sanitization @u 4.6
+					$none_san_fields = apply_filters('evo_settings_non_san_fields', array('evo_etl','evcal_top_fields','evcal_sort_options'), $current_tab);
+					
+					// field keys with html
+					$html_fields = apply_filters( 'evo_settings_html_fields', array());
+
+					//$new_settings = array();
+					$new_settings = $saved_settings;
+
+					// process all form data
+					foreach($form_data as $settings_field => $settings_value ){
+
+						// strip [] from feild name
+						if( strpos($settings_field, '[]') !== false ){
+							$settings_field = str_replace('[]','', $settings_field);							
+						}
+
+						// skip fields
+						if(in_array($settings_field, array( 
+							'option_page', 'action','_wpnonce','_wp_http_referer','evcal_noncename','qm-theme','qm-editor-select'
+						))){	continue;	}
+
+
+						// HTML fields 4.6
+						if( in_array( $settings_field, $html_fields )){
+							$new_settings[ $settings_field ] = $help->sanitize_html( $settings_value );
+							continue;
+						}
+
+						// none sanitize fields
+						if( in_array($settings_field, $none_san_fields) ){
+							$new_settings[ $settings_field ] = $settings_value;
+
+						// If value contains 'http' or 'https', treat it as a URL
+					    } elseif (is_string($settings_value) && (strpos($settings_value, 'http') !== false)) {
+					        $new_settings[$settings_field] = esc_url($settings_value);
+
+					    // Sanitize normal text fields
+					    } else {
+					        $new_settings[$settings_field] = !is_array($settings_value) ? sanitize_text_field($settings_value) : $settings_value;
+					    }	
+						
+					}
+
+					// check isolatedly saved setting values and include them
+						foreach( array('evo_ecl','evowhs') as $_iso_field){
+							if( array_key_exists( $_iso_field, $saved_settings)){
+
+								$new_settings[ $_iso_field ] = $saved_settings[ $_iso_field ];
+							}
+						}
+
+					// for general settings evcal_1
+						if( $current_tab == 'evcal_1'){
+							// update custom meta fields count into settings
+							$new_settings['cmd_count'] = evo_calculate_cmd_count();
+						}
+
+
+					// plug
+						do_action('evo_before_settings_saved', $current_tab, '',  $new_settings);
+
+
+					// save settings
+						EVO()->cal->set_cur( $current_tab );
+
+						$new_settings = apply_filters('evo_save_settings_optionvals', $new_settings, $current_tab, $form_data);
+
+						EVO()->cal->set_option_values( $new_settings );
+
+
+					// save custom styles and php code
+						if( isset($new_settings['evcal_styles']) ) 
+							update_option('evcal_styles', sanitize_text_field( $new_settings['evcal_styles']) );
+
+						if( isset($new_settings['evcal_php']) )	
+							update_option('evcal_php', strip_tags(stripslashes($new_settings['evcal_php'])) );
+
+					// update dynamic styles after settings are saved to options field
+						if( $current_tab == 'evcal_1' || $current_tab == 'evcal_3'){
+
+							// add dynamic styles to options
+							EVO()->evo_admin->update_dynamic_styles();
+
+							// update the dynamic styles .css file or write to headr
+							EVO()->evo_admin->generate_dynamic_styles_file();
+						}
+
+
+					// update global settings values
+					$GLOBALS['EVO_Settings'][ 'evcal_options_' .$current_tab] = $new_settings;
+
+				endif;
+			
+			
+
+			$return_content = array(
+				//'debug'=> $form_data,
+				'debug2'=> $new_settings,
+				'content'=> '',
+				'msg'=> __('Saved Successfully','eventon'),
+				'status'=>'good'
+			);			
+			wp_send_json($return_content);	wp_die();
+		}
+
 	// Feature an event from admin */
 		function eventon_feature_event() {
 
@@ -952,6 +1208,122 @@ class EVO_admin_ajax{
 
 			wp_safe_redirect( remove_query_arg( array('trashed', 'untrashed', 'deleted', 'ids'), wp_get_referer() ) );
 			exit;
+		}
+	// system log
+		function admin_system_log(){
+			
+			$html = '';
+			ob_start();
+
+			echo EVO_Error()->_get_html_log_view();
+
+			echo "<div class='evopadt20'>";
+
+				EVO()->elements->print_trigger_element(array(
+					'extra_classes'=>'',
+					'title'=>__('Flush Log','eventon'),
+					'dom_element'=> 'span',
+					'uid'=>'evo_admin_flush_log',
+					'lb_class' =>'evoadmin_system_log',
+					'lb_load_new_content'=> true,	
+					'ajax_data' =>array('action'=>'eventon_admin_system_log_flush'),
+				), 'trig_ajax');
+
+			echo "</div>";
+
+
+			$html = ob_get_clean();
+
+			wp_send_json(array(
+				'status'=>'good',
+				'content'=> $html
+			));
+			wp_die();
+		}
+		function admin_system_log_flush(){
+			EVO_Error()->_flush_all_logs();
+
+			$html = EVO_Error()->_get_html_log_view();
+			
+			wp_send_json(array(
+				'status'=>'good',
+				'msg'=> __('All system logs flushed'),
+				'content'=> $html
+			));
+			wp_die();
+		}
+
+	// environment @u 4.5.5
+		function admin_get_environment(){
+
+			// check if admin and loggedin
+				if( !current_user_can('edit_eventons') ){
+					wp_send_json_error(  __('User does not have permission','eventon') );
+					wp_die();
+				}
+			
+			$data = array(); $html = ''; global $wpdb;
+
+			// event count
+			$event_posts_r = $wpdb->get_results( "SELECT ID FROM {$wpdb->posts} WHERE post_type='ajde_events'" );
+			$events_count = ($event_posts_r && is_array($event_posts_r) )? count($event_posts_r):0;
+
+			// event post meta count
+			$pm_cunt_r = $wpdb->get_results( "SELECT pm.meta_id FROM {$wpdb->posts} p INNER JOIN {$wpdb->postmeta} pm ON p.ID = pm.post_id WHERE p.post_type = 'ajde_events'" );
+			$pm_count = ($pm_cunt_r && is_array($pm_cunt_r) )? count($pm_cunt_r):0;
+
+			$data['EventON_version'] = EVO()->version;			
+
+			$data['shead0'] = __('WordPress Environment');
+			$data['WordPress_version'] = get_bloginfo( 'version' );
+			$data['is_multisite'] = is_multisite()?'Yes':'No';
+			$data['WordPress_memory_limit'] =  WP_MEMORY_LIMIT;
+			$data['WordPress_Debug_mode'] = ( defined( 'WP_DEBUG' ) && WP_DEBUG ) ? 'Yes':'No';
+			$data['WordPress_Cron'] = ! ( defined( 'DISABLE_WP_CRON' ) && DISABLE_WP_CRON ) ? 'Yes':'No';
+			$data['Active_plugins_count'] = count(get_option('active_plugins'));
+			$data['Permalink_structure'] = get_option('permalink_structure') ?: 'Default';
+			$db_size = $wpdb->get_var("SELECT SUM(data_length + index_length) FROM information_schema.tables WHERE table_schema = '" . DB_NAME . "'");
+			$data['Database_size'] = size_format($db_size);
+						
+			$data['shead1'] = __('Server Environment');
+			$data['PHP_version'] = phpversion();
+			$data['PHP_max_input_vars'] = ini_get( 'max_input_vars' ) . ' '. __('Characters');
+			$data['Maximum_update_size'] = size_format( wp_max_upload_size() );
+			$data['PHP_memory_limit'] = ini_get('memory_limit');
+			$data['MySQL_version'] = $wpdb->db_version();
+			$data['PHP_max_execution_time'] = ini_get('max_execution_time') . ' seconds';
+			$data['Server_timezone'] = date_default_timezone_get();
+			$data['SSL_enabled'] = is_ssl() ? 'Yes' : 'No';
+			$data['CURL_enabled'] = in_array  ('curl', get_loaded_extensions() ) ? 'Yes':'No';
+
+			
+
+			$data['shead2'] = __('Post Data');
+			$data['Events_count'] = $events_count;
+			$data['Total_event_postmeta_DB_entries'] = $pm_count;
+
+			// database information
+			if ( defined( 'DB_NAME' ) ) {	}
+
+			$html = '<div class="evo_environment">';
+
+			foreach($data as $D=>$V){
+
+				if( strpos($D, 'shead') !==  false ){ 
+					$html .= "<p class='shead'>". $V ."</p>"; continue;
+				}
+
+				$D = str_replace('_', ' ', $D);
+				$html .= "<p><span>".$D."</span><span class='data'>". $V ."</span></p>";
+			}
+
+
+			$html .= "</div>";
+				
+			wp_send_json(array(
+				'status'=>'good',
+				'content'=> $html,
+			)); wp_die();
 		}
 	
 

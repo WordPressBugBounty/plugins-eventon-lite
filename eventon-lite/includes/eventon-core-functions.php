@@ -7,7 +7,7 @@
  * @author 		AJDE
  * @category 	Core
  * @package 	EventON/Functions
- * @version     L2.2.17
+ * @version     2.4
  */
 
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
@@ -23,6 +23,25 @@ require EVO_ABSPATH. 'includes/evo-conditional-functions.php';
 			&& $opt['evcal_af_'.$number]=='yes'
 			&& !empty($opt['evcal_ec_f'.$number.'a1']) 
 			&& !empty($opt['evcal__fai_00c'.$number])  )? true: false;
+	}
+
+	// return valid event type array  @4.9.2
+	function eventon_get_valid_ett(){
+
+		$output = [];
+		for($x=1; $x<= evo_max_ett_count(); $x++ ){
+			// extra tax
+			if($x > 2){
+				if( !EVO()->cal->check_yn('evcal_ett_'.$x,'evcal_1') ) continue;
+			}
+			$output[ $x ] = 'eventtype_'. $x;  
+		}
+
+		return $output;
+	}
+	// return the maximum allowed event type taxonomies
+	function evo_max_ett_count(){
+		return (int) apply_filters('evo_event_type_count',5);
 	}
 
 	// GET activated event type count
@@ -41,92 +60,53 @@ require EVO_ABSPATH. 'includes/evo-conditional-functions.php';
 		}
 		return $count;
 	}
-	// return the maximum allowed event type taxonomies
-	function evo_max_ett_count(){
-		return apply_filters('evo_event_type_count',5);
-	}
 
-	// this will return the count for custom meta data fields that are active
-	function evo_calculate_cmd_count($evopt=''){
-		$evopt = (!empty($evopt))? $evopt: get_option('evcal_options_evcal_1');
 
-		$count=0;
-		for($x=1; $x<evo_max_cmd_count(); $x++ ){
-			if(!empty($evopt['evcal_af_'.$x]) && $evopt['evcal_af_'.$x]=='yes' && !empty($evopt['evcal_ec_f'.$x.'a1'])){
-				$count = $x;
-			}else{
-				break;
-			}
+	// GET event type names - return names for all tax upto max
+	function evo_get_ettNames($options=''){
+		$output = array();
+
+		$options = (!empty($options))? $options: get_option('evcal_options_evcal_1');
+		for( $x=1; $x <= evo_max_ett_count() ; $x++){
+			$ab = ($x==1)? '':$x;
+			$output[$x] = (!empty($options['evcal_eventt'.$ab]))? $options['evcal_eventt'.$ab]:'Event Type '.$ab;
 		}
-		return $count;
+		return $output;
 	}
-	function evo_retrieve_cmd_count($evopt=''){
-		$opt = EVO()->frontend->evo_options;
-		$evopt = (!empty($evopt))? $evopt: $opt;
+	// updated @v4.1
+	function evo_get_localized_ettNames($lang='', $options='', $options2=''){
+		$output = array();
+
+		$options = (!empty($options))? $options: EVO()->calendar->evopt1;
+		$options2 = (!empty($options2))? $options2: EVO()->calendar->evopt2;
 		
-		if(!empty($evopt['cmd_count']) && $evopt['cmd_count']==0){
-			return $evopt['cmd_count'];
+		if(!empty($lang)){
+			$_lang_variation = $lang;
 		}else{
-			$new_c = evo_calculate_cmd_count($evopt);
-
-			if( !is_array( $evopt )) $evopt = array();
-			$evopt['cmd_count'] = $new_c;
-			//update_option('evcal_options_evcal_1', $evopt);
-
-			return $new_c;
+			$shortcode_arg = EVO()->calendar->shortcode_args;
+			$_lang_variation = (!empty($shortcode_arg['lang']))? $shortcode_arg['lang']:'L1';
 		}
-	}
-	// return maximum custom meta data field count for event
-	// @version 2.3.11
-	function evo_max_cmd_count(){
-		return apply_filters('evo_max_cmd_count', 11);
-	}
 
+		
+		// foreach event type upto activated event type categories
+		for( $x=1; $x <= evo_max_ett_count(); $x++){
+			$ab = ($x==1)? '':$x;
 
-	// GET event type names
-		function evo_get_ettNames($options=''){
-			$output = array();
+			$_tax_lang_field = 'evcal_lang_et'.$x;
 
-			$options = (!empty($options))? $options: get_option('evcal_options_evcal_1');
-			for( $x=1; $x< (evo_get_ett_count($options)+1); $x++){
-				$ab = ($x==1)? '':$x;
-				$output[$x] = (!empty($options['evcal_eventt'.$ab]))? $options['evcal_eventt'.$ab]:'Event Type '.$ab;
-			}
-			return $output;
-		}
-		function evo_get_localized_ettNames($lang='', $options='', $options2=''){
-			$output = array();
-			
-			$options = (!empty($options))? $options: get_option('evcal_options_evcal_1');
-			$options2 = (!empty($options2))? $options2: get_option('evcal_options_evcal_2');
-			
-			if(!empty($lang)){
-				$_lang_variation = $lang;
+			// check on eventon language values for saved name
+			$lang_name = (!empty($options2[$_lang_variation][$_tax_lang_field]))? 
+				stripslashes($options2[$_lang_variation][$_tax_lang_field]): null;
+
+			// conditions
+			if(!empty($lang_name)){
+				$output[$x] = $lang_name;
 			}else{
-				$shortcode_arg = EVO()->calendar->shortcode_args;
-				$_lang_variation = (!empty($shortcode_arg['lang']))? $shortcode_arg['lang']:'L1';
-			}
-
-			
-			// foreach event type upto activated event type categories
-			for( $x=1; $x< (evo_get_ett_count($options)+1); $x++){
-				$ab = ($x==1)? '':$x;
-
-				$_tax_lang_field = 'evcal_lang_et'.$x;
-
-				// check on eventon language values for saved name
-				$lang_name = (!empty($options2[$_lang_variation][$_tax_lang_field]))? 
-					stripslashes($options2[$_lang_variation][$_tax_lang_field]): null;
-
-				// conditions
-				if(!empty($lang_name)){
-					$output[$x] = $lang_name;
-				}else{
-					$output[$x] = (!empty($options['evcal_eventt'.$ab]))? $options['evcal_eventt'.$ab]: __('Event Type','eventon').' '.$ab;
-				}			
-			}
-			return $output;
+				$output[$x] = (!empty($options['evcal_eventt'.$ab]))? $options['evcal_eventt'.$ab]: __('Event Type','eventon').' '.$ab;
+			}			
 		}
+		return $output;
+	}
 
 	// GET  event custom taxonomy field names
 		function eventon_get_event_tax_name($tax, $options=''){
@@ -196,7 +176,38 @@ require EVO_ABSPATH. 'includes/evo-conditional-functions.php';
 		}
 		return update_option('evo_tax_meta', $termmetas);
 	}
+// Custom meta fields
+	// this will return the count for custom meta data fields that are active
+	function evo_calculate_cmd_count($evopt=''){
+		$evopt = (!empty($evopt))? $evopt: get_option('evcal_options_evcal_1');
 
+		$count=0;
+		for($x=1; $x<evo_max_cmd_count(); $x++ ){
+			if(!empty($evopt['evcal_af_'.$x]) && $evopt['evcal_af_'.$x]=='yes' && !empty($evopt['evcal_ec_f'.$x.'a1'])){
+				$count = $x;
+			}else{
+				break;
+			}
+		}
+		return $count;
+	}
+	function evo_retrieve_cmd_count($evopt=''){
+		$opt = EVO()->frontend->evo_options;
+		$evopt = (!empty($evopt))? $evopt: $opt;
+		
+		if(!empty($evopt['cmd_count']) && $evopt['cmd_count']==0){
+			return $evopt['cmd_count'];
+		}else{
+			$new_c = evo_calculate_cmd_count($evopt);
+
+			return $new_c;
+		}
+	}
+	// return maximum custom meta data field count for event
+	// @version 2.3.11
+	function evo_max_cmd_count(){
+		return apply_filters('evo_max_cmd_count', 11);
+	}
 
 // DATE & TIME
 	// if event is in date range
@@ -824,7 +835,7 @@ require EVO_ABSPATH. 'includes/evo-conditional-functions.php';
 			// day number to name
 			}else if($type=='day_num_to_name'){
 			
-				$text_num = $data; // 1-7
+				$text_num = (int)$data; // 1-7
 				
 				if($len=='full'){	
 					$option_name_prefix = 'evcal_lang_day';
@@ -860,7 +871,7 @@ require EVO_ABSPATH. 'includes/evo-conditional-functions.php';
 			}else if($type=='month_num_to_name'){
 				
 				//global $eventon_month_names;
-				$text_num = $data; // 1-12
+				$text_num = (int)$data; // 1-12
 				
 				if($len == 'full'){
 					$option_name_prefix = 'evcal_lang_';
@@ -872,12 +883,13 @@ require EVO_ABSPATH. 'includes/evo-conditional-functions.php';
 					$_not_value = !empty($eventon_month_names[ $text_num])?
 						substr($eventon_month_names[ $text_num], 0 , 3):'';
 				}
-			// am pm
-			}else if($type=='ampm'){
+			// am pm. & AM PM
+			}else if($type=='ampm' || $type=='ampm2'){
 				$text_num = $data; 
 				
 				$option_name_prefix = 'evo_lang_';
 				$_not_value = $original;
+				if( $type == 'ampm2') $option_name_suffix = '2';
 			}
 			
 			$output = (!empty($evo_options[$_lang_variation][$option_name_prefix.$text_num]))? 
@@ -956,6 +968,7 @@ require EVO_ABSPATH. 'includes/evo-conditional-functions.php';
 							if( $unix_S != $interval[0] &&	$unix_E != $interval[1]) continue;
 						}
 						
+						// deprecating since 4.8.2
 						// for intervals that were added as new
 						if(isset($interval['type']) && isset($interval['type'])=='dates'){
 							
@@ -1348,6 +1361,7 @@ require EVO_ABSPATH. 'includes/evo-conditional-functions.php';
 				switch($st){
 					case 'm':
 						$new_str.= eventon_return_timely_names_('month_num_to_name',$month_number, 'full', $lang);
+
 						
 					break;
 					case 'Y':
@@ -1728,6 +1742,18 @@ require EVO_ABSPATH. 'includes/evo-conditional-functions.php';
 		));
 	}
 
+/**
+ * Debug Handling
+ * @version 4.9
+ */
+	function EVO_Debug($message) {
+		if( !EVO()->cal->check_yn('evo_debug_mode','evcal_1')) return;
+        if (defined('WP_DEBUG') && WP_DEBUG && defined('WP_DEBUG_LOG') && WP_DEBUG_LOG) {
+            // Format the message for readability
+            $formatted_message = "[EVO_Debug] " . print_r($message, true);
+            error_log($formatted_message);
+        }
+    } 
 
 // SUPPORT FUNCTIONS
 	// Link Related
@@ -1759,26 +1785,66 @@ require EVO_ABSPATH. 'includes/evo-conditional-functions.php';
 			
 			$lat = $lon = '';
 
-			// google maps API is required
-			$gmap_api = EVO()->cal->get_prop('evo_gmap_api_key', 'evcal_1');
-			if(!$gmap_api) return false;
+			// Check if address is valid
+		    if (empty($address))     return false;
+
+		    // Google Maps API key
+		    $gmap_api = EVO()->cal->get_prop('evo_gmap_api_key', 'evcal_1');
+		    $use_openstreet = EVO()->cal->check_yn('evo_geoOSM');
+
+		    if(!$use_openstreet && !$gmap_api) return false;
+
+			// Clean up address (remove suite numbers which might confuse Nominatim)
+		    $address = preg_replace('/\bSuite\s+[A-Z0-9]\b/i', '', $address);
+		    $address = urlencode(str_replace(" ", "+", trim($address)));
 			
-			$address = str_replace(" ", "+", $address);
-			$address = urlencode($address);
-			
-			// URL to call the cords
-			$url = "https://maps.google.com/maps/api/geocode/json?address=$address&sensor=false&key=".$gmap_api;
+			// Set up the URL based on API choice
+		    $url = $use_openstreet 
+		        ? "https://nominatim.openstreetmap.org/search?q={$address}&format=json&limit=1"
+		        : "https://maps.google.com/maps/api/geocode/json?address={$address}&sensor=false&key={$gmap_api}";
 
-			$response = wp_remote_get($url);
+			// Check for WP_Error
+		    if (is_wp_error($response)) {
+		        EVO_Debug("WP Error: " . $response->get_error_message());
+		        return false;
+		    }
 
-			$response = wp_remote_retrieve_body( $response );
-			if(!$response) return false;
-
-			$RR = json_decode($response);
-
-			return array(
-		        'lat' => $RR->results[0]->geometry->location->lat,
-		        'lng' => $RR->results[0]->geometry->location->lng,
+			$body = wp_remote_retrieve_body($response);
+		    if (empty($body)) {
+		        EVO_Debug("Empty response body");
+		        return false;
+		    }
+		    
+		    $RR = json_decode($body);
+		    //EVO_Debug("Raw response: " . print_r($RR, true));
+		    
+		    // Handle Google Maps response
+		    if (!$use_openstreet) {
+		        if (isset($RR->error_message)) {
+		            EVO_Debug("Google API Error: " . $RR->error_message);
+		            return $RR->error_message;
+		        }
+		        
+		        if (!isset($RR->results) || empty($RR->results) || !isset($RR->results[0]->geometry->location)) {
+		            EVO_Debug("Invalid Google Maps response structure");
+		            return false;
+		        }
+		        
+		        return array(
+		            'lat' => $RR->results[0]->geometry->location->lat,
+		            'lng' => $RR->results[0]->geometry->location->lng,
+		        );
+		    }
+		    
+		    // Handle OpenStreetMap response
+		    if (!isset($RR[0]) || !isset($RR[0]->lat) || !isset($RR[0]->lon)) {
+		        EVO_Debug("Invalid response structure");
+		        return false;
+		    }
+		    
+		    return array(
+		        'lat' => $RR[0]->lat,
+		        'lng' => $RR[0]->lon,
 		    );
 					    
 		}

@@ -6,7 +6,7 @@
  * @author 		AJDE
  * @category 	Core
  * @package 	EventON/Functions/AJAX
- * @version     L2.2.12
+ * @version     2.4
  */
 
 class EVO_AJAX{

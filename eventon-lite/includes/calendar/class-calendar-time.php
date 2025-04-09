@@ -3,7 +3,7 @@
  * Calendar Time class.
  *
  * @class 		EVO_Cal_Time
- * @version		2.3.1
+ * @version		2.4
  * @package		EventON/Classes
  * @category	Class
  * @author 		AJDE

@@ -1,8 +1,7 @@
 <?php
 /**
   * evo settings class
-  * @version 2.3.1
-  * @version 4.8
+  * @version 2.4
   */
 class evo_settings_settings{
 	
@@ -19,8 +18,6 @@ class evo_settings_settings{
 
 		$help = EVO()->helper;
 
-		// google maps styles description
-		$gmaps_desc = '<span class="evo_gmap_styles" data-url="'.AJDE_EVCAL_URL.'/assets/images/ajde_backender/"></span>';
 
 		return apply_filters('eventon_settings_tab1_arr_content', array(
 			array(
@@ -164,10 +161,21 @@ class evo_settings_settings{
 							'10'=>'10',
 							'8'=>'8',
 							'7'=>'7',
-						)),
+						)),					
 					
 					array('id'=>'evo_gmap_iconurl','type'=>'text','name'=>__('Custom map marker icon complete http url','eventon'),
 						'legend'=> __('Type a complete http:// url for a PNG image that can be used instead of the default red google map markers.','eventon'),'default'=>'eg. http://www.site.com/image.png'
+					),
+
+					array('id'=>'evo_gen_map',
+						'type'=>'yesno',
+						'name'=>__('Enable generate google maps from address for all newly created events, by default','eventon'), 
+						'legend'=>__('When you are creating a new event the option to generate google map from address will be turned on by default.','eventon')),
+					array('id'=>'evo_geoOSM',
+						'type'=>'yesno',
+						'name'=>__('Use Openstreetmap API to get geolocation coordinates','eventon'), 
+						'legend'=>__('This will use openstreetmap.org API to fetch geolocation lat lon values instead of google maps API.','eventon'),
+						'ver'=> '4.7.2'
 					),
 					
 			)),
@@ -180,11 +188,13 @@ class evo_settings_settings{
 				'fields'=> apply_filters('eventon_settings_time', array(
 					
 					array('type'=>'sub_section_open','name'=>__('General Time/Date Settings','eventon')),
-						array('id'=>'evo_global_tzo','type'=>'dropdown',
-							'name'=>__('Default Event Timezone','eventon'),'width'=>'full',
-							'options'=> $help->get_timezone_array(false, true),
-							'default'=> 'UTC',
-							'legend'=> __('Calendar will be created using this timezone and all the events will be added relative to this timezone','eventon')
+						array(
+							'id'				=>'evo_global_tzo',
+							'type'			=>'dropdownS2',
+							'name'			=>__('Default Event Timezone','eventon'),'width'=>'full',
+							'options'		=> $help->get_modified_wp_timezone_list(),
+							'default'		=>'Europe/London',
+							'legend'		=> __('Calendar will be created using this timezone and all the events will be added relative to this timezone','eventon')
 						),
 						array('id'=>'evo_tzo_all','type'=>'yesno',
 							'name'=>__('Apply default timezone to all events','eventon'), 
@@ -212,14 +222,14 @@ class evo_settings_settings{
 							'name'=>__('Use WP default Date format in eventON calendar (Excluding eventCard event date format)','eventon'), 
 							'legend'=>__('Select this option to use the default WP Date format through out eventON calendar parts excluding eventCard main date format. Default format: yyyy/mm/dd','eventon')),
 											
-						array('id'=>'evo_timeF','type'=>'yesno','name'=>__('Allow universal event time format on eventCard','eventon'),
+						array('id'=>'evo_timeF','type'=>'yesno','name'=>__('Enable custom event time format on eventCard','eventon'),
 							'legend'=>__('This will change the time format on eventCard to be a universal set format regardless of the month events span for.','eventon'),
 								'afterstatement'=>'evo_timeF'),
 							array('id'=>'evo_timeF','type'=>'begin_afterstatement'),
-							array('id'=>'evo_timeF_v','type'=>'text','name'=>__('Date/Time Format','eventon'), 
-								'default'=>'F j(l) g:ia'),
+							array('id'=>'evo_timeF_v','type'=>'text','name'=>__('Date Format','eventon'), 'default'=>'F j (l)'),
+							array('id'=>'evo_timeF_tf','type'=>'text','name'=>__('Time Format','eventon'), 'default'=> EVO()->calendar->time_format ),
 							array('id'=>'evcal_api_mu_note','type'=>'note',
-								'name'=>__('Refer to guide for acceptable date/time format values: php <a href="http://php.net/manual/en/function.date.php" target="_blank">date()</a> You can use {} to add constants to the date/time format eg. F j(l) g{hr} i{min}. NOTE: Setting a custom time format will stop hide end time and all day event times from working as default.','eventon')),
+								'name'=>__('Refer to guide for acceptable date/time format values: php <a href="https://www.php.net/manual/en/datetime.format.php" target="_blank">date()</a> Use \ to add special characters eg. \a\t H:i','eventon')),
 							array('id'=>'evo_timeF','type'=>'end_afterstatement'),
 
 						array('id'=>'evo_show_localtime','type'=>'yesno',
@@ -594,7 +604,55 @@ class evo_settings_settings{
 						),
 
 					))
-				),			
+				),	
+
+				array(
+					'id'=>'evcal_013',
+					'name'=>__('Diagnose EventON Environment','eventon'),
+					'tab_name'=>__('Diagnose','eventon'),
+					'icon'=>'rocket',
+					'fields'=>array(	
+						array('id'=>'daig','type'=>'note',
+							'name'=>__('The below options are for testing and debuging eventon environment. They can provide general guidance for verification of proper functionality of EventON features.','eventon'),
+						),		
+						array('id'=>'evo_label','type'=>'subheader','name'=>__('EventON & Your Website Environment Data','eventon'),),
+						array('id'=>'evcal__note','type'=>'customcode','code'=>$this->environ_data()),
+
+						array('type'=>'sub_section_open','name'=>__('Other Debug & Diagnose Settings','eventon')),
+							// @added 4.9
+							array(
+								'id'=>'evo_desc_check','type'=>'yesno',
+								'name'=>__('Activate event description content HTML validity check','eventon'),
+								'legend'=>__('Make sure event description content has valid properly closed HTML. If not this will add an error message instead of event description.','eventon'),
+								'ver'=> '4.9'
+							),
+							array('id'=>'evo_debug_mode',
+								'type'=>'yesno',
+								'name'=>__('Enable debug on EventON Calendar','eventon'), 
+								'legend'=>__('Enabling this will add eventon custom debug messages to wp debug log. Make sure to enable WP_DEBUG for this to work properly.','eventon'),
+								'ver'=> '4.9', 'beta'=> true
+							),
+						array('type'=>'sub_section_close'),
+					)
+				),
+
+				// advanced 
+				array(
+					'id'=>'evcal_001_advance',
+					'name'=>__('Advanced Settings','eventon'),
+					'tab_name'=>__('Advanced Settings','eventon'),
+					'icon'=>'laptop-code',
+					'fields'=> apply_filters('evo_settings_advanced', array(
+						
+						array('type'=>'sub_section_open','name'=>__('Event Cache Settings' ,'eventon')),		
+							array('id'=>'evo_cache_events',
+								'type'=>'yesno',
+								'name'=>__('Cache calendar events list data','eventon'), 
+								'legend'=>__('This will cache the event data for calendar for upto 1 hour.','eventon')
+							),
+						array('type'=>'sub_section_close'),
+					))
+				),		
 			
 		)
 		);	
@@ -721,7 +779,6 @@ class evo_settings_settings{
 		function eventtop_settings(){
 			
 			$num = evo_calculate_cmd_count($this->evcal_opt[1]);
-			$_add_tax_count = evo_get_ett_count($this->evcal_opt[1]);
 			$_tax_names_array = evo_get_ettNames($this->evcal_opt[1]);
 			
 			$arr = array(
@@ -731,10 +788,10 @@ class evo_settings_settings{
 			);
 
 			// additional taxonomies
-			for($n=1; $n<= $_add_tax_count; $n++){
-				$__tax_fields = 'eventtype'.($n==1?'':$n);
-				$__tax_name = $_tax_names_array[$n];
-				$arr[$__tax_fields] = sprintf(__('%s (Category #%d)','eventon'),  $__tax_name , $n );
+			foreach( eventon_get_valid_ett() as $key => $nn){
+				$__tax_fields = 'eventtype'.($key==1?'':$key);
+				$__tax_name = $_tax_names_array[$key];
+				$arr[$__tax_fields] = sprintf(__('%s (Category #%d)','eventon'),  $__tax_name , $key );
 			}
 
 
@@ -773,20 +830,22 @@ class evo_settings_settings{
 
 		function event_type_options(){
 			$event_type_names = evo_get_ettNames($this->evcal_opt[1]);
-			// event types category names		
-			$ett_verify = evo_get_ett_count($this->evcal_opt[1] );
-
+				
 			$event_type_options = array();
 			
 			$event_type_options['event_past_future'] = __('Past & Future Event Filtering','eventon');
 			$event_type_options['event_virtual'] = __('Virtual Event Filtering','eventon');
 			$event_type_options['event_status'] = __('Event Status Filtering','eventon');
 
-			for($x=1; $x< ($ett_verify+1); $x++){
-				$ab = ($x==1)? '':'_'.$x;
-				$event_type_options['event_type'.$ab] = $event_type_names[$x];
+			$event_type_options['event_type'] = $event_type_names[1];
+			$event_type_options['event_type_2'] = $event_type_names[2];
+
+			foreach( eventon_get_valid_ett()as $key => $name){
+				$nn = $key == 1 ? 'event_type' : 'event_type_'.$key;
+				$event_type_options[ $nn ] = $event_type_names[$key];
 			}
 
+			
 			$event_type_options['event_location'] = __('Event Location','eventon');
 			$event_type_options['event_organizer'] = __('Event Organizer','eventon');
 
@@ -913,7 +972,7 @@ class evo_settings_settings{
 							$CC .= "<span class='ecd_row_box". ($H ? ' hidden':'') ."' data-b='". esc_attr( $B )."' data-n='". esc_attr( $N )."' data-h='". esc_attr( $H )."' data-c='". esc_attr( $C )."'> 
 								<span class='ecd_act1'>
 									<i class='vis fa fa-eye". ($H ? '-slash':'') ."'></i>
-									<span class='colorselector clr' hex='". esc_attr( $C )."' style='background-color:#". esc_attr( $C )."' title='". __('Field Color','eventon')."'></span>
+									<span class='colorselector clr evotooltipfree' hex='". esc_attr( $C )."' style='background-color:#". esc_attr( $C )."' title='". __('Field Color','eventon')."'></span>
 									<span class='clr_reset". esc_attr( $clr_reset )."' data-hex='". esc_attr( $default_evc_color )."' style='background-color:#". esc_attr( $default_evc_color )."' title='". __('Reset to Default Color','eventon')."'></span>
 								</span>
 								<em>". esc_attr( $name )."</em>
@@ -1051,6 +1110,37 @@ class evo_settings_settings{
 					'name'=>sprintf(__('Want more than 5 event categories? <br/><br/><a href="%s" target="_blank"class="evo_admin_btn btn_triad">Extend categories using pluggable functions</a>' ,'eventon'), 'http://www.myeventon.com/documentation/increase-event-type-count/') );
 
 			return $etc;
+		}
+
+	// html for diagnosis content
+		function environ_data(){
+			ob_start();
+			
+				EVO()->elements->print_trigger_element(array(
+					'title'=>__('Load Environment Stats','eventon'),
+					'class_attr'=>'evo_admin_btn evolb_trigger btn_triad',
+					'dom_element'=> 'span',
+					'uid'=>'evoadmin_enviro',
+					'lb_class' =>'evoadmin_enviro',
+					'lb_title'=> __('EventON & Website Environment Stats','eventon'),
+					'ajax_data' =>array(
+						'action'=>'eventon_admin_get_environment'
+					),
+				), 'trig_lb');
+
+				EVO()->elements->print_trigger_element(array(
+					'title'=>__('View eventon system log','eventon'),
+					'class_attr'=>'evo_admin_btn evolb_trigger btn_triad',
+					'dom_element'=> 'span',
+					'uid'=>'evo_admin_system_log',
+					'lb_class' =>'evoadmin_system_log',
+					'lb_title'=> __('EventON System Log','eventon'),
+					'ajax_data' =>array(
+						'action'=>'eventon_admin_system_log'
+					),
+				), 'trig_lb');
+
+			return ob_get_clean();
 		}
 
 	/**

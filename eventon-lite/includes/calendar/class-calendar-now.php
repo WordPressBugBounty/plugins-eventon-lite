@@ -2,7 +2,7 @@
 /**
  *
  *	EventON Now Calendar Content
- *	@version L2.2.17
+ *	@version 2.4
  */
 
 class Evo_Calendar_Now{
@@ -123,8 +123,9 @@ class Evo_Calendar_Now{
 					$help = EVO()->helper;
 
 					$next_event_start_unix = $event_list_array[0]['unix_start'];
+					$current_time = time();
 					
-					if( $next_event_start_unix > 0 ){
+					if( $next_event_start_unix > $current_time ){ // make sure event is in the future
 					
 						$next_events = array( $event_list_array[0]);
 						
@@ -148,14 +149,7 @@ class Evo_Calendar_Now{
 							'n'=> $nonce,
 						);
 
-						echo "<h3><em class='fsn padr10' >". esc_html( evo_lang('Coming up Next in') ) ."</em> <span class='evo_countdowner' ";
-
-						foreach( $data_attr as $key=>$value){
-							if( is_array($value)) $value = htmlspecialchars( wp_json_encode($value), ENT_QUOTES);
-							echo ' data-' . esc_attr( $key ) . '="' . esc_attr( $value ) . '"';  
-						}
-
-						echo "></span></h3>";
+						echo "<h3 class='evogap10 evofxaic'><em class='fsn' >". evo_lang('Coming up Next in') ."</em> <span class='evo_countdowner' ". $help->array_to_html_data($data_attr) ."></span></h3>";
 
 						$header_args = array(
 							'external'=> true,

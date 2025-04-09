@@ -2,7 +2,7 @@
 /**
  * Language Settings 
  *
- * @version		2.3
+ * @version		2.4
  * @package		EventON/settings
  * @category	Settings
  * @author 		AJDE
@@ -209,6 +209,7 @@ class evo_settings_lang extends EVO_Lang_Settings{
 					array('label'=>'Rescheduled','var'=>1),	
 					array('label'=>'Preliminary','var'=>1),	
 					array('label'=>'Tentative','var'=>1),	
+					array('label'=>'Repeating Event','var'=>1),	
 					array('label'=>'Virtual Event','var'=>1),	
 					array('label'=>'Virtual/ Physical Event','var'=>1),	
 					array('label'=>'Virtual Event Details','var'=>1),	
@@ -461,6 +462,8 @@ class evo_settings_lang extends EVO_Lang_Settings{
 				$output = array();
 				$output['evo_lang_am'] = 'am';
 				$output['evo_lang_pm'] = 'pm';
+				$output['evo_lang_am2'] = 'AM';
+				$output['evo_lang_pm2'] = 'PM';
 				return $output;
 			}
 			function _array_part_taxonomies(){
@@ -471,25 +474,25 @@ class evo_settings_lang extends EVO_Lang_Settings{
 
 				$output[] =array('type'=>'togheader','name'=>'Event Type Categories');
 
-				for($x=1; $x<($ett_verify+1); $x++){
+				foreach( eventon_get_valid_ett() as $key => $val){
 
-					$default = $event_type_names[$x];
-					$output[] = array('label'=>$default, 'name'=>'evcal_lang_et'. esc_attr( $x ) );
+					$default = $event_type_names[$key];
+					$output[] = array('label'=>$default, 'name'=>'evcal_lang_et'.$key);
 
 					// each term of taxonomy
-					$ab = $x==1?'':'_'.$x;
+					$ab = $key==1?'':'_'.$key;
 					
-					$taxonomy = 'event_type' . esc_attr( $ab );
+					$taxonomy = 'event_type' . $ab;
 					$terms = get_terms(array(
 					    'taxonomy'   => $taxonomy,
 					    'hide_empty' => false,
-					));
-					
+					));					
+
 					$termitem = array();
 					if(!empty($terms)){
 						foreach($terms as $term){
-							$var = 'evolang_'.'event_type'. esc_attr( $ab ) .'_'.$term->term_id;
-							$termitem[$var]=(!empty($this->lang_options[$var]))?  $this->lang_options[$var]: $term->name;
+							$var = 'evolang_'.'event_type'.$ab.'_'.$term->term_id;
+							$termitem[$var] = (!empty($this->lang_options[$var]))?  $this->lang_options[$var]: $term->name;
 						}
 					}
 					if(!empty($termitem)){

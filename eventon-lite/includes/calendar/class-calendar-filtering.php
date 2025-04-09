@@ -1,7 +1,7 @@
 <?php
 /**
 * Calendar Filtering
-* @version L2.2.20
+* @version 2.4
 */
 
 class EVO_Cal_Filering{
@@ -64,10 +64,10 @@ class EVO_Cal_Filering{
 					$cnt =1;
 					foreach($evsa1 as $so=>$sov){
 						if(in_array($so, $sorting_options) || $so=='date' ){
-						echo "<p data-val='sort_". esc_attr( $so )."' data-type='". esc_attr( $so )."' class='evs_btn evo_sort_option ".( ($args['sort_by'] == $sort_options[$cnt])? 'evs_hide':null)."' >"
-								. esc_html( $this->cal->lang('evcal_lang_s'.$so,$sov) )
-								."</p>";
-						}
+						echo "<p data-val='sort_".$so."' data-type='".$so."' class='evs_btn evo_sort_option ".( ($args['sort_by'] == $sort_options[$cnt])? 'evs_hide select':null)."' >"
+									.$this->cal->lang('evcal_lang_s'.$so,$sov)
+									."</p>";
+							}
 						$cnt++;
 					}
 				echo "</div>";

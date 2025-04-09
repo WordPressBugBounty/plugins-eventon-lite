@@ -1,7 +1,7 @@
 <?php
 /**
  * EventON Lite Setup
- * @version 2.3.2
+ * @version 2.4
  * 
  */
 
@@ -11,7 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 class EventON {
 
 	// defines
-		public $version = '2.3.2';
+		public $version = '2.4';
 				
 		public $template_url;
 		public $print_scripts=false;
@@ -132,7 +132,8 @@ class EventON {
 			include_once(EVO_ABSPATH.'includes/admin/post_types/ajde_events.php' );
 			include_once(EVO_ABSPATH.'includes/admin/welcome.php' );		
 			include_once(EVO_ABSPATH.'includes/admin/class-evo-admin.php' );						
-			include_once(EVO_ABSPATH.'includes/admin/class-evo-errors.php' );					
+			include_once(EVO_ABSPATH.'includes/admin/class-evo-errors.php' );
+			include_once(EVO_ABSPATH.'/includes/admin/settings/class-settings-designer.php' );							
 		}
 		if ( ! $this->is_request('admin') || $this->is_request('ajax') ){}	
 	}	

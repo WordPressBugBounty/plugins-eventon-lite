@@ -1,7 +1,7 @@
 <?php
 /**
  * Schedule view calendar 
- * @version L2.2.11
+ * @version 2.4
  */
 
 class Evo_Cal_Schedule{
@@ -60,7 +60,7 @@ class Evo_Cal_Schedule{
 				{{#each events}}
 				<div class='row'>
 					<div class='evosv_date'>{{{../date}}}</div>
-					<div class='evosv_items' data-id='{{@key}}' data-uxval='{{ux_val}}'>
+					<div class='evosv_items evoff_2' data-id='{{@key}}' data-uxval='{{ux_val}}'>
 						<div class='evosv_clr llxvl' style='background-color:{{color}}'></div>
 						<div class='evosv_time llxvl'>{{time}}</div>
 						<div class='evosv_event llxvl'>{{{tag}}} {{{title}}} {{{loc}}} {{{org}}}</div>

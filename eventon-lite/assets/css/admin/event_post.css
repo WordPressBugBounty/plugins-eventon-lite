@@ -1,6 +1,6 @@
 /**
  * all event post types and taxonomy styles
- * @version 2.3
+ * @version 2.3.3
  */
 
 
@@ -26,12 +26,8 @@
 	    background-color: transparent;
     	padding: 10px 5px;
     }
-    .event_status_settings p.evo_row_select span.values{background-color: transparent;}
-    .event_status_settings p.evo_row_select span.values span{
-    	    border: 1px solid var(--evo_border_c);
-	    border-radius: 25px;
-	    margin: 0 5px 5px 0;
-    }
+    .evo_meta_elements .evo_elm_row.evoelm_url{gap:20px; flex-wrap: wrap;}
+    .evo_meta_elements .evo_elm_row.evoelm_url .evo_field_container{width:auto;flex:1;}
 
 /** EVENT COLOR **/
 	.evo_mb_color_box{padding:10px;}
@@ -597,7 +593,7 @@
 	.evomb_header.closed:after{content: "\f347";}
 	.evomb_header:hover .evomb_icon{opacity:1}
 	.evomb_header{
-		padding:10px;
+		padding:15px;
 		position:relative;
 		cursor:pointer;
 		box-sizing:content-box;
@@ -620,7 +616,7 @@
 	}
 	.evomb_body{
 		color: var(--evo_color_1);
-	    padding: 25px;
+	    padding: 15px;
 	    font: 13px var(--evo_main_font);
 	}
 	.evomb_body .yesno_leg_line label{color:#808080;}

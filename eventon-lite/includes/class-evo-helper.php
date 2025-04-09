@@ -1,9 +1,8 @@
 <?php
 /** 
  * Helper functions to be used by eventon or its addons
- * front-end only
- *
- * @version 2.3
+ * front-end only 
+ * @version 2.4
  */
 
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly

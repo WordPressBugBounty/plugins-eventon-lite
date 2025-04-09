@@ -63,7 +63,7 @@ class evo_search{
 			</div>
 
 
-			<p class="evo_search_results_count" style='display:none'><span>10</span> <?php echo esc_html( evo_lang_get('evoSR_004','Event(s) found') );?></p>
+			<p class="evo_search_results_count evoff_2 evofz16" style='display:none'><span>10</span> <?php echo esc_html( evo_lang_get('evoSR_004','Event(s) found') );?></p>
 			<div class="evo_search_results"></div>
 		</div>
 		<?php

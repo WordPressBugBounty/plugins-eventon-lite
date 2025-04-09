@@ -1,5 +1,6 @@
 /** 
- * @version  L2.2.10
+ * @version  2.3.3
+ * @version 4.8.2
  */
 jQuery(document).ready(function($){
 
@@ -380,7 +381,7 @@ jQuery(document).ready(function($){
 		
 	/** User interaction meta field 	 **/
 		// new window
-		$('#evo_new_window_io').click(function(){
+		$('body').on('click','#evo_new_window_io',function(){
 			var curval = $(this).hasClass('selected');
 			if(curval){
 				$(this).removeClass('selected');
@@ -391,33 +392,29 @@ jQuery(document).ready(function($){
 			}
 		});
 		 
-		$('.evcal_db_ui').click(function(){
-			var val = $(this).attr('value');
-			$('#evcal_exlink_option').val(val);
-			
-			$('.evcal_db_ui').removeClass('selected');
-			$(this).addClass('selected');
-			
-			var link = $(this).attr('link');		
-			var linkval = $(this).attr('linkval');
-			var opval = $(this).attr('value');
-			
-			if(link=='yes'){			
-				$('#evcal_exlink').show();
-				if(linkval!=''){
-					$('#evcal_exlink').val(linkval);
+		$('body').on('click','.evo_eventedit_ui',function(){
+			const box = $(this).closest('.evo_event_edit_ui_box');
+			var new_value = $(this).attr('value');
+
+			const input_field = box.find('input[name=_evcal_exlink_option]');
+			var input_val = input_field.val( new_value );
+			const evcal_exlink_input = box.find('input[name=evcal_exlink]');
+
+
+			// if open in new window option is visible
+			if( new_value == 2 || new_value == 3 || new_value == 4){
+				box.find('.event_edit_ui_extra').show();
+				evcal_exlink_input.show();
+				if( new_value == 4){
+					evcal_exlink_input.val( box.data('event_url'));
+				}else{
+					evcal_exlink_input.val( '');
 				}
-			}
-			
-			// slide down event card
-			if(opval=='1' || opval=='3'|| opval=='X'){
-				$('#evo_new_window_io').removeClass('selected');
-				$('#evcal_exlink_target').val('no');
-				$('#evcal_exlink').hide().attr({value:''});
-				$('#evo_new_window_io').hide();
 			}else{
-				$('#evo_new_window_io').show();
+				box.find('.event_edit_ui_extra').hide();
+				evcal_exlink_input.hide();
 			}
+
 		});
 		
 	// repeating events UI	
@@ -472,9 +469,10 @@ jQuery(document).ready(function($){
 		
 		// adding a new custom repeat interval
 		// @since 2.2.24
-		// @updated 2.5.3
-			$('#evo_add_repeat_interval').on('click',function(){
-				var obj = $('.evo_repeat_interval_new');
+		// @updated 4.8.2
+			$('body').on('click','#evo_add_repeat_interval',function(){
+				var el = $(this);
+				var obj = $('body').find('.evo_repeat_interval_new');
 
 				// if the add new RI form is not visible
 				if(!obj.is(':visible')){
@@ -482,49 +480,49 @@ jQuery(document).ready(function($){
 				}else{
 
 
-					if( obj.find('.datepickernew_repeat_startdate').val() &&
-						obj.find('.datepickernew_repeat_enddate').val() 
+					if( obj.find('input.evo_dpicker.end').val() &&
+						obj.find('input.evo_dpicker.start').val() 
 					){		
-						if($('ul.evo_custom_repeat_list').find('li').length > 0){
-							count = parseInt($('ul.evo_custom_repeat_list li:last-child').data('cnt'))+1;	
-						}else{
-							count = 1;
-						}
 
-						var start_date_red = obj.find('.datepickernew_repeat_startdate').val();
-						var end_date_red = obj.find('.datepickernew_repeat_enddate').val();
+						const container = el.closest('.repeat_information');
+						const box = container.find('.evo_repeat_interval_new.evo_edit_field_box');
+						var ajax_data = {}
 
-						var start_date = obj.find('.evo_new_repeat_start_alt_date').val();
-						var end_date = obj.find('.evo_new_repeat_end_alt_date').val();
+						// gather repeat instance time data
+						box.find('input, select').each(function(){
+							ajax_data[ $(this).attr('name') ] = $(this).val();
+						});
 
-						var start_time = obj.find('._new_repeat_start_hour').val()
-							+':'+obj.find('._new_repeat_start_minute').val()
-							+	( obj.find('._new_repeat_start_ampm').val() !== undefined ? ':'+ obj.find('._new_repeat_start_ampm').val(): '' );
+						// get index
+						const ul = container.find('.evo_custom_repeat_list');
+						ajax_data['new_index'] = ul.find('li:last').data('cnt');
 
-						var end_time = obj.find('._new_repeat_end_hour').val()
-							+':'+obj.find('._new_repeat_end_minute').val()
-							+ ( obj.find('._new_repeat_end_ampm').val() !== undefined ? ':'+ obj.find('._new_repeat_end_ampm').val(): '' );
+						el.evo_admin_get_ajax({
+							'adata':{
+								a:'eventon_generate_custom_repeat_unix',
+								data:ajax_data,
+								show_snackbar:true,
+								loader_class:'evo_repeat_interval_new'
+							},
+							uid:'generate_custom_repeat_unix'
+						});
 
-						var html = '<li data-cnt="'+count+'" class="new"><span>from</span>'
-							+ start_date_red +' '+start_time
-							+' <span class="e">End</span>'
-							+ end_date_red +' '+ end_time +'<em alt="Delete">x</em>';
-						html += '<input type="hidden" name="repeat_intervals['+count+'][0]" value="'+ start_date +' '+start_time+'"/>';
-						html +='<input type="hidden" name="repeat_intervals['+count+'][1]" value="'+ end_date +' '+end_time+'"/>';
-						html +='<input type="hidden" name="repeat_intervals['+count+'][type]" value="dates"></li>';
-
-
-						$('ul.evo_custom_repeat_list').append(html);
-
-						// release time locks on date picker
-						obj.find('input.evo_dpicker').datepicker('option','minDate',null);
-						obj.find('input.evo_dpicker').datepicker('option','maxDate',null);
-
+						return;
 
 					}else{
-						$('.evo_repeat_interval_button').find('span').fadeIn().html(' All fields are required!').delay(2000).fadeOut();
+						el.evo_snackbar({message: "All fields are required!"});
 					}
 				}
+			});
+
+			$('body').on('evo_ajax_success_generate_custom_repeat_unix',function(event, OO, data, el){
+
+				el = $(el);
+				const container = el.closest('.repeat_information');
+				const box = container.find('.evo_repeat_interval_new.evo_edit_field_box');
+				const ul = container.find('.evo_custom_repeat_list');
+
+				ul.append( data.content );
 			});
 
 		// delete a repeat interval
@@ -558,10 +556,11 @@ jQuery(document).ready(function($){
 		
 	$('body')
 	// end time hide or not
-		.on('click','#evo_hide_endtime', function(){
-			
+		.on('evo_blockbtn_trigged', function(e, newval, el, id, as){
+			if( id != 'evo_hide_endtime') return;
+
 			// yes
-			if( !($(this).hasClass('NO')) ){
+			if( newval == 'yes' ){
 				$('body').find('.evo_date_time_elem.evo_end').animate({'opacity':'0.5'});
 			}else{
 				$('body').find('.evo_date_time_elem.evo_end').animate({'opacity':'1'});

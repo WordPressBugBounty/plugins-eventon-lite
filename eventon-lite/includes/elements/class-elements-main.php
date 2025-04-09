@@ -1,7 +1,7 @@
 <?php
 /**
  * EventON General Calendar Elements
- * @version 2.3
+ * @version 2.4
  */
 
 class EVO_General_Elements extends EVO_Elm_Trigs{	
@@ -20,13 +20,16 @@ class EVO_General_Elements extends EVO_Elm_Trigs{
 	function get_element($A){ 
 		$A = array_merge( array(
 			'id'=>'',
+			'id2'=> '', // @4.9 secondary id
 			'index'=>'',// referance index
 			'name'=>'',	
 			'label'=>'',		
 			'hideable'=> false,
 			'value'=>'','default'=>'','values'=> array(),'values_array'=> array(),
+			'placeholder'=>'',// @4.9
 			'value_2'=>'',
-			'max'=>'','min'=>'','step'=>'','readonly'=>false,
+			'max'=>'','min'=>'','step'=>'','readonly'=>false, 
+			'maxlength'=> '', // 4.9.2
 			'TD'=>'eventon', // text domain
 			'legend'=>'','tooltip'=>'',
 			'tooltip_position'=>'',
@@ -49,6 +52,7 @@ class EVO_General_Elements extends EVO_Elm_Trigs{
 			'trig_data'=> false,//4.7
 			'trig_type'=>'', //4.7
 			'_echo'=> false,//4.7
+			'conditional_subfields'=> null, // @4.9.2
 
 		), $A);
 		extract($A);
@@ -65,6 +69,7 @@ class EVO_General_Elements extends EVO_Elm_Trigs{
 					
 				}
 				$field_attr = !empty($field_attr) ? implode(' ', $field_attr) : null;
+				$help = new evo_helper();
 
 			// validation
 				if(empty($type)) return false;
@@ -84,7 +89,13 @@ class EVO_General_Elements extends EVO_Elm_Trigs{
 			case 'notice':
 				echo "<p class='evo_elm_row evo_elm_notice ". esc_attr( $row_class )."' style='" . esc_attr( $row_style )."'>". esc_attr( $name ) ."</p>";
 			break;
-
+			case 'static_field': // @since 4.7
+			case 'static':
+				echo "<p class='evo_elm_row evo_elm_notice {$row_class}' style='{$row_style}'>". $name . "<code class='evomarl10'>". $value . '</code>'. $legend_code ."</p>";
+			break;
+			case 'section_header':
+				echo "<div class='evo_elm_row evopadb10 evopadt10'><p class='evo_elm_header {$row_class} evofz18i evopad0i evomar0i' style='{$row_style}'>". $name .$legend_code ."</p></div>";
+			break;
 			// custom code field
 			case 'custom_code':
 			case 'code':
@@ -95,6 +106,58 @@ class EVO_General_Elements extends EVO_Elm_Trigs{
 			case 'hidden':
 				$name = (!empty($name)) ? $name : $id;
 				echo "<input type='hidden' name='". esc_attr( $name )."' value='". esc_attr( $value ) ."'/>";
+			break;
+
+			// GENERAL Text field
+			case 'text':
+			case 'input':
+				echo "<div class='evo_elm_row evoelm_text {$id} {$row_class}' style='{$row_style}'>";
+				
+				// Placeholder content
+			    $placeholder = (!empty($placeholder) || !empty($default)) 
+			        ? "placeholder='" . (!empty($placeholder) ? $placeholder : $default) . "'" 
+			        : "";
+
+
+				$show_val = $hideable && !empty($value);
+			    $hideable_text = $show_val 
+			        ? "<span class='evo_hideable_show' data-t='". __('Hide', $TD) ."'>". __('Show', $TD). "</span>" 
+			        : "";
+				
+				echo "<p class='evo_field_label'>{$name}{$legend_code}{$hideable_text}</p>";
+    			echo "<p class='evo_field_container evoposr'>";
+
+    			//$input_value = !empty($value) ? htmlspecialchars($value, ENT_QUOTES) : '';
+    			$input_value = !empty($value) ? htmlspecialchars(trim($value, " \t\n\r\0\x0B\xC2\xA0"), ENT_QUOTES) : '';
+    			$input_value = html_entity_decode( $input_value );
+
+				if ($show_val && $hideable) {
+			        echo "<input class='{$field_class}' type='password' name='{$id}' value='{$input_value}'";
+			    } else {
+			        echo "<input class='{$field_class}' type='{$field_type}' name='{$id}' "
+			            . (!empty($max) ? "max='{$max}' " : "")
+			            . (!empty($min) ? "min='{$min}' " : "")
+			            . (!empty($step) ? "step='{$step}' " : "")
+			            . (!empty($maxlength) ? "maxlength='{$maxlength}' " : "")
+			            . ($readonly ? " readonly='true'" : "")
+			            . " value='{$input_value}'";
+			    }
+			    echo " {$placeholder}/>";
+
+				// Character count display when maxlength is set
+			    if (!empty($maxlength)) {
+			        $current_length = strlen($input_value);
+			        echo "<span class='evolm_char_count evoposa evor0 evomart10 evomarr10 evoop7' style='font-size:12px; margin-left:5px;'>{$current_length}/{$maxlength}</span>";
+			        echo "<script>
+			            document.querySelector('input[name=\"{$id}\"]').addEventListener('input', function(e) {
+			                document.querySelector('.evolm_char_count').textContent = e.target.value.length + '/{$maxlength}';
+			            });
+			        </script>";
+			    }
+
+				if(!empty($description)) echo "<em>". $description ."</em>";
+
+				echo "</p></div>";
 			break;
 
 			// image
@@ -109,71 +172,41 @@ class EVO_General_Elements extends EVO_Elm_Trigs{
 				$__button_text_not = ($image_id)? __('Remove Image','eventon'): __('Choose Image','eventon');
 				$__button_class = ($image_id)? 'removeimg':'chooseimg';
 				?>
-				<p class='evo_metafield_image <?php echo !empty($image_id)?'has_img':'';?>'>
-					<label><?php echo $name.$legend_code; ?></label>
+				<div class='evo_elm_row evo_metafield_image <?php echo !empty($image_id)?'has_img':'';?> <?php echo $id.' '.$row_class;?>'>
+					<p class='evo_field_label'><?php echo $name.$legend_code; ?></p>
 					
 					<input class='evo_meta_img field <?php echo $id;?> custom_upload_image' name="<?php echo $id;?>" type="hidden" value="<?php echo ($image_id)? $image_id: null;?>" /> 
             		
             		<span class='image_src evoposr evo_hover_op7 evomart5 evobr10'>
             			<span class='evolm_img_actions evoposa evodfx evofx_jc_c evofx_ai_c evoh100p evow100p'>
-            				<button class='evolm_img_select_trig evoposa evoboxsn evobgclt evocurp evobrn evow100p evoh100p'><?php _e('Select an Image','eventon');?></button>
+            				<button class='evolm_img_select_trig evoposa evoboxsn evobgclt evocurp evobrn evow100p evoh100p evoff_2'><?php _e('Select an Image','eventon');?></button>
             				<i class='evoel_img_remove_trig fa fa-times evofx_jc_c evofx_ai_c evobgclw evopad10 evobr50p evofz18 evocurp evo_trans_sc1_07 evo_transit_all'></i>
             			</span>
             			
             			<span class='evoelm_img_holder evobr10 evoh100p evow100p evodb evobgpc evobgsc' style='background-image: url(<?php echo $img_src;?>);'></span>
             		</span>
             		
-            	</p>
+            	</div>
 				<?php
 			break;
 
-			// GENERAL Text field
-			case 'text':
-			case 'input':
-				echo "<div class='evo_elm_row ". esc_attr( $id )."' style='". esc_attr( $row_style ) ."'>";
-				$placeholder = (!empty($default) )? 'placeholder="'. esc_attr( $default ) .'"':null;				
-
-				$show_val = false; $hideable_text = '';
-				if( $hideable && !empty($value)){
-					$show_val = true;
-					$hideable_text = "<span class='evo_hideable_show' data-t='". __('Hide', 'eventon') ."'>". __('Show','eventon'). "</span>";
-				}
-				
-				echo"<p class='evo_field_label'>". esc_attr( $name ) .$legend_code. $hideable_text. "</p><p class='evo_field_container'>";
-
-				if($show_val && $hideable){
-					echo "<input class='". esc_attr( $field_class ). "' type='password' style='' name='". esc_attr( $id ) ."'";
-					echo'value="'. ( !empty($value) ? htmlspecialchars( $value , ENT_QUOTES) : '' ) .'"';
-				}else{
-					echo "<input class='". esc_attr( $field_class )."' type='". esc_attr( $field_type )."' name='". esc_attr( $id )."' max='". esc_attr( $max )."' min='". esc_attr( $min )."' step='". esc_attr( $step )."'";
-
-					if( $readonly ) echo 'readonly="true"';
-					$__values = !empty($value) ? htmlspecialchars( $value , ENT_QUOTES) : '' ;
-					//$__values =  $value ;
-					echo 'value="'. $__values .'"';
-				}				
-				echo $placeholder."/>";
-
-				if(!empty($description)) echo "<em>". esc_html( $description ) ."</em>";
-
-				echo "</p></div>";
-			break;
+			
 
 			// color picker field
 			case 'colorpicker':
 
 				$vis_input_field = !empty($support_input) && $support_input ? true: false;
 
-				echo "<div class='evo_elm_row ". esc_attr( $id )."' style='". esc_attr( $row_style )."'>";
+				echo "<div class='evo_elm_row {$id} {$row_class}' style='{$row_style}'>";
 
-				echo"<p class='evo_field_label'>".esc_html( $name ) .$legend_code. "</p>";
+				echo"<p class='evo_field_label'>".$name.$legend_code. "</p>";
 				echo "<p class='evo_field_container ". ( $vis_input_field? 'visi':'') ."'>";
-				echo "<em class='evo_elm_color' style='background-color:#". esc_attr( $value )."'></em>";
+				echo "<em class='evo_elm_color' style='background-color:#{$value}'></em>";
 
 				if($vis_input_field ):
-					echo "<input class='evo_elm_hex' type='text' name='". esc_attr( $id )."' value='". esc_attr( $value )."'/>";
+					echo "<input class='evo_elm_hex' type='text' name='{$id}' value='{$value}'/>";
 				else:
-					echo "<input class='evo_elm_hex' type='hidden' name='". esc_attr( $id )."' value='". esc_attr( $value )."'/>";
+					echo "<input class='evo_elm_hex' type='hidden' name='{$id}' value='{$value}'/>";
 				endif;
 				
 				//echo "<input class='evo_elm_rgb' type='hidden' name='{$rgb_field_name}' value='{$rgb_num}'/>";
@@ -199,22 +232,24 @@ class EVO_General_Elements extends EVO_Elm_Trigs{
 
 			case 'plusminus':
 
-				echo "<div class='evo_elm_row ". esc_attr( $id )." ". esc_attr( $row_class )."' style='". esc_attr( $row_style )."'>";
+				echo "<div class='evo_elm_row evoelm_plusminus {$id} {$row_class}' style='{$row_style}'>";
 
-				if( !empty( $field_before_content ) ) echo wp_kses_post( $field_before_content );
+				echo $field_before_content;
 
-				echo"<p class='evo_field_label'>". esc_html( $name ) .$legend_code. "</p><p class='evo_field_container evo_field_plusminus_container'>";
+				$value = empty($value) ? ($default ?? null) : $value;
+
+				echo"<p class='evo_field_label'>".$name.$legend_code. "</p><p class='evo_field_container evo_field_plusminus_container'>";
 				?>
 					<span class="evo_plusminus_adjuster">
-						<b class="min evo_plusminus_change <?php echo esc_attr( $unqiue_class );?>">-</b>
-						<input class='evo_plusminus_change_input <?php echo esc_attr( $class_2 );?>' type='text' name='<?php echo esc_attr( $id );?>' value='<?php echo esc_attr( $value );?>' data-max='<?php echo esc_attr( $max );?>'/>
-						<b class="plu evo_plusminus_change <?php echo esc_attr( $unqiue_class );?> <?php echo (!empty($max) && $max==1 )? 'reached':'';?>">+</b>						
+						<b class="min evo_plusminus_change <?php echo $unqiue_class;?>">-</b>
+						<input class='evo_plusminus_change_input <?php echo $class_2.' '. $field_class;?>' type='text' name='<?php echo $id;?>' value='<?php echo $value;?>' data-max='<?php echo $max;?>'/>
+						<b class="plu evo_plusminus_change <?php echo $unqiue_class;?> <?php echo (!empty($max) && $max==1 )? 'reached':'';?>">+</b>						
 					</span>
 				<?php
 
 				echo "</p>";
 
-				if( !empty( $field_after_content ) ) echo wp_kses_post($field_after_content );
+				echo $field_after_content;
 
 				echo "</div>";
 
@@ -329,21 +364,30 @@ class EVO_General_Elements extends EVO_Elm_Trigs{
 
 			// select row 
 			case 'select_row':
+					
+				// legacy
+				if (empty($id) && !empty($name))    $id = $name;    // Legacy: if no id, use name as id
+
 				?>
-				<p class='evo_elm_row evo_row_select <?php echo esc_attr( $row_class );?> <?php echo $select_multi_options? 'multi':'';?>' style='<?php echo esc_attr( $row_style );?>'>
-					<input type='hidden' name='<?php echo esc_attr( $name );?>' value='<?php echo esc_attr( $value );?>'/>
+				<p class='evo_elm_row evo_row_select <?php echo $row_class;?> <?php echo $select_multi_options? 'multi':'';?>' style='<?php echo $row_style;?>'>
+					<input type='hidden' name='<?php echo $id;?>' value='<?php echo $value;?>'/>
 					
 					<?php if(!empty($label)):?> 
-						<label style='margin-right: 10px;'><?php echo esc_attr( $label ).' '. $legend_code;?></label>
+						<label style='margin-right: 10px;'><?php echo $label.' '. $legend_code;?></label>
 					<?php endif;?>
 					
-					<span class='values <?php echo esc_attr( $name );?>'>
+					<span class='values evobr30 evopad10 <?php echo $id;?>'>
 					<?php 
 
 					$vals = array();
-					if($select_multi_options && !empty($value)){
-						$vals = explode(',', $value);
-					}
+				
+
+					// Handle default value and current value
+				    if(!empty($value)) {
+				        $vals = $select_multi_options ? explode(',', $value) : array($value);
+				    } elseif(!empty($default)) {
+				        $vals = $select_multi_options ? explode(',', $default) : array($default);
+				    }
 
 					foreach($options as $F=>$V){
 
@@ -351,14 +395,69 @@ class EVO_General_Elements extends EVO_Elm_Trigs{
 						if($select_multi_options){
 							if( in_array($F, $vals)) $selected = ' select';
 						}else{
-							if($F==$value) $selected = ' select';
+							if(!empty($vals) && $F == $vals[0]) $selected = ' select';
 						}
 
-
-						echo "<span value='". esc_attr( $F )."' class='evo_row_select_opt opt". esc_html( $selected )." ". esc_attr( $select_option_class )."'>". esc_html( $V )."</span>";
+						echo "<span value='{$F}' class='evo_row_select_opt opt{$selected} {$select_option_class}'>{$V}</span>";
 					}?>
 					</span>
 				</p><?php
+
+				// conditional subfields (CSF)
+				if(!empty($conditional_subfields) && is_array($conditional_subfields)){
+					echo "<div class='evoelm_CSF' data-parent-id='{$id}'>";
+					foreach($conditional_subfields as $index=> $CSF){
+
+						$visibility = 'hidden';
+
+						// Check if the current value or default value matches any of the CSF's trigger values
+						$trigger_values = $CSF['values']; // Array of values that trigger this CSF
+            			$check_values = !empty($value) ? explode(',', $value) : (!empty($default) ? explode(',', $default) : []);
+
+            			if (!empty($check_values) && count(array_intersect($trigger_values, $check_values)) > 0) {
+			                $visibility = 'visible';
+			            }
+			            
+			            echo "<div class='evoelm_csf_section' data-values='". json_encode($CSF['values']) ."' style='display: ".($visibility === 'visible' ? 'block' : 'none')."'>";
+			            echo $this->get_element($CSF['field']);
+			            echo "</div>";
+					}
+					echo "</div>";
+				}
+
+			break;
+
+			// check boxes @4.9
+			case 'checkbox':
+			
+				if( !is_array($options)) break;
+						
+				echo "<div class='evo_elm_row evo_elm_check evomarb10 {$id} {$row_class}' style='{$row_style}'>";
+				if( !empty($name)) echo "<p class='evo_field_label'>$name $legend_code</p>"; 
+
+				$_values = is_array($value) ? $value : (is_string($value) ? [$value] : ($default ?? []));
+
+				echo "<div class='evodfx evofx_dr_c evogap5 evoff_2 evofz14 evopadt5'>";
+
+				foreach($options as $option_id => $option_val){
+
+					$is_val = in_array($option_id, $_values) ? true: false;
+
+					echo "<span class='evoelm_check_trig evodfx evofx_dr_r evogap10 evopadb5 evocurp evohoop7' data-id='{$option_id}'>";
+					echo "<i class='". ($is_val ? 'fa':'far')." fa-circle".($is_val ? '-check': null)." evofz18'></i>" . $option_val ;
+					echo "<input class='{$field_class}' type='hidden' name='{$id}[]' value='". ($is_val ? $option_id: null) ."' data-role='none'/>";
+					echo "</span>";
+
+				}
+
+				echo "</div>";
+				
+				// legend for under the field
+				if(!empty( $legend )){
+					echo "<br/><i style='opacity:0.6'>".$legend."</i>";
+				}
+
+				echo "</div>";						
 			break;
 
 			// DROP Down select field
@@ -386,69 +485,172 @@ class EVO_General_Elements extends EVO_Elm_Trigs{
 				echo "</p>";						
 			break;
 
+			// dynamic select @4.9
+			case 'dynamic_select':
+
+				echo "<div class='evo_elm_row evo_elm_dynamic_select {$id} {$row_class} evoposr evofxaic' style='{$row_style}' >";
+
+					if( !empty($name)) echo "<label class='evoff_2 evomarr5'>$name $legend_code</label>"; 
+
+					$firstKey = array_key_first($options);
+					$selected = $options[ $firstKey ];
+					if( !empty($value) && isset( $options[ $value ] ) ) $selected = esc_html( $options[ $value ] );
+
+					echo "<button class='evo_elm_dynamic_select_trig evocurp evoposr' aria-haspopup='listbox' aria-expanded='false'>
+					<div class='evoelm_ds_in evodfx evofx_dr_r evogap10 evofx_ai_c'>";
+						echo "<div class='evoelm_ds_current evofz14 evoff_2' id='selected-option'>" .$selected.  "</div>";
+						echo "<i class='fa fa-chevron-down evofz12i'></i>";
+					echo "</div>";
+					echo "</button>";
+
+					echo "<div class='evodn' data-d='". json_encode( $options ) ."'></div>";
+					echo "<input type='hidden' name='{$id}' value='{$firstKey}'/>";
+
+				echo "</div>";
+
+			break;
+
 			// DROP Down select field -- select2
 			case 'dropdownS2':					
-						
-				echo "<p class='evo_elm_row evo_elm_select ". esc_attr( $id )." ". esc_attr( $row_class )."' style='". esc_attr( $row_style )."'>";
-				echo "<label>". esc_html( $name )." $legend_code</label>"; 
-				echo "<select class='ajdebe_dropdown evo_select2' name='". esc_attr( $id )."' style='width:100%'>";
+				
+				echo "<div class='evo_elm_row evoelm_sel2 {$id} {$row_class} evoposr evomarb5' style='{$row_style}'>";
 
-				if(is_array($options)){
-					$dropdown_opt = !empty($value)? $value: (!empty($default)? $default :'');		
-					foreach($options as $option=>$option_val){
-						echo"<option name='". esc_attr( $id )."' value='". esc_attr( $option )."' "
-						.  ( ($option == $dropdown_opt)? 'selected=\"selected\"':null)  .">". esc_html( $option_val )."</option>";
-					}	
-				}					
-				echo  "</select>";
-					// legend for under the field
-					if(!empty( $legend )){
-						echo "<br/><i style='opacity:0.6'>". esc_html( $legend ) ."</i>";
-					}
-				echo "</p>";						
+				echo "<div class='evoelm_sel2_in evodfx evofxdrr evogap10 evofxaic'>";
+			    echo "<label class='evomarb5 evodb'>{$name} {$legend_code}</label>";
+
+			    // Input field with selected text (option_val) as value
+			    $selected_key = !empty($value) ? $value : (!empty($default) ? $default : '');
+			    $selected_text = '';
+			    if (is_array($options) && array_key_exists($selected_key, $options)) {
+			        $selected_text = $options[$selected_key];
+			    }
+
+			    echo "<div class='evoposr evofx_1'>";
+			    	echo "<span class='evoelm_sel2_cur_val evobgcw evopad10-20 evocurp evohoop7 evodfx evobr20 evofxjcsb evofxaic evoborder'>
+			    		<em class='evoelm_sel2_cur_v evofsn'>". $selected_text . "</em><i class='fa fa-chevron-down'></i></span>";
+				    
+				    echo "<input class='evoelm_sel2_val' type='hidden' name='{$id}' value='{$selected_key}' />";
+
+				    // Hidden dropdown list as spans
+				    echo "<div class='evoelm_sel2_opt_list evobr20 evodfx evofxdrc evoofh evoposa evobgcw evot0 evow100p' style='display:none; '>";
+
+				    	echo "<span class='evoelm_sel2_op_val evopad10-20 evodfx evofxjcsb evofxaic'><em class='evoelm_sel2_cur_v evofsn'>{$selected_text}</em><i class='evoelm_sel2_hide fa fa-chevron-up evocurp evohoop7'></i></span>";
+
+				    	echo "<div class='evopad5 evobordert evoborderb'>";
+				    	echo "<input type='search' class='evoelm_sel2_search evomar0i evopad0-10' name='{$id}_s' value='' placeholder='". __('Type to search...','eventon')."' style='width:100%' />";
+					    echo "</div>";
+
+					    echo "<div class='evoelm_sel2_opt_list_in evobgcw'>";
+					    if (is_array($options)) {
+					        foreach ($options as $option => $option_val) {
+					            $is_selected = ($option == $selected_key) ? ' selected' : '';
+					            echo "<span class='evoelm_sel2_opt{$is_selected} evofz14 evocurp evodb evopad10 evobordert' data-value='{$option}'>{$option_val}</span>";
+					        }
+					    }
+					     echo "</div>";
+
+				    echo "</div>";
+			    echo "</div>";
+
+			    echo "</div>";
+
+
+			    // Legend under the field
+			    if (!empty($legend))     echo "<i class='evodb evomart5' style='opacity:0.6'>{$legend}</i>";
+			    echo "</div>";
+
 			break;
+
+			// URL field
+			case 'url':
+				echo "<div class='evo_elm_row evoelm_url {$id} {$row_class}' style='{$row_style}'>";
+				$placeholder = (!empty($default) )? 'placeholder="'.$default.'"':null;				
+				
+				echo"<p class='evo_field_label'>".$name.$legend_code . "</p>";
+				echo "<p class='evo_field_container'>";
+					
+					echo "<span class='evodfx evogap10 evofx_ai_c'>";
+						echo "<input class='{$field_class} evofx_1' type='{$field_type}' name='{$id}'";
+
+						if( $readonly ) echo 'readonly="true"';
+						$__values = !empty($value) ? htmlspecialchars( $value , ENT_QUOTES) : '' ;
+						echo 'value="'. $__values .'"' . $placeholder."/>";
+
+						echo "<span class='evodfx evofx_dr_r evofx_ai_c'>";
+						echo $this->yesno_btn(array(
+							'id'=>$id2,
+							'var'=> $value_2,
+							'input'=> true,
+							'label'=> __('Open in new tab'),
+						));
+						echo "</span>";
+
+
+					echo "</span>";
+
+					if(!empty($description)) echo "<em>". $description ."</em>";
+
+				echo "</p></div>";
+			break;
+			
 
 			// YES NO
 			case 'yesno':						
 				if(empty( $value) ) $value = 'no';
-				echo "<p class='evo_elm_row yesno_row ". esc_attr( $id )." ". esc_attr( $row_class )."' style='". esc_attr( $row_style )."'>";
-
-				$this->print_yesno_btn(array(
-					'id'=> 		esc_attr( $id ),
-					'var'=> 	esc_attr( $value ),
-					'afterstatement'=> esc_attr( $afterstatement ),
-					'input'=> 	true,
-					'guide'=> 	esc_html( $tooltip ),
-					'guide_position'=> esc_attr( $tooltip_position ),
-					'label'=> 	esc_html( $label ),
-				));
-
-				echo "<span class='field_name'>". esc_html( $name ) ."{$legend_code}</span>";
+				echo "<p class='evo_elm_row yesno_row {$id} {$row_class}' style='{$row_style}'>".$this->yesno_btn(array(
+						'id'=>$id,
+						'var'=> $value,
+						'afterstatement'=> $afterstatement,
+						'input'=> true,
+						'guide'=> $tooltip,
+						'guide_position'=> $tooltip_position,
+						'inputAttr'=>$inputAttr, // @s 4.5.5
+						'label'=> $label,
+					))."<span class='field_name'>". $name ."{$legend_code}</span>";
 
 					// description text for this field
 					if(!empty( $legend )){
-						echo"<i style='opacity:0.6; padding-top:8px; display:block'>". esc_html( $legend ) ."</i>";
+						echo"<i class='evoop7 evomart5 evodb'>".$legend."</i>";
 					}
 				echo'</p>';
 			break;
 			case 'yesno_btn':						
 				if(empty( $value) ) $value = 'no';
-				
-				echo "<p class='evo_elm_row yesno_row ". esc_attr( $id )." ". esc_attr( $row_class )."' style='". esc_attr( $row_style )."'>";
+				echo "<p class='evo_elm_row yesno_row {$id} {$row_class}' style='{$row_style}'>".
 
-				$this->print_yesno_btn(array(
-					'id'=>			esc_attr( $id ),
-					'var'=> 		esc_attr( $value ),
-					'afterstatement'=> esc_attr( $afterstatement ),
-					'input'=> 		true,
-					'guide'=> 		esc_html( $tooltip ), 
-					'guide_position'=> esc_attr( $tooltip_position ),
-					'label'=> 		esc_html( $label ),
-					'inputAttr'=>	esc_attr( $inputAttr ),
-					'attr'=>		esc_attr( $attr ),
+				$this->yesno_btn(array(
+					'id'=>$id,
+					'var'=> $value,
+					'afterstatement'=> $afterstatement,
+					'input'=> true,
+					'guide'=> $tooltip, 
+					'guide_position'=> $tooltip_position,
+					'label'=> $label,
+					'inputAttr'=>$inputAttr,
+					'attr'=>$attr,
 				));
 
 				echo'</p>';	
+			break;
+
+			// Block button @2.3.3
+			case 'block_button':
+				if(empty( $value) ) $value = 'no';
+				echo "<div class='evo_elm_row evoelm_blockbtn {$id} {$row_class} evocurp evo_transit_all evopad15 evobr20 ".($value=='yes'? 'on':'')."' style='{$row_style}' afterstatement='" . ( $afterstatement ?? '' ) . "' data-id='{$id}'>";
+					echo "<i class='evofz18i ".($value=='yes'? 'fa fa-circle-check':' far fa-circle')." evomarb5'></i>";
+					// icon as $value_2
+					$icon = ( !empty($value_2)) ? "<i class='evoop1i evomarr5 evoop1i fa {$value_2}'></i>": '';
+
+					echo "<p class='evo_field_label'>". $icon . $label . "</p>";
+					echo $legend_code;
+					if(!empty( $legend )){
+						echo"<i class='evoop7 evomart5 evodb'>".$legend."</i>";
+					}
+					echo "<input class='{$field_class} ' type='hidden' name='{$id}'";					
+					echo 'value="'. $value .'"/>';
+
+				echo "</div>";
+
 			break;
 
 			case 'angle_field':						
@@ -548,11 +750,12 @@ class EVO_General_Elements extends EVO_Elm_Trigs{
 						<input type='hidden' name='". esc_attr( $id )."' id='". esc_attr( $id )."' value='". esc_attr( $value )."'></p>";			
 				if( !empty($legend)) echo "<p class='description'>". esc_html( $legend ) ."</p>";
 			break;
-			case 'begin_afterstatement': 						
-				$yesno_val = (!empty($value))? $value:'no';				
-				echo"<div class='evo_elm_afterstatement ' id='". esc_attr( $id )."' style='display:".(($yesno_val=='yes')?'block':'none')."'>";
-			break;
-			case 'end_afterstatement': echo "</div>"; break;
+			// afterstatement
+				case 'begin_afterstatement': 						
+					$yesno_val = (!empty($value))? $value:'no';				
+					echo"<div class='evo_elm_afterstatement {$id}' id='{$id}' style='display:".(($yesno_val=='yes')?'block':'none')."'>";
+				break;
+				case 'end_afterstatement': echo "</div>"; break;
 		}
 
 		echo $_nesting_end;
@@ -571,6 +774,45 @@ class EVO_General_Elements extends EVO_Elm_Trigs{
 			$output .= $this->get_element( $AD);
 		}
 		return $output;
+	}
+
+	public function populate_field_values( $fields, $data){
+		foreach( $fields as $key => $value){
+
+			// field id
+				$field_id = $key;				
+				if( isset( $value['id'] )) $field_id = $value['id'];
+				if( isset( $value['var'] )) $field_id = $value['var'];
+
+			// get field value
+				$field_value = '';
+				if(empty($value['value'])){
+
+					if(!empty( $field_id ) && !empty( $data[ $field_id ] )){
+						if( !is_array($data[ $field_id ]) && !is_object($data[ $field_id ])){
+							$field_value = stripslashes(str_replace('"', "'", (esc_attr( $data[ $field_id ] )) ));
+						}	
+
+						if( is_array( $data[ $field_id ] ))	{
+							$field_value = $data[ $field_id ];
+						}				
+					}
+
+				}else{	
+					$field_value = $value['value'];	
+				}
+
+
+			$fields_processed[ $key ] = $value;
+			if( !empty($value['placeholder']) ) $fields_processed[ $key ]['default'] = $value['placeholder'];
+			if( !empty($value['legend']) ) $fields_processed[ $key ]['tooltip'] = $value['legend'];
+			if( !empty($value['var']) ) $fields_processed[ $key ]['var'] = $field_id;
+			$fields_processed[ $key ]['id'] = $field_id;
+			$fields_processed[ $key ]['value'] = $field_value;
+
+		}
+
+		return $fields_processed;
 	}
 
 	// @since 4.3.5
@@ -1000,6 +1242,28 @@ class EVO_General_Elements extends EVO_Elm_Trigs{
 				</span></span>";
 	}
 
+// EventCard Items -- @version 4.9
+	public function print_eventcard_box_header($data){
+		extract(array_merge( array(
+			'row_class'=> '',
+			'header_data_attr'=> array(),
+			'icon_key'=> '',
+			'icon_class'=> '',
+			'title'=> '',
+		), $data) );
+
+		$help = new evo_helper();
+
+		$header_data = '';
+		if( count($header_data_attr)>0 ) $header_data = $help->array_to_html_data( $header_data_attr);
+
+		echo  "<div id='evo_vendor' class='evo_metarow_vendor evorow evcal_evdata_row bordb evcal_evrow_sm".$row_class."' {$header_data}>
+					<span class='evcal_evdata_icons'><i class='fa ".get_eventON_icon( $icon_key , $icon_class  )."'></i></span>
+					<div class='evcal_evdata_cell'>";
+				echo "<h3 class='evo_h3'>". $title ."</h3>";
+
+	}
+
 // HTML for grid 
 	// @version 4.7
 	public function get_grid_content($structure){
@@ -1056,6 +1320,175 @@ class EVO_General_Elements extends EVO_Elm_Trigs{
 		
 	}
 
+// General Settings Element support - 4.6 @updated 4.7.2
+	function _get_settings_content( $data ){
+
+		ob_start();
+
+		$args = array(
+			'hidden_fields'=> array(),
+			'form_class'=>'',
+			'container_class'=>'',
+			'fields'=> array(),
+			'save_btn_data'=> array(),
+			'nonce_action'=>'eventon',// nonce field name
+			'footer_btns'=> array(
+				'save_changes'=> array(
+					'label'=> __('Save Changes','eventon'),
+					'data'=> array(),
+					'class'=> 'evo_btn evolb_trigger_save',
+					'href'=>'',
+					'target'=> ''
+				)
+			)
+		);
+
+		$args = array_merge($args, $data);
+		extract($args);
+
+		?>
+		<div class='<?php echo $container_class;?> evolb_form_out'>
+			<form class='<?php echo $form_class;?> evolb_form'>
+				<div class='evo_form_body'>
+				<?php 
+
+				// include nonce field
+				wp_nonce_field( $nonce_action, 'evo_noncename' );
+
+				if( is_array($hidden_fields) && count($hidden_fields) >0 ) $this->print_hidden_inputs( $hidden_fields);
+					
+				echo $this->process_multiple_elements( $fields );
+
+				?>
+				</div>
+				<div class='evo_form_footer'>
+				<?php
+
+					$this->_print_settings_footer_btns( $footer_btns );
+
+				?>	
+				</div>
+
+			</form>
+		</div>
+		<?php 
+		return ob_get_clean();
+	}
+	function _print_settings_footer_btns($arr){
+		$A = array_merge(array(
+			'save_changes'=> array(
+				'label'=> __('Save Changes','eventon'),
+				'data'=> array(),
+				'class'=> 'evo_btn evolb_trigger_save',
+				'href'=>'',
+				'target'=> ''
+			)
+		), $arr);
+		?>
+		<p class='evopadt20'>					
+			<?php 
+			foreach( $A as $btn):
+				if(!isset( $btn['label'] )) continue;
+				$href = isset($btn['href']) && !empty( $btn['href'] )? 'href="'. $btn['href'] .'"':'';
+				$target = isset($btn['target']) && !empty( $btn['target'] ) ? 'target="'. $btn['target'] .'"' : '';
+
+				?><a <?php echo $href; echo $target;?> class='<?php echo $btn['class'];?>' data-d='<?php echo json_encode($btn['data']);?>' style=''><?php echo $btn['label'];?></a>
+			<?php endforeach;?>
+			
+		</p>	
+		<?php 
+	}
+
+	// settings toggle with nested settings start
+	// @since 4.7 @u
+	function _print_settings_toggle_nester_start( $data){
+		extract( array_merge(array(
+			'id'=>'',
+			'value'=>'',
+			'value_yn'=> false,
+			'afterstatement'=>'',			
+			'tooltip'=>'',			
+			'label'=>'',	
+			'toggle_class'=>'',		
+		), $data) );
+		?>
+		<div class='<?php echo $toggle_class;?>'>			
+			<div class=''>
+				<?php 
+					EVO()->elements->get_element(
+						array(
+							'type'=>'yesno_btn','_echo'=> true,
+							'id'=> $id,
+							'value'=> $value, 
+							'afterstatement'=> $afterstatement,
+							'tooltip'=> $tooltip,
+							'label'=> $label,
+						)
+					);
+				?>
+			</div>
+			<div class='innersection' id='<?php echo $afterstatement;?>' style='display:<?php echo $value_yn ? 'block':'none';?>'>
+				<div class='evo_edit_field_box'>	
+		<?php 
+	}
+	function _print_settings_toggle_nester_close(){
+		?>
+		</div>
+			</div>
+		</div>
+		<?php
+	}
+
+// settings row items with edit/delete button and item data
+// @since 4.7.2
+	function row_item_ul( $extra_class = '' , $sortable = false ){
+		?>
+		<ul class='evoelm_settings_row <?php echo $extra_class;?> <?php echo $sortable ? 'evosortable':'';?>'>
+		<?php 
+	}	
+	function row_item_ul_end(){ echo "</ul>";}
+
+	function row_item_li($data){
+		extract( array_merge(array(
+			'item_id'=>'',
+			'extra_classes'=>'',
+			'name'=>'',
+			'other_data'=> array(), 'other_data_row'=> false,
+			'edit_data'=> array(),
+			'delete_data'=> array(),
+		), $data) );
+
+		echo "<li data-id='". esc_attr( $item_id ) ."' class='evodfx evofx_jc_sb evoposr ". esc_attr( $extra_classes ). ( $other_data_row ? ' od_row':null ) ."'>";
+
+		echo "<span class='evodfx evofxww evogap10'>";
+			echo "<span class='name evofw700'>" . esc_html( $name) ."</span>";
+			if( count( $other_data)> 0){
+				echo "<span class='other_data'>";
+
+				foreach( $other_data as $other_data_item ){
+					echo "<span class='evodfx evogap5'>";
+						echo "<span class=''>". $other_data_item[0]. "</span>";
+						echo "<span class='evofw700'>". $other_data_item[1]. "</span>";
+					echo "</span>";
+				}
+
+				echo "</span>";
+			}
+		echo "</span>";
+		echo "<span class='actions evodfx'>";
+
+			if( count( $edit_data)> 0){
+				echo "<i class='edit evolb_trigger fa fa-pencil' ". $this->_process_trigger_data( $edit_data , 'trig_lb','data' )."></i>";
+			}
+			if( count( $delete_data)> 0){
+				echo "<i class='delete evo_trigger_ajax_run fa fa-times' ". $this->_process_trigger_data( $delete_data , 'trig_ajax' ,'data') ."></i>";
+			}
+
+		echo "</span>";
+
+		echo "</li>";
+	}
+	
 // SVG icons
 	public function get_icon($name){
 		if( $name == 'live'){
@@ -1078,7 +1511,7 @@ class EVO_General_Elements extends EVO_Elm_Trigs{
 				$L = null;
 			}
 
-		$output = "<span class='evo_tooltip ajdeToolTip{$L} fa". ($handleClass? ' handle':'')." {$class}' data-d='{$content}' data-handle='{$handleClass}'></span>";
+		$output = "<span class='evotooltip ajdeToolTip{$L} fa". ($handleClass? ' handle':'')." {$class}' data-d='{$content}' data-handle='{$handleClass}'></span>";
 
 		if(!$echo)
 			return $output;			

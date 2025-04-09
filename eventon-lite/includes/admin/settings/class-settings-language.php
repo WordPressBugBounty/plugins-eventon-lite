@@ -1,7 +1,7 @@
 <?php
 /**
  * EventON Language Settings Processing
- * @version 2.3
+ * @version 2.4
  */
 
  class EVO_Lang_Settings{

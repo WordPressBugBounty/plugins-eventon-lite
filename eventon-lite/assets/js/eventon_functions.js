@@ -1,102 +1,97 @@
 /**
  * Javascript: EventON functions for all calendars
- * @version: 2.3
- * @fullversion 4.8
+ * @version: 2.4
  */
 (function($){
 
-	// Calendar function s
-		$.fn.evo_cal_functions = function(O){
-			el = this;
-			switch(O.return){
-				// load shortcodes inside calendar data
-				case 'load_shortcodes':
-					return el.find('.evo_cal_data').data('sc');		
-				break;
-				case 'update_shortcodes':
-					el.find('.evo_cal_data').data( 'sc', O.SC );
-				break;
+ 	// Basic
+		// Calendar function s
+			$.fn.evo_cal_functions = function(O){
+				el = this;
+				switch(O.return){
+					// load shortcodes inside calendar data
+					case 'load_shortcodes':
+						return el.find('.evo_cal_data').data('sc');		
+					break;
+					case 'update_shortcodes':
+						el.find('.evo_cal_data').data( 'sc', O.SC );
+					break;
+				}
+			};
+
+		// access page GLOBALS
+			$.fn.evo_get_global = function(opt){
+				var defaults = { S1:'', S2:''};
+				var OPT = $.extend({}, defaults, opt);
+
+				var BUS = $('#evo_global_data').data('d');
+
+				if(!(OPT.S1 in BUS)) return false;
+				if(!(OPT.S2 in BUS[OPT.S1])) return false;
+				return BUS[OPT.S1][OPT.S2];
 			}
-		};
+			$.fn.evo_get_txt = function(opt){
+				var defaults = { V:''}
+				var OPT = $.extend({}, defaults, opt);
 
-	// access page GLOBALS
-		$.fn.evo_get_global = function(opt){
-			var defaults = { S1:'', S2:''};
-			var OPT = $.extend({}, defaults, opt);
+				var BUS = $('#evo_global_data').data('d');
+				if(!('txt' in BUS)) return false;
+				if(!(OPT.V in BUS.txt)) return false;
+				return BUS.txt[OPT.V];
+			}
+			$.fn.evo_get_cal_def = function(opt){
+				var defaults = { V:''}
+				var OPT = $.extend({}, defaults, opt);
 
-			var BUS = $('#evo_global_data').data('d');
+				var BUS = $('#evo_global_data').data('d');
+				if(!('cal_def' in BUS)) return false;
+				if(!(OPT.V in BUS.cal_def)) return false;
+				return BUS.cal_def[OPT.V];
+			}
 
-			if(!(OPT.S1 in BUS)) return false;
-			if(!(OPT.S2 in BUS[OPT.S1])) return false;
-			return BUS[OPT.S1][OPT.S2];
-		}
-		$.fn.evo_get_txt = function(opt){
-			var defaults = { V:''}
-			var OPT = $.extend({}, defaults, opt);
+			// return dms translates values from global data
+			// added 4.0
+			$.fn.evo_get_dms_vals = function(opt){
+				// type = d, d1,d3, m, m3
+				// V = 0-x
+				var defaults = { type:'d', V:''}
+				var OPT = $.extend({}, defaults, opt);
 
-			var BUS = $('#evo_global_data').data('d');
-			if(!('txt' in BUS)) return false;
-			if(!(OPT.V in BUS.txt)) return false;
-			return BUS.txt[OPT.V];
-		}
-		$.fn.evo_get_cal_def = function(opt){
-			var defaults = { V:''}
-			var OPT = $.extend({}, defaults, opt);
+				var BUS = $('#evo_global_data').data('d');			
+				if(!('dms' in BUS)) return false;
+				if(!(OPT.type in BUS.dms)) return false;
 
-			var BUS = $('#evo_global_data').data('d');
-			if(!('cal_def' in BUS)) return false;
-			if(!(OPT.V in BUS.cal_def)) return false;
-			return BUS.cal_def[OPT.V];
-		}
+				return BUS.dms[ OPT.type ][ OPT.V ];
+				
+			}
 
-		// return dms translates values from global data
-		// added 4.0
-		$.fn.evo_get_dms_vals = function(opt){
-			// type = d, d1,d3, m, m3
-			// V = 0-x
-			var defaults = { type:'d', V:''}
-			var OPT = $.extend({}, defaults, opt);
-
-			var BUS = $('#evo_global_data').data('d');			
-			if(!('dms' in BUS)) return false;
-			if(!(OPT.type in BUS.dms)) return false;
-
-			return BUS.dms[ OPT.type ][ OPT.V ];
-			
-		}
-
-	// GENERAL AJAX ACCESS @4.7.2
+	// GENERAL AJAX ACCESS @4.9.2
 		$.fn.evo_admin_get_ajax = function(opt){
 
-			var el = $(this);
+			var el = this,
+		        OO = this.evo_process_ajax_params(opt),
+		        LB = OO.lbdata.class ? $('body').find('.evo_lightbox.' + OO.lbdata.class) : false,
+		        ajax_url = el.evo_get_ajax_url({a: OO.adata.a, e: OO.adata.end, type: OO.adata.ajax_type});
 
-  			var OO = this.evo_process_ajax_params( opt );
-
-  			var _lbdata = OO.lbdata;
-			var _adata = OO.adata;	
-			var _populate_id = OO._populate_id;	
-
-			//console.log( OO );
-
-			var ajax_url = el.evo_get_ajax_url({a: _adata.a, e: _adata.end, type: _adata.ajax_type});
-
-			// for lightbox
-				var LB = false;
-	  			if( _lbdata.class != '') LB = $('body').find('.evo_lightbox.'+ _lbdata.class );
-
-	  		//console.log( OO );
 
 	  		// Run AJAX
   			$.ajax({
 				beforeSend: function(){
+					if (opt.onBefore) opt.onBefore.call(el, OO, LB);
 					el.evo_perform_ajax_run_loader( OO, LB, 'start'  );
 				},
-				type: 'POST', url: ajax_url, data: _adata.data,	dataType:'json',
+				type: 'POST', url: ajax_url, data: OO.adata.data,	dataType:'json',
 				success:function(data){	
-
-					el.evo_perform_ajax_success( OO, data, LB );
+					
+					if (opt.onSuccess || opt.success) {
+		                (opt.onSuccess || opt.success).call(el, data, OO, LB);
+		            } else {
+		                el.evo_perform_ajax_success(OO, data, LB);
+		                if (opt.successExtra) opt.successExtra.call(el, OO, data, LB);
+		            }					
 
 				},complete:function(){
+					if (opt.onComplete) opt.onComplete.call(el, OO, data, LB);
 					el.evo_perform_ajax_run_loader( OO, LB, 'end'  );
 					
 				}
@@ -104,18 +99,37 @@
 		}
 
 		// submit forms via ligtbox
-		// @since 4.2.2		@updated 4.7.2
-		$.fn.evo_ajax_lightbox_form_submit = function(opt){
+		// @since 4.2.2		@updated 4.9.2
+		$.fn.evo_ajax_lightbox_form_submit = function(opt , formObj ){
 			
   			const el = this;
 
   			var OO = this.evo_process_ajax_params( opt );
 
+  			console.log(OO);
+
   			var _lbdata = OO.lbdata;
 			var _adata = OO.adata;	
 			var _populate_id = OO._populate_id;	
   			
-  			const form = this.closest('form');
+  			var form = this.closest('form');
+  			if( formObj !== undefined ) form = formObj;
+
+  			// form required fields validation - @4.9
+			if( el.hasClass('validate')){
+
+				var hasError = false;
+
+				$('body').trigger('evo_elm_form_presubmit_validation', [form, function(isValid) {
+				    hasError =  isValid ? false: true;
+				}]);
+
+			    if( hasError){
+			    	LB = el.closest('.evo_lightbox');
+			    	LB.evo_lightbox_show_msg({message:'Required fields missing'});
+			    	return;
+			    }	
+			}
 
   			// for lightbox
 				var LB = false;
@@ -125,21 +139,25 @@
   			if( LB) LB.evo_lightbox_hide_msg();
 
   			var ajax_url = el.evo_get_ajax_url({a: _adata.a, e: _adata.end, type: _adata.ajax_type});
+
+  			// Add passed on data from ajax object @4.8.2
+			var extra_ajax_data = ('data' in _adata ) ? _adata.data : null;
 	  			
   			// Submit form
-			form.ajaxSubmit({
-				beforeSubmit: function(opt, xhr){
-					el.evo_perform_ajax_run_loader( OO, LB, 'start'  );
-				},
-				dataType: 	'json',	
-				url: ajax_url,	type: 	'POST',
-				success:function(data){
-					el.evo_perform_ajax_success( OO, data, LB );
-				},
-				complete:function(){	
-					el.evo_perform_ajax_run_loader( OO, LB, 'end'  );
-				}
-			});
+				form.ajaxSubmit({
+					beforeSubmit: function(opt, xhr){
+						el.evo_perform_ajax_run_loader( OO, LB, 'start'  );
+					},
+					dataType: 	'json',	
+					url: ajax_url,	type: 	'POST',
+					data: extra_ajax_data,
+					success:function(data){
+						el.evo_perform_ajax_success( OO, data, LB );
+					},
+					complete:function(){	
+						el.evo_perform_ajax_run_loader( OO, LB, 'end'  );
+					}
+				});
 		}
 
 	// perform ajax functions / type = start/end
@@ -148,30 +166,44 @@
 			var _lbdata = OO.lbdata;
 			var _adata = OO.adata;	
 
+			//console.log(OO);
+
 			var customer_loader_elm = false;
+			var loader_btn_el = false;
+
   			if( _adata.loader_el !='')	customer_loader_elm = _adata.loader_el;
   			if( 'loader_class' in _adata && _adata.loader_class != '') 
   				customer_loader_elm = $('.' + _adata.loader_class);
+  			if( _adata.loader_btn_el != '' && _adata.loader_btn_el !== undefined ) loader_btn_el = el;
   			
   			var LB_loader = false;
   			if( LB && 'loader' in _lbdata && _lbdata.loader ) LB_loader = true;
 
   			if( type == 'start'){
-  				$('body').trigger('evo_ajax_beforesend_' + OO.uid ,[ OO, el ]);
+
+  				var trigger_id = ( 'uid' in OO && OO.uid != '' ) ? OO.uid : OO.ajax_action; // @4.8
+  				$('body').trigger('evo_ajax_beforesend_' + trigger_id ,[ OO, el ]);
 
 				if( LB_loader ){
 					LB.find('.ajde_popup_text').addClass( 'evoloading loading'); // legacy
 					LB.evo_lightbox_start_inloading();
 				}
 				if( customer_loader_elm ) $( customer_loader_elm ).addClass('evoloading loading');
+				if( loader_btn_el ) el.addClass('evobtn_loader'); // loader on button
   			}else{
-  				$('body').trigger('evo_ajax_complete_' + OO.uid ,[ OO , el ]);
+
+  				var trigger_id = ( 'uid' in OO && OO.uid != '' ) ? OO.uid : OO.ajax_action; // @4.8
+
+  				$('body').trigger('evo_ajax_complete_' + trigger_id ,[ OO , el ]);
 			
 				if( LB_loader ){
 					LB.find('.ajde_popup_text').removeClass( 'evoloading loading');
 					LB.evo_lightbox_stop_inloading();	
 				}
 				if( customer_loader_elm ) $( customer_loader_elm ).removeClass('evoloading loading');
+				if( loader_btn_el ) el.removeClass('evobtn_loader'); // loader on button
+
+				
   			}
 
 			return {
@@ -183,26 +215,49 @@
 		$.fn.evo_perform_ajax_success = function ( OO, data, LB ){
 			var el = this;
 			var _lbdata = OO.lbdata;
-			var _populate_id = OO._populate_id;	
+			var _adata = OO.adata;	
+			var _populate_id = OO._populate_id;		
 
-			//console.log( OO);
+			if( !data || data === undefined ) return;	
+
+			// if json is passing data object @4.9
+			var _success = ('success' in data) ? data.success : (data.status === 'good');
+
+			var extractedContent = 'content' in data ? data.content: '';
+			if( 'data' in data && 'content' in data.data) extractedContent = data.data.content;
+			var extractedData = ('data' in data) ? data.data : data;
+			extractedData['content'] = extractedContent;
+
+			// Ensure extractedData is an object for property checks; if it’s a string, wrap it
+		    if (typeof extractedData !== 'object' || extractedData === null) {
+		        extractedData = { msg: extractedData }; // Convert string to object
+		    }
+
+		    // Assign success and status to the extracted data
+		    extractedData.success = _success;
+		    extractedData.status = ('status' in extractedData) ? extractedData.status : (_success ? 'good' : 'bad');
+
+		    // Replace original data with processed data
+		    data = extractedData;
 
 			// if inside lightbox
-			if( LB ){
+			if( LB.length > 0 ){
 				// show message
-					if( data && 'msg' in data && data.msg != '' ){
-						LB.evo_lightbox_show_msg({'type': data.status, 
+					if (data && typeof data === 'object' && !Array.isArray(data) && 'msg' in data && data.msg !== '') {
+						LB.evo_lightbox_show_msg({
+							'type': ( _success ? 'good':'bad'), 
 							'message':data.msg, 
-							hide_lightbox: ( data.status == 'bad' ? false : _lbdata.hide ),	
+							hide_lightbox: (  _success ? _lbdata.hide : false ),	
 							hide_message: _lbdata.hide_msg
 						});
 					}	
 
 				// populate lightbox
 				if( data && _lbdata.new_content && 'content' in data && data.content != '' ){
+
 					// populate a specific dom element with content
 					if( _populate_id ){
-						$('body').find('#'+_populate_id ).replaceWith( data.content );
+						$('body').find('#'+_populate_id ).replaceWith( data.content );					
 					}else{
 						LB.evo_lightbox_populate_content({content: data.content});
 					}
@@ -214,6 +269,10 @@
 					$('body').find('#'+_populate_id ).html( data.content );
 				}						
 			}
+
+			// Show snackbar message
+				if( 'show_snackbar' in  _adata && ('msg' in data)  && data.msg != '' ) 
+					el.evo_snackbar({message: data.msg});
 
 			// populate content with matching DOM class names, will set new html @4.7.2
 				if( 'populate_dom_classes' in data){
@@ -307,6 +366,7 @@
 				var processed = {};
 				processed['uid'] = OO.uid;
 
+
 			// Ajax	
 				var _adata = ( OO.adata == '') ? {}: OO.adata;
 
@@ -326,13 +386,14 @@
 					'end':'admin',
 					'data': '',
 					'loader_el':'',
+					'loader_btn_el':'',//4.8
 					'loader_class':'',
 					'url':'',
 				}
 				
 				// set default values
 				$.each( def_avals, function(key, value) {					
-					if( key == 'data' && ('data' in _adata ) && 'a' in _adata.data ) return;
+					if( key == 'data' && !( 'a' in _adata ) && ('data' in _adata ) && 'a' in _adata.data ) return;
 					if( !(key in _adata ) && value != '' ) _adata[ key ] = value;
 				});	
 
@@ -356,6 +417,8 @@
 					}  
 				});	
 
+				if( _adata.data === undefined ) _adata.data = {};
+
 				//console.log( _adata );			
 
 				// Move additional values in _adata to _adata.data
@@ -368,7 +431,7 @@
 
 				if( 'data' in _adata ){
 					//_adata['data']['nn'] = ( _adata.end == 'client' ) ? evo_general_params.n : evo_admin_ajax_handle.postnonce; 
-					
+										
 					_adata['data']['nn'] = (typeof evo_admin_ajax_handle !== 'undefined' && evo_admin_ajax_handle !== null) 
 					    ? evo_admin_ajax_handle.postnonce 
 					    : evo_general_params.n;
@@ -443,6 +506,7 @@
 					processed['_populate_id'] =  false;
 					if( OO.load_new_content_id != '')  processed['_populate_id'] = OO.load_new_content_id;
 					if( 'new_content_id' in _lbdata && _lbdata.new_content_id != '')  processed['_populate_id'] = _lbdata.new_content_id;
+					if( 'content_id' in _lbdata && _lbdata.content_id != '') processed['_populate_id'] = _lbdata.content_id;
 
 				processed['lbdata'] = _lbdata;
 
@@ -497,7 +561,85 @@
 		});
 		
 
-		// Lightbox opening
+	// Lightbox opening
+		$.fn.evo_alert = function(opt){ // @since 4.9.2
+			var defz = { 
+		        'title': 'Confirmation Action',
+		        'message': '',
+		        'yes_text': 'Proceed',
+		        'no_text': 'No',
+		        'on_yes': function() {}, // Callback for Yes
+		        'on_no': function() {}   // Callback for No
+		    };	
+
+		    // Extend passed options with defaults
+		    var options = $.extend({}, defz, opt);
+
+		    // Create alert HTML content
+		    var alertHtml = '<div class="evo_alert_box">' +
+		        '<p class="evotal evopad10i">' + options.message + '</p>' +
+		        '<div class="evo_alert_buttons evotar">' +		            
+		            '<button class="evo_alert_no evoboxsn evobrn evooln evocurp evohoop7 evopad10-20 evobr20 evobgclt">' + options.no_text + '</button>' +
+		            '<button class="evo_alert_yes evoboxsn evobrn evooln evocurp evoHbgc1 evopad10-20 evobr20 evomarr10 evobgclp evoclw">' + options.yes_text + '</button>' +
+		        '</div></div>';
+
+		    // Define lightbox options with the alert content
+		    var lightboxOptions = {
+		        lbdata: {
+		            class: 'evo_alert_lightbox',
+		            title: options.title || 'Alert',
+		            content: alertHtml, // Set the alert HTML as the lightbox content
+		            padding: 'pad20', // Optional: Add padding class if needed
+		            size:'small',
+		        },
+		    };
+
+		    // Open the lightbox with the alert content
+		    $(this).evo_lightbox_open(lightboxOptions);
+
+		    // After the lightbox is opened, attach event handlers
+		    setTimeout(function() {
+		        var LIGHTBOX = $('.evo_lightbox.evo_alert_lightbox');
+		        
+		        LIGHTBOX.find('.evo_alert_yes').on('click', function() {
+		            options.on_yes(LIGHTBOX); // Execute Yes callback
+		            LIGHTBOX.evo_lightbox_close(); // Close the lightbox
+		            removeKeyListeners(); // Remove key listeners
+		        });
+
+		        LIGHTBOX.find('.evo_alert_no').on('click', function() {
+		            options.on_no(LIGHTBOX); // Execute No callback
+		            LIGHTBOX.evo_lightbox_close(); // Close the lightbox
+		            removeKeyListeners(); // Remove key listeners
+		        });
+
+		        // Keypress handler function
+		        function handleKeyPress(event) {
+		            if (event.key === 'Escape') { // Esc key
+		                options.on_no(LIGHTBOX); // Execute No callback
+		                LIGHTBOX.remove(); // Close the lightbox
+		                removeKeyListeners(); // Remove key listeners
+		            } else if (event.key === 'Enter') { // Enter key
+		                options.on_yes(LIGHTBOX); // Execute Yes callback
+		                LIGHTBOX.remove(); // Close the lightbox
+		                removeKeyListeners(); // Remove key listeners
+		            }
+		        }
+
+		        // Add keypress listener
+		        $(document).on('keydown', handleKeyPress);
+
+		        // Function to remove key listeners
+		        function removeKeyListeners() {
+		            $(document).off('keydown', handleKeyPress);
+		        }
+
+		        // Ensure key listeners are removed when lightbox is closed manually (e.g., via close button)
+		        LIGHTBOX.find('.evolb_close_btn').on('click', function() {
+		            removeKeyListeners();
+		        });
+		    }, 350); // Delay to ensure lightbox is fully rendered
+		}
 		$.fn.evo_lightbox_open = function (opt ){
 
 			var OO = this.evo_process_ajax_params( opt );
@@ -535,18 +677,16 @@
 
 				// show loading animation
 				LIGHTBOX.evo_lightbox_show_open_animation(OO);
-				
-			// Load content locally from DOM
-				// dynamic content within the site
-					if(_lbdata.content_id != ''){					
-						var content = $('#'+ _lbdata.content_id ).html();					
-						LIGHTBOX.find('.evolb_content').html( content);
-					}
-				// load passed on content
-					if(_lbdata.content != ''){
-						LIGHTBOX.find('.evolb_content').html( _lbdata.content);
-					}
 
+
+			// Load content locally from DOM
+			    if (_lbdata.content_id != '') {
+			        var content = $('#' + _lbdata.content_id).html();
+			        LIGHTBOX.find('.evolb_content').html(content);
+			    }
+			    if (_lbdata.content != '') {
+			        LIGHTBOX.find('.evolb_content').html(_lbdata.content);
+			    }
 
 			// run ajax to load content for the lightbox inside
 				if( 'a' in _adata  && _adata.a != ''){ // @4.7.2
@@ -567,38 +707,25 @@
 			$('body').trigger('evo_lightbox_processed', [ OO, LIGHTBOX]);
 		}
 
-		$.fn.evo_lightbox_close = function (opt){
-			var LB = this;
-			var defaults = { 
-				'delay':500, 
-				'remove_from_dom':true,
-			};
+		$.fn.evo_lightbox_close = function(opt) {
+		    if (!this.hasClass('show')) return;
 
-			if( !(LB.hasClass('show')) ) return;
+		    const defaults = { delay: 500, remove_from_dom: true };
+		    const OO = $.extend({}, defaults, opt);
+		    const hideDelay = parseInt(OO.delay);
+		    const completeClose = this.parent().find('.evo_lightbox.show').length === 1;
 
-			var OO = $.extend({}, defaults, opt);
+		    // Remove 'show' class with delay if needed
+		    hideDelay > 500 ? setTimeout(() => this.removeClass('show'), hideDelay - 500) : this.removeClass('show');
 
-			var hide_delay = parseInt( OO.delay);
-
-			complete_close = (LB.parent().find('.evo_lightbox.show').length == 1)? true: false;
-
-			if( hide_delay > 500){
-				setTimeout( function(){ 
-					LB.removeClass('show');
-				}, ( hide_delay - 500  ) );
-			}else{
-				LB.removeClass('show');
-			}
-			
-			setTimeout( function(){ 
-				if(complete_close){
-					$('body').removeClass('evo_overflow');
-					$('html').removeClass('evo_overflow');
-				}
-				// remove lightbox HTML from DOM
-				if( OO.remove_from_dom) LB.remove();
-			}, hide_delay);	
-		}
+		    // Final cleanup after delay
+		    setTimeout(() => {
+		        if (completeClose) {
+		            $('body, html').removeClass('evo_overflow');
+		        }
+		        if (OO.remove_from_dom) this.remove();
+		    }, hideDelay);
+		};
 
 
 		// Other LB functions
@@ -1028,15 +1155,52 @@
 				'ux_val': ELM.find('.evcal_list_a').data('ux_val'),
 				'event_title': _event_title,
 				'hex_color': ELM.data('colr'),
-				'hide_et': ELM.hasClass('no_et') ? 'y':'n',
+				'hide_et': ELM.hasClass('no_et') ? 'y':'n', // hide endtime
 				'evcal_event_color': ELM.data('colr'),
 				'unix_start': parseInt(time[0]),// @4.5.7
 				'unix_end': parseInt(time[1]),// @4.5.7
 			};
 
+			// event type
+			RR['ett1'] = {};
+			ELM.find('.evoet_eventtypes.ett1 .evoetet_val').each(function(){
+				RR['ett1'][ $(this).data('id')] = $(this).data('v');
+			});
+
+			// since 4.3.5
+			const eventtop_data = ELM.find('.evoet_data').data('d');
+
+			// location
+			if(eventtop_data && 'loc.n' in eventtop_data && eventtop_data['loc.n'] != ''){
+				RR['location'] = eventtop_data['loc.n'];
+			}
+
+			// organizer
+			if(eventtop_data && 'orgs' in eventtop_data && eventtop_data.orgs !== undefined ){
+				var org_names = '';
+				$.each(eventtop_data.orgs, function(index, value){
+					org_names += value +' ';
+				});
+				RR['organizer'] = org_names;
+			}
+
+			// event image
+			if( ELM.find('.evo_event_schema').length > 0){
+				imgObj = ELM.find('.evo_event_schema').find('meta[itemprop=image]').attr('content');
+				RR['image_url'] = imgObj;
+			}
+
+			// event tags @s 4.5.2
+			if( eventtop_data && 'tags' in eventtop_data && eventtop_data.tags !== undefined ){
+				//console.log(eventtop_data.tags);
+				RR['event_tags'] = eventtop_data.tags;
+			}
+
+
 			return RR;
 
 		}
+
 
 
 	// DATE time functions @+2.8		

@@ -98,6 +98,37 @@ class EVO_Error{
 		return $log[$type];
 	}
 
+	public function _get_html_log_view(){
+		$html = '';
+		$html .= "<div style='padding:20px; font-family:courier; line-height:1.5; max-height:500px; overflow-y:auto;background-color: #5f5f5f;color: #fff;border-radius:10px;'>";
+			$log = EVO_Error()->get_log('general');
+
+			if($log){
+				$log = array_filter($log);
+
+				if(sizeof($log)==0){ 
+					$html .= 'No Log!'; 
+				}else{
+					$html .= "<b>Data Log</b><br/><i>This data is stored in your website wp_optinos table and is not shared with anyone.</i><br/>";
+
+					$html .= "<br/><br/>";
+					foreach($log as $time=>$data){
+						$time = explode('-', $time);
+						$html .= date('Y-m-d h:i:s',$time[0]).": ". $data."<br/>";
+					}
+				}				
+			}else{
+				$html .= 'No Log!';
+			}		
+			$html .= "</div>";
+
+		return $html;
+	}
+
+	public function _flush_all_logs(){
+		$this->trash_all_logs();
+	}
+
 	public function display_log(){
 		if(isset($_REQUEST['page']) && $_REQUEST['page']=='eventon' && isset($_REQUEST['tab']) && 
 			$_REQUEST['tab']=='evcal_4' 

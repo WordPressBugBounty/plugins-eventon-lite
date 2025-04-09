@@ -1,7 +1,7 @@
 <?php
 /**
  * @theme: 		Dark
- * @updated:	Lite 1.0.1
+ * @updated:	2.4
  */
 	
 $theme = apply_filters('evo_color_theme_dark', array(
@@ -45,6 +45,7 @@ $theme = apply_filters('evo_color_theme_dark', array(
 	'evcal__fc5'=>'d9d9d9',// section titles
 	'evcal_closebtn'=>'303030',// close button
 	'evcal_closebtnx'=>'4F4E4E',// close button H
+	'evcal__ecI'=>'d9d9d9',// icon color
 
 	// repeat instance button
 	'evcal_repinst_btn'=>'4c4c4c',

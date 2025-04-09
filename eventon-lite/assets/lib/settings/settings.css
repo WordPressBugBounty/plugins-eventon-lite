@@ -1,7 +1,6 @@
 /**
  * AJDE backender styles
- * @version 2.3
- * @fullversion 4.7.4
+ * @version 2.4
  */
 
 	
@@ -21,7 +20,7 @@
 	.ajde_settings.evcal_1{padding-left: 0px;}
 	.evo_settings_header{
 		background-color: #fff;
-	    padding: 0px;
+	    padding: 65px 0 0px;
 	    margin: -20px -20px 30px;
 	    border-bottom:1px solid #e0e0e0;
 	}
@@ -175,18 +174,20 @@
 	}
 
 /* top menu*/
+	#meta_tabs{padding-top: 4px;}
 	.evo_settings_nav_in{overflow-x: auto;}
 	#evcal_settings #meta_tabs{ border-bottom: none; margin:0px; display: flex;}
 	#evcal_settings #meta_tabs a {
-		border-radius: 30px;
-	    border: 1px solid #e8e8e8;
-	    margin: 0 10px 10px 0;
-	    padding: 5px 15px;
-	    background-color: transparent;
+		background-color: transparent;
+	    border: none;
+	    margin: 0;
+	    color: var(--evo_cl_b40);
 	}
-	#evcal_settings #meta_tabs a:hover{background-color: var(--evo_color_1); color:#fff;}
+	#evcal_settings #meta_tabs a:hover{color: var(--evo_color_1)}
 	#evcal_settings #meta_tabs a.nav-tab-active{
-		background-color: #fed584; border-color: var(--evo_color_1)
+		border-color: var(--evo_color_1);
+	    border-bottom: 4px solid var(--evo_color_second);
+	    color: var(--evo_color_1);
 	}
 
 /* save settings */
@@ -257,22 +258,18 @@
 	    min-height: 900px;border-radius: 15px;
 	}
 
-
 /* subsection */
 	.evo_settings_subsection .evo_in{
-		background-color: #ececec;
-	    padding: 20px;
-	    border-radius: 10px;
+		padding: 20px;
+	    border-radius: 15px;
 	    margin: 0 -10px 10px;
+	    border: 1px solid var(--evo_border_c);
 	}
 	.evo_settings_subsection h4{margin-bottom: 10px;}
 	.evo_settings_subsection em.hr_line{border-color: #d8d5d5;}
 	.evo_settings_subsection p.acus_line.acus_radio{    padding-bottom: 10px; margin-bottom: 10px;}
-	#ajde_customization .evo_settings_subsection .ajdebe_dropdown, 
-	.customization_right_in .evo_settings_subsection .nfe_f_width input, 
-	.customization_right_in .evo_settings_subsection .nfe_f_width textarea{
-		background-color: #fbfbfb
-	}
+	
+	.evo_settings_subsection em.hr_line:last-child{display: none;}
 	.evo_settings_subsection .backender_yn_sec{background-color: transparent;}
 
 /* checkmark styles */

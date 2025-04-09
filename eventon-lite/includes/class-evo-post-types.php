@@ -7,7 +7,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
  * Registers post types and taxonomies
  *
  * @class 		EVO_post_types
- * @version		2.2.18
+ * @version		2.4
  * @package		Eventon/Classes/events
  * @category	Class
  * @author 		AJDE
@@ -101,11 +101,12 @@ class EVO_post_types{
 			$event_type_names = evo_get_ettNames($evOpt);
 
 			// for each activated event type category
-			for($x=1; $x<=evo_get_ett_count($evOpt); $x++){
-				$ab = ($x==1)? '':'_'.$x;
-				$ab2 = ($x==1)? '':'-'.$x;
-				$evt_name = $event_type_names[$x];
+			foreach( eventon_get_valid_ett() as $key=>$nn){
+				$ab = ($key==1)? '':'_'.$key;
+				$ab2 = ($key==1)? '':'-'.$key;
+				$evt_name = $event_type_names[$key];
 
+				
 				register_taxonomy( 'event_type'.$ab, 
 					apply_filters( 'eventon_taxonomy_objects_event_type'.$ab, array('ajde_events') ),
 					apply_filters( 'eventon_taxonomy_args_event_type'.$ab, array(

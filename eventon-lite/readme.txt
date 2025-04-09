@@ -4,8 +4,8 @@ Plugin Name: EventON Lite
 Author URI: http://ashanjay.com/
 Tags: calendar, event calendar, virtual events, events, event management
 Requires at least: 6.0
-Tested up to: 6.7.1
-Stable tag: 2.3.2
+Tested up to: 6.7.2
+Stable tag: 2.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -236,6 +236,33 @@ Yes, EventON Lite supports different timezones for each event. You can even disp
 For support with the Lite version, visit [support forum here](https://wordpress.org/support/plugin/eventon-lite/). For premium support or queries related to the Full version, please contact us through [our helpdesk](https://helpdesk.ashanjay.com).
 
 == Changelog ==
+= 2.4 (2025-4-9) = 
+ADDED: Filter admin events by event status
+ADDED: object cache for event list - option in settings
+ADDED: Advance settings to enable debug mode
+ADDED: Saving eventon settings via ajax
+ADDED: Support for separate custom date and time format in settings
+ADDED: Event description content HTML validity check
+ADDED: Diagnose settings
+ADDED: Enable google map generation for events by default
+ADDED: Use openstreetmaps API for cordinates generation
+FIXED: custom repeats not adding correct for certain date formats
+FIXED: ICS add to calendar DST time incorrectness
+FIXED: missing repeating events text string from translations
+FIXED: event end time not in correct timezone
+FIXED: input text fields with space showing &nbsp;
+FIXED: Event type categories not showing when previous types are disabled
+FIXED: custom time format \ not working
+FIXED: quick edit saving event time not working
+FIXED: Eventtop text color styles settings not reflecting on event
+FIXED: eventtop custom colors not working
+FIXED: default sorting by date not showing in dropdown menu
+FIXED: ICS download incorrect time 
+FIXED: Color selector circle tooltip not working
+FIXED: fixed_month as 08 not working
+UPDATED: Admin UI
+UPDATED: Settings to save via AJAX
+
 = 2.3.2 (2025-1-25) = 
 FIXED: event lists with tiles not showing in row
 FIXED: capitalized month name in eventcard

@@ -127,9 +127,6 @@ class evo_admin {
 		// when an addon is updated or installed - since 2.5
 			add_action('evo_addon_version_change', array($this, 'update_addon_styles'), 10);
 
-		// Deactivate single events addon
-			deactivate_plugins('eventon-single-event/eventon-single-event.php');
-			deactivate_plugins('eventon-search/eventon-search.php');
 	}
 	
 // admin menus
@@ -190,7 +187,6 @@ class evo_admin {
 		function eventon_settings_page() {
 			include_once(  AJDE_EVCAL_PATH.'/includes/admin/settings/class-settings.php' );
 			
-			include_once(  AJDE_EVCAL_PATH.'/includes/admin/settings/eventon-admin-settings.php' );
 			include_once(  AJDE_EVCAL_PATH.'/includes/admin/settings/class-settings-appearance.php' );
 			include_once(  AJDE_EVCAL_PATH.'/includes/admin/settings/class-settings-scripts.php' );
 

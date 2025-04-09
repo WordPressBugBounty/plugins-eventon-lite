@@ -1,7 +1,6 @@
 /**
  * EventON Elements CSS 
- * @version 2.3
- * @fullversion4.7.4
+ * @version 2.4
  */
 
 :root{
@@ -13,20 +12,34 @@
         border-radius: 8px;
         background-color: #e5e5e5; width:100%;
     }
-    .evo_elm_afterstatement .evo_elm_row p.evo_field_container input,
-    .evo_elm_afterstatement .evo_elm_row p.evo_field_container textarea{background-color:rgb(255 255 255 / 60%) }
-    .evo_elm_row p.evo_field_container input:focus{
-        box-shadow: 0px 0px 10px 0px #dadada;
-        background-color: #fff;
+    .evo_elm_row p.evo_field_container input::placeholder,
+    .evo_elm_row p.evo_field_container textarea::placeholder {
+        color: #8e8e8e;
     }
+    .evo_elm_afterstatement .evo_elm_row p.evo_field_container input,
+    .evo_elm_afterstatement .evo_elm_row p.evo_field_container textarea{
+        background-color:rgb(255 255 255 / 60%) }    
     .evo_elm_row{display: block;width: 100%;box-sizing: border-box;}
     .evo_elm_row.evodfx{display: flex;}
     .evo_elm_row p.evo_field_label, .evo_elm_row p.evo_field_container{margin:0;}
-    .evo_elm_row p.evo_field_label{margin-bottom: 5px; padding-bottom: 0; font-size: 14px;position: relative;}
+    .evo_elm_row p.evo_field_label{margin-bottom: 5px; padding-bottom: 0; font-size: 14px;position: relative;width:auto;}
     .evo_elm_row p.evo_field_container{margin-bottom: 10px;padding:0;}
     .evo_nesting{
         display: flex; gap: 15px;
     }
+    /* form real time errors  4.9 */
+    .evo_lightbox .evolb_content .evo_elm_row input:focus,
+    .evo_lightbox .evolb_content .evo_elm_row textarea:focus{
+        outline: none;
+        box-shadow: 0px 0px 0px 2px #0000009c;
+        background-color: #fff;
+    }
+    .evo_lightbox .evolb_content .evo_elm_row input.input.err,
+    .evo_lightbox .evolb_content .evo_elm_row textarea.input.err{
+        box-shadow: 0px 0px 0px 2px #ffa1a1;
+    }
+    .evo_lightbox .evolb_content .evoelm_field_errmsg{color:#ff6464;}
+
 /* interactive wysiwyg row */
     .evo_elm_row.trumbowyg p.evo_field_container{margin-bottom: 1px;}
     .evo_elm_row.trumbowyg{padding-bottom: 10px;}
@@ -37,8 +50,9 @@
     .evo_elm_row.trumbowyg .evo_field_preview,.evo_elm_row.trumbowyg .evo_elm_act_on{
         cursor: pointer;
         background-color: #e8e8e8;
-        padding: 8px 15px;
+        padding: 10px 15px;
     }
+    .evo_elm_row.trumbowyg .trumbowyg-editor ul{ list-style: disc;margin-left: 15px;}
 
 /* detailed button 4.7 */
     .evo_elm_button{
@@ -86,6 +100,19 @@
     .evo_elm_button:hover .evo_btn_vis
     {color: var(--evo_color_prime);}
 
+/* custom select 2 */ 
+    .evoelm_sel2_opt_list {  
+        z-index: 1000;max-height: 300px;
+        box-shadow: 0px 0px 10px -5px;
+    }
+    .evoelm_sel2_opt_list input{
+        width: calc(100% - 2px);
+        border: none;  box-sizing: border-box;    margin: 0 1px;
+    }
+    .evoelm_sel2_opt_list_in{ overflow-y: scroll;}
+    .evoelm_sel2_opt:hover { background: #f0f0f0; }
+    .evoelm_sel2_opt.selected { background: #e0e0e0; font-weight: bold;}
+
 /* editable select row value */
     .evo_edittable_sel_val , .evomb_body p.evo_edittable_sel_val{
         border-radius: 30px; padding: 5px 10px 5px 20px;
@@ -112,42 +139,8 @@
     .evo_edittable_sel_val i.fa-cross,.evo_edittable_sel_val i.fa-times{}
     .evo_edittable_sel_val i.fa-pencil{}
 
-/* multiple images */  
-    .evo_metafield_images span.evo_img{
-        background-color: #c3c3c3;
-        height: 100px;
-        display: inline-block;
-        width: 100px;
-        border-radius: 15px;
-        margin: 0 5px 5px 0;
-        border: 2px dashed #333;
-        cursor: pointer; position: relative;
-        background-size: cover;
-        background-position: center;
-    }
-    .evo_metafield_images span.evo_img:hover{opacity: 0.7}
-    .evo_metafield_images span.evo_img:before{
-        content:"\2b";
-            font-family: 'evo_FontAwesome','evo_FontAwesomeB';
-        font-weight: 400;
-            -webkit-font-smoothing: antialiased;
-        display: var(--fa-display, inline-block);
-        font-style: normal;
-        font-variant: normal;
-        line-height: 1;
-        text-rendering: auto; border-radius: 20px;
-        height: 30px; width: 30px; position: absolute; top: calc(50% - 15px);left: calc(50% - 15px);
-        display: flex;justify-content: center;align-items: center;
-    }
-    .evo_metafield_images span.evo_img.on{border:2px solid var(--evo_color_1);}
-    .evo_metafield_images span.evo_img.on:before{
-        content:"\2b"; transform: rotate(45deg);
-        background-color: var(--evo_color_second);
-    }
-    .evo_metafield_images span.evo_img.on:hover:before{ transform: scale(1.2) rotate(45deg);}
-    .evo_metafield_images span.evo_img_trig{}
 
-/* single image */
+/* Image Selection */
     .evo_metafield_image{}
     .evo_metafield_image span.image_src{
         height: 50px; width: 200px;
@@ -163,6 +156,41 @@
     .evo_metafield_image.has_img .image_src .evoel_img_remove_trig{display: flex; 
         left:calc(50% - 25px); top:calc(50% - 25px); height: 30px; width: 30px;}
     .evo_metafield_image.has_img .image_src:before{}
+
+    /* multiple images */  
+    .evo_metafield_image.multi span.evo_img{
+        background-color: #c3c3c3;
+        height: 100px;
+        display: inline-block;
+        width: 100px;
+        border-radius: 15px;
+        margin: 0 5px 5px 0;
+        border: 2px dashed #333;
+        cursor: pointer; position: relative;
+        background-size: cover;
+        background-position: center;
+    }
+    .evo_metafield_image.multi span.evo_img:hover{opacity: 0.7}
+    .evo_metafield_image.multi span.evo_img:before{
+        content:"\2b";
+            font-family: 'evo_FontAwesome','evo_FontAwesomeB';
+        font-weight: 400;
+            -webkit-font-smoothing: antialiased;
+        display: var(--fa-display, inline-block);
+        font-style: normal;
+        font-variant: normal;
+        line-height: 1;
+        text-rendering: auto; border-radius: 20px;
+        height: 30px; width: 30px; position: absolute; top: calc(50% - 15px);left: calc(50% - 15px);
+        display: flex;justify-content: center;align-items: center;
+    }
+    .evo_metafield_image.multi span.evo_img.on{border:2px solid var(--evo_color_1);}
+    .evo_metafield_image.multi span.evo_img.on:before{
+        content:"\2b"; transform: rotate(45deg);
+        background-color: var(--evo_color_second);
+    }
+    .evo_metafield_image.multi span.evo_img.on:hover:before{ transform: scale(1.2) rotate(45deg);}
+    .evo_metafield_image.multi span.evo_img_trig{}
 
 /* yes no button */
     .ajde_yn_btn {
@@ -229,30 +257,21 @@
         transition: all .2s ease;
     }
     .yesno_row span.field_name, .yesno_row label, .yesno_leg_line label
-    { padding-left:10px; line-height: 1.8;     }
+    { padding-left:10px; line-height: 1.8;font-size:14px;     }
     .evo_lightbox .yesno_row span.field_name{padding-left: 10px;}
     .evo_inside .yesno_row span.field_name{pointer-events:auto;}
     .yesno_row .ajde_yn_btn { padding: 0;flex: 0 0 auto;}
 
 /* date picker @4.7.4 */
     .evo-datepicker.ui-datepicker.ui-widget{ 
-        border-radius: 15px !important;
-        padding: 5px;
-        border: none;
-        overflow: hidden;
-        box-shadow: 0px 5px 12px -5px #333;
-        background-color: #fff;
+        border-radius: 15px !important; padding: 5px;border: none;
+        overflow: hidden;box-shadow: 0px 5px 12px -5px #333;background-color: #fff;
     }
     .evo-datepicker .ui-widget-header{background: transparent;border:none;}
     .evo-datepicker .ui-datepicker-calendar .ui-state-default{
-        background: transparent;
-        border: none;
-        text-align: center;
-        border-radius: 5px;
-        padding: 6px 2px;
-        line-height: 1.5;
-        transition: 0.3s;
-        color:var(--evo_color_2);
+        background: transparent; border: none; text-align: center;  border-radius: 5px;
+        padding: 6px 2px;line-height: 1.5;transition: 0.3s;
+        color:var(--evo_color_1);
     }
 
     .evo-datepicker.ui-datepicker .ui-datepicker-title, 
@@ -261,7 +280,6 @@
     {
         font-family: var(--evo_font_1);
     }
-
     .evo-datepicker .ui-datepicker-calendar .ui-state-default.ui-state-highlight{
         color:var(--evo_color_prime);        
     }
@@ -288,14 +306,7 @@
     .evo-datepicker.ui-datepicker .ui-datepicker-next.ui-state-hover{right:2px; top:2px;}
     .evo-datepicker.ui-datepicker .ui-datepicker-prev .ui-icon:before,
     .evo-datepicker.ui-datepicker .ui-datepicker-next .ui-icon:before{
-        content: "\f053";
-        left: 1px;top:3px;
-        position: absolute;
-        width: 16px;
-        color: #bbbbbb; 
-        /* height: 15px; */
-        text-indent: 0;
-        text-align: center;
+        content: "\f053";left: 1px;top:3px;position: absolute;width: 16px;color: #bbbbbb; text-indent: 0;text-align: center;
     }
     .evo-datepicker.ui-datepicker .ui-datepicker-next .ui-icon:before{left:-1px}
     .evo-datepicker.ui-datepicker .ui-datepicker-prev.ui-state-hover .ui-icon:before,
@@ -308,17 +319,11 @@
     .evo-datepicker.ui-datepicker .ui-datepicker-prev .ui-icon,
     .evo-datepicker.ui-datepicker .ui-datepicker-next .ui-icon
     {
-        font-family:  'evo_FontAwesome', 'evo_FontAwesomeB';
-        font-weight: 900;
-        -moz-osx-font-smoothing: grayscale;
-        -webkit-font-smoothing: antialiased;
-        font-style: normal;
-        font-variant: normal;
-        line-height: 1;
-        text-rendering: auto;
-        position: relative;
-        background: none;
-        font-size: 12px;
+        font-family:  'evo_FontAwesome', 'evo_FontAwesomeB'!important;
+        font-weight: 900;-moz-osx-font-smoothing: grayscale;-webkit-font-smoothing: antialiased;
+        font-style: normal;font-variant: normal; line-height: 1;
+        text-rendering: auto; position: relative;background: none; font-size: 12px;
+        text-indent: -999999px!important;display: block!important;
     }
 
 /* angle button */
@@ -489,7 +494,10 @@
         margin-bottom: -15px;
     }
 /* plus minus */
-    .evo_plusminus_adjuster{display: flex;flex-direction: row}
+    .evoelm_plusminus.evo_elm_row{
+        gap: 10px;display: flex;align-items: center;flex-wrap: wrap;
+    } 
+    .evo_plusminus_adjuster{display: flex;flex-direction: row; position: relative;}
     .evo_plusminus_adjuster .evo_plusminus_change{
         border-radius: 50%;
         height: 30px;
@@ -501,22 +509,21 @@
         text-align: center;
         font-size: 24px;
         font-weight: normal;
-        cursor: pointer;
-        position: relative;
-        top: 0;
+        cursor: pointer; position: absolute;
+        top: 5px; left:5px;
         padding: 0;
         box-sizing: border-box;
             flex: 0 0 30px;
     }
+    .evo_plusminus_adjuster .evo_plusminus_change.plu{left: auto; right: 5px;}
     .evo_elm_row .evo_field_plusminus_container.evo_field_container{
         display: inline-block;
         background-color: #f1f1f1;
-        border-radius: 25px; padding: 5px;
+        border-radius: 25px; padding: 0px;
     } 
     .evo_plusminus_adjuster .evo_plusminus_change:hover{opacity: 0.7}
     .evo_plusminus_adjuster .evo_plusminus_change.plu{
-        background-color: #3091d4;
-        top: 1px;line-height: 28px;
+        background-color: #3091d4;line-height: 28px;
     }
     .evo_plusminus_adjuster em{
         font-style: normal;
@@ -528,32 +535,86 @@
         border: none;
         box-shadow: none;
         margin: 0!important;
-        padding: 0 10px!important;
-        height: 30px;
-        width: 70px!important;
         background-color: transparent;
         text-align: center;
+        padding: 5px 30px!important;
+        width: 130px!important;
+        height: 40px!important;
+        border-radius: 20px;
     }
 /* color picker */
     .evo_elm_color{display: block;height: 35px;width: 60px!important; border-radius: 25px; background-color: #888}
 /* Select in a row */
     p.evo_row_select {display: flex;align-items: center;}
-    p.evo_row_select span.values{background-color: #e8e8e8;display: flex;padding: 0;
-        border-radius: 20px;overflow: hidden;padding:5px;flex-wrap: wrap;}
+    p.evo_row_select span.values{background-color: #e8e8e8;display: flex;
+      overflow: hidden;padding:10px;flex-wrap: wrap;gap:5px;}
 
-    .innersection p.evo_row_select span.values{background-color: #c5c9d5}
+
+    .innersection p.evo_row_select span.values,
+    .evo_edit_field_box p.evo_row_select span.values
+    {background-color: #e3e3e3}
     
-    p.evo_row_select span span:hover{ color: #9c9c9c;}
+    p.evo_row_select span span:hover{ background-color: var(--evo_color_white);   border-radius: 20px;}
     p.evo_row_select span span.select{   background-color: var(--evo_color_1);color:#fff;border-radius: 20px}
     
     p.evo_row_select span span{padding:8px 15px;color:#636363;cursor: pointer;line-height: 1 ;    }
+    .evoelm_CSF .evoelm_csf_section{
+        transition: all 0.3s ease; opacity: 1;
+    }
+    .evoelm_CSF .csf_section[style*="display: none"] {
+        opacity: 0; height: 0; overflow: hidden;
+    }
+/* duration select @4.9.2 */
+    .evoelm_durationselect .evo_field_container{background-color: var(--evo_boxcolor_1);}
+    .evo_edit_field_box .evoelm_durationselect .evo_field_container
+    {background-color: #e3e3e3}
 
+/* block button @4.9.2*/
+    .evoelm_blockbtn{ background-color: #f0f0f0; flex:1 0 100px;   }
+    .evoelm_blockbtn.on, .evoelm_blockbtn.on:hover{ background-color: #bce9ff;}
+    .evoelm_blockbtn:hover{background-color: #e1eef4;}
+    .evoelm_blockbtn i{opacity: 0.3}
+    .evoelm_blockbtn.on i{opacity: 1}
+    .evoelm_blockbtn .evotooltip{margin:0; opacity: 0.5}
+    .evoelm_blockbtn .evotooltip:hover{opacity: 1}
+
+/* select 3 @4.9 */
+    .evoelm_sel3 .evoelm_sel3_list.show:before{
+        content:"";
+    }
+    .evoelm_sel3 .evoelm_sel3_list .evoelm_sel3_item_trig{background-color: #fff;pointer-events: all;}
+    .evoelm_sel3 .evoelm_sel3_list .evoelm_sel3_item_trig:hover{background-color: var(--evo_color_second);}
+    .evoelm_sel3 .evoelm_sel3_list.show{
+        pointer-events: none;
+        display: block; overflow: hidden;
+        top: 0px; padding-top: 42px;
+        z-index: 99999;
+        box-shadow: 0px 4px 10px -5px #333;
+        left: 0;
+    }
+    .evoelm_sel3_option_1:hover{background-color: var(--evo_color_second);}
+    .evoelm_sel3_option_1 .fa{
+        cursor: pointer;
+        color: var(--evo_color_1);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 30px;
+        width: 30px;
+        margin: 0;
+        border-radius: 40px;
+    }
+    .evoelm_sel3_option_1 .fa:hover{    background-color: var(--evo_color_1);    color: #fff;}
+    .evoelm_sel3_option_1 .evoelm_sel3_sel_trig{
+        display: flex; flex-direction: row;align-items: center; justify-content: space-between;
+    }
 /* afterstatement field */
     .evo_elm_afterstatement {
         background-color: #ddd;
-        padding: 20px 20px 15px;margin-bottom: 10px;
+        padding: 10px;margin-bottom: 10px;
         border-radius: 15px;
     }
+    .evo_elm_afterstatement .ajde_yn_btn_label{margin-bottom: 0!important}
     .evo_elm_afterstatement .evo_elm_afterstatement{background-color: #cdcdcd;}
 
 /* import/upload files */
@@ -663,6 +724,8 @@
         border-color: transparent #3a4652 transparent  transparent;
         left:auto;right:0px;
     }
+    .evotooltipfree{position: relative;}
+
     .evotooltip.free{
         color: var(--evo_color_1);
         width: auto;
@@ -676,7 +739,6 @@
         display: inline-block;
         color: #fff;
         font-size: 10px;
-        margin-top: 3px;
         background-color: var(--evo_color_1);
         padding: 3px;
         border-radius: 50%;
@@ -695,9 +757,9 @@
         margin-left:4px;
         text-align: center;
         font-style: normal;
-        position: absolute;
+        /*position: absolute;
         width: 13px;
-        height: 14px;
+        height: 14px;*/
         line-height: 110%;
         border-radius:0px;
         color:#fff;
@@ -756,6 +818,32 @@
         background-color: var(--evo_color_1);
         color: #fff;
     }
+
+/* Evo Snackbar @since 4.8 */
+    #evo_snackbar {
+        max-width: 600px;
+        margin-left: 10px;
+        background-color: #000000d9;
+        color: #fff;
+        text-align: center;
+        border-radius: 4px;
+        padding: 12px 20px;
+        position: fixed;
+        z-index: 1;
+        right: 20px;
+        bottom: 30px;
+        font-size: 13px;
+        backdrop-filter: blur(16px) saturate(180%);
+        box-shadow: 0 1px 2px #0000000d, 0 2px 3px #0000000a, 0 6px 6px #00000008, 0 8px 8px #00000005;
+        opacity: 0;
+        transform: translateY(90px);
+        transition: all 0.2s;
+        pointer-events: auto;
+    }
+
+    #evo_snackbar.show {  opacity: 1;    transform: translateY(0);    }
+    #evo_snackbar:hover{box-shadow: 0px 0px 10px 0 #333;}
+    #evo_snackbar.hide { opacity: 0; transition: opacity 0.5s;    }
 
 
 /* in event metabox */

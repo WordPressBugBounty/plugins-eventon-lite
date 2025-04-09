@@ -37,6 +37,7 @@ class EVO_Shortcodes {
 			$A['sep_month'] = 'no';
 			$A['calendar_type'] = 'default';
 
+
 			return EVO()->calendar->_get_initial_calendar($A );
 		}
 

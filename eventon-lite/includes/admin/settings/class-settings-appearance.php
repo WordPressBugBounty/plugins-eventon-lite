@@ -1,8 +1,7 @@
 <?php
 /**
  * Appearance settings for eventon
- * @version 2.3
- * @fullversion 4.8
+ * @version 2.4
  */
 
 class evoadmin_set_appearance{
@@ -197,8 +196,8 @@ class evoadmin_set_appearance{
 						array('id'=>'evo_ett_colorful_color',
 							'type'=>'dropdown',
 							'options'=> array(
-								'custom'=> __('Use custom colorful only color for eventtop text'),
-								'none'=> __('Use Default eventtop text colors'),
+								'custom'=> __('Use all text color for eventtop text from below','eventon'),
+								'none'=> __('Use Default eventtop text colors from above','eventon'),
 							),
 							'default'=> 'custom',
 							'name'=>__('Configure text color for colorful & Image eventtops','eventon'),
@@ -389,7 +388,7 @@ class evoadmin_set_appearance{
 					array('id'=>'evo_live4','type'=>'fontation','name'=>__('Coming Up Counter','eventon'),
 						'variations'=>array(
 							array('id'=>'evo_live4a', 'name'=>__('Text Color','eventon'), 'type'=>'color', 'default'=>'ffffff'),
-							array('id'=>'evo_live4b', 'name'=>__('Background Color','eventon'), 'type'=>'color', 'default'=>'a5a5a5'),
+							array('id'=>'evo_live4b', 'name'=>__('Background Color','eventon'), 'type'=>'color', 'default'=>$evo_color_2),
 						)
 					),	
 					array('id'=>'evo_live5','type'=>'fontation','name'=>__('No Current Events Section','eventon'),
@@ -408,9 +407,20 @@ class evoadmin_set_appearance{
 	function appearance_theme_selector(){			
 		ob_start();
 
-			echo  '<h4 class="acus_header">'. esc_html__('Calendar Themes','eventon').'</h4>
-			<input id="evo_cal_theme" name="evo_cal_theme" value="'.( (!empty($this->evcal_opt[1]['evo_cal_theme']))? esc_attr( $this->evcal_opt[1]['evo_cal_theme'] ) :null).'" type="hidden"/>
-			<div id="evo_theme_selection">';
+			?>
+			<div class='evodfx evofx_dr_r evofx_jc_sb evofx_ai_c'>
+				<p><?php _e('Reset appearance color settings to default values. (Save changes afterwards)','eventon');?></p>
+				<span id='resetColor' class='evo_admin_btn'><?php _e('Reset Colors to Default','eventon');?></span>
+
+			</div>
+
+			<em class='hr_line'></em>
+
+			<h4 class="acus_header"> <?php _e('Calendar Themes','eventon');?></h4>
+			<input id="evo_cal_theme" name="evo_cal_theme" value="<?php echo ( (!empty($this->evcal_opt[1]['evo_cal_theme']))? $this->evcal_opt[1]['evo_cal_theme']:null) ;?>" type="hidden"/>
+			<div id="evo_theme_selection">
+
+			<?php 
 
 			// scan for themes
 			$dir = AJDE_EVCAL_PATH.'/themes/';				

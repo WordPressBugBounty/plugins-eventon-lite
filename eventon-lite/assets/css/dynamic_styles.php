@@ -2,7 +2,7 @@
 /**
  * dynamic styles for front end
  *
- * @version		2.3
+ * @version		2.4
  * @package		eventon/Styles
  * @author 		AJDE
  */
@@ -13,6 +13,7 @@
 	
 	$preset_data = EVO()->elements->get_def_css();
 	extract($preset_data);
+
 
 	// complete styles array
 	$style_array = apply_filters('eventon_inline_styles_array', array(
@@ -56,7 +57,7 @@
 		.evo_metarow_virtual .evo_live_now_tag,
 		.evo_page_body .evo_sin_page .evosin_event_title'
 	),
-			'css'=>'font-family:$', 
+			'css'=>'font-family:$;', 
 			'type'=>'font_name',
 			'var'=>'evcal_font_fam',	
 			'default'=> $evo_font_1
@@ -206,6 +207,7 @@
 				'css'=>'border-color:#$', 'var'=>'evcal__evcbrb',	'default'=>'d5d5d5'
 			)
 		//eventtop
+
 			,array(
 				'item'=>'.eventon_events_list .eventon_list_event .evcal_list_a.featured_event',
 				'css'=>'background-color:#$', 'var'=>'evcal__bgc5',	'default'=>'fff6e2'
@@ -234,19 +236,12 @@
 				'css'=>'background-color:#$', 'var'=>'evoeventtop_live2',	'default'=>'9a9a9a'
 			),
 
-			
-			// text under event title
-			// when ett color is "custom" > use colorful text color for colorful ett only
-				array(
-					'item'=>'.ajde_evcal_calendar.color.etttc_custom, .evo_lightboxes .eventon_list_event.color.etttc_custom',
-					'css'=>'--evo_ett_color:#$; --ett_title_color:#$; --ett_subtitle_color:#$;--ett_dateblock_color:#$;', 'var'=>'evcal__colorful_text',	'default'=> 'ffffff'
-				),
-
 			// custom ett colors, that may also be applied to colorful if set		
 				// general 				
 				array(
 					'item'=>'.ajde_evcal_calendar.clean, 
 						.ajde_evcal_calendar.color.etttc_none,
+						.ajde_evcal_calendar.white.etttc_custom, 
 						.evo_lightboxes .eventon_list_event.clean, 
 						.evo_lightboxes .eventon_list_event.color.etttc_none',
 					'css'=>'--evo_ett_color:#$;', 'var'=>'evcal__fc6',	'default'=> $evo_color_1
@@ -255,6 +250,7 @@
 				array(
 					'item'=>'.ajde_evcal_calendar.clean, 
 						.ajde_evcal_calendar.color.etttc_none, 
+						.ajde_evcal_calendar.white.etttc_custom, 
 						.evo_lightboxes .clean.eventon_list_event, 
 						.evo_lightboxes .eventon_list_event.color.etttc_none',
 					'css'=>'--ett_title_color:#$', 'var'=>'evcal__fc3',	'default'=> $evo_color_1
@@ -262,7 +258,8 @@
 				// subtitle
 				array(
 					'item'=>'.ajde_evcal_calendar.clean, 
-						.ajde_evcal_calendar.color.etttc_none, 
+						.ajde_evcal_calendar.color.etttc_none,
+						.ajde_evcal_calendar.white.etttc_custom,  
 						.evo_lightboxes .clean.eventon_list_event, 
 						.evo_lightboxes .eventon_list_event.color.etttc_none',
 					'css'=>'--ett_subtitle_color:#$', 'var'=>'evcal__fc3st',	'default'=> $evo_color_1
@@ -271,6 +268,19 @@
 				array(
 					'item'=>'.ajde_evcal_calendar, .evo_lightboxes .eventon_list_event',
 					'css'=>'--ett_dateblock_color:#$', 'var'=>'evcal__fc6a',	'default'=>$evo_color_1
+				),
+
+				array('type'=> 'linebreak'),
+			
+			// text under event title
+			// when ett color is "custom" > use colorful text color for colorful ett only
+				array(
+					'item'=>'.ajde_evcal_calendar.color.etttc_custom, .evo_lightboxes .eventon_list_event.color.etttc_custom',
+					'css'=>'--evo_ett_color:#$; --ett_title_color:#$; --ett_subtitle_color:#$;--ett_dateblock_color:#$;', 'var'=>'evcal__colorful_text',	'default'=> 'ffffff'
+				),
+				array(
+					'item'=>'.evo_lightboxes .eventon_list_event.color.etttc_custom .eventon_list_event',
+					'css'=>'--ett_dateblock_color:#$', 'var'=>'evcal__colorful_text',	'default'=>'ffffff'
 				),
 
 		// close button for eventcard
@@ -310,20 +320,6 @@
 		)
 
 		,array(
-			'name'=>'Event title color',
-			'item'=>'#evcal_list .eventon_list_event .evcal_desc span.evcal_event_title,
-				.evo_lightboxes .evo_pop_body .evcal_desc span.evcal_desc2',
-			'css'=>'color:#$', 'var'=>'evcal__fc3',	'default'=>$preset_data['evo_color_1']
-		),array(
-			'name'=>'Event title color (boxy)',
-			'item'=>'.ajde_evcal_calendar.boxy #evcal_list .eventon_list_event .evcal_desc span.evcal_event_title',
-			'css'=>'color:#$', 'var'=>'evcal__fc3box',	'default'=>'ffffff'
-		),array(
-			'name'=>'Event sub title color',
-			'item'=>'.eventon_events_list .eventon_list_event .evcal_desc span.evcal_event_subtitle, 
-				.evo_lightboxes .evo_pop_body .evcal_desc span.evcal_event_subtitle',
-			'css'=>'color:#$', 'var'=>'evcal__fc3st',	'default'=>$preset_data['evo_color_1']
-		),array(
 			'item'=>'.fp_popup_option i',
 			'multicss'=>array(
 				array('css'=>'color:#$', 'var'=>'fp__f1',	'default'=>'999'),
@@ -381,15 +377,15 @@
 				array('css'=>'background-color:#$', 'var'=>'evcal__jm011H','default'=>$evo_color_1),			
 			)			
 		),array(
-			'item'=>'.ajde_evcal_calendar .calendar_header .evcal_arrows:before,
-	.evo_footer_nav .evcal_arrows:before',
-			'css'=>'border-color:#$', 'var'=>'evcal__jm01A','default'=>'737373'
+			'item'=>'.ajde_evcal_calendar .calendar_header .evcal_arrows i,
+				.evo_footer_nav .evcal_arrows i',
+			'css'=>'color:#$', 'var'=>'evcal__jm01A','default'=>'737373'
 		),array(
-			'item'=>'.ajde_evcal_calendar .calendar_header .evcal_arrows.evcal_btn_next:hover:before,
-.ajde_evcal_calendar .calendar_header .evcal_arrows.evcal_btn_prev:hover:before,
-	.evo_footer_nav .evcal_arrows.evcal_btn_prev:hover:before,
-	.evo_footer_nav .evcal_arrows.evcal_btn_next:hover:before',
-			'css'=>'border-color:#$', 'var'=>'evcal__jm01AH','default'=>'e2e2e2'
+			'item'=>'.ajde_evcal_calendar .calendar_header .evcal_arrows.evcal_btn_next:hover i,
+				.ajde_evcal_calendar .calendar_header .evcal_arrows.evcal_btn_prev:hover i,
+					.evo_footer_nav .evcal_arrows.evcal_btn_prev:hover i,
+					.evo_footer_nav .evcal_arrows.evcal_btn_next:hover i',
+			'css'=>'color:#$', 'var'=>'evcal__jm01AH','default'=>'e2e2e2'
 		),
 		// general
 		array(
@@ -608,7 +604,7 @@
 				'item'=>'.evo_eventon_live_now_section .evo_eventon_now_next h3','css'=>'color:#$', 'var'=>'evo_live3',	'default'=>$evo_color_1
 			),array(
 				'item'=>'.evo_eventon_live_now_section .evo_eventon_now_next h3 .evo_countdowner','multicss'=>array(
-					array('css'=>'background-color:#$', 'var'=>'evo_live4b','default'=>'a5a5a5'),
+					array('css'=>'background-color:#$', 'var'=>'evo_live4b','default'=>$evo_color_2),
 					array('css'=>'color:#$', 'var'=>'evo_live4a','default'=>'ffffff')
 				)	
 			),array(
@@ -624,6 +620,8 @@
 	// @+4.5.1
 	if(sizeof($style_array)>0){
 		foreach($style_array as $sa){
+			if( isset( $sa['type']) && $sa['type'] == 'linebreak'){ echo "\n"; continue;}
+
 			if(!empty($sa['multicss']) && is_array($sa['multicss'])){
 
 				echo esc_attr( $sa['item'] ).'{';
@@ -638,7 +636,7 @@
 							$css = str_replace('$'.$index ,$css_val, $css );
 						}
 						
-						echo esc_attr( $css ) .';';
+						echo  $css  .';';
 					}else{
 						$field_var = $sin_CSS['var'];
 
@@ -658,7 +656,7 @@
 				$css_val = str_replace('&#039;',"'",$css_val );
 				$css = str_replace('$',$css_val,$sa['css'] );
 
-				echo esc_attr( $sa['item'] ) .'{'. esc_attr( $css ).'}';
+				echo esc_attr( $sa['item'] ) .'{'.  $css .'}';
 			}
 		}
 	}

@@ -3,7 +3,7 @@
  * Eventon date time class.
  *
  * @class 		EVO_generator
- * @version		L2.2.16
+ * @version		2.4
  * @package		EventON/Classes
  * @category	Class
  * @author 		AJDE

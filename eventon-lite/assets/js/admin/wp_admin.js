@@ -1,6 +1,6 @@
 /*
  * EventON Back end scripts for general backend of wordpress
- * @version 2.3
+ * @version 2.3.3
  */
 jQuery(document).ready(function($){	
 
@@ -12,7 +12,8 @@ jQuery(document).ready(function($){
 			var EE = $(this);
 			EE.ColorPicker({
 				onBeforeShow: function(){
-					$(this).ColorPickerSetColor( $(this).attr('hex'));
+					const hex = $(this).attr('hex') || 'f3f3f3';
+					$(this).ColorPickerSetColor( hex );	
 				},	
 				onChange:function(hsb, hex, rgb){
 					//console.log(hex+' '+rgb);
@@ -703,6 +704,7 @@ jQuery(document).ready(function($){
 
 			}
 		});
+
 		
 	// Export settings
 		$('body').on('evo_data_uploader_submitted', function(event, reader_event, msg_elm, upload_box){

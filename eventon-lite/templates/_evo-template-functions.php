@@ -1,7 +1,7 @@
 <?php
 /**
  *	EventON Template functions for template system
- *	@version L2.2.19
+ *	@version 2.4
  */
 
 defined( 'ABSPATH' ) || exit;
@@ -142,17 +142,22 @@ function evotemp_before_single_event_content(){
 	// if password protected event
 	//if( $event->is_password_required() ) echo 'Password Protected event';
 
-	$rtl = EVO()->cal->check_yn( 'evo_rtl','evcal_1');
-
 	$event_id = get_the_ID();
 	$json = apply_filters('evo_event_json_data',array(), $event_id);
 
+	$_class_attr = array();
+
 	// eventtop style
 	$eventtop_style = EVO()->cal->get_prop('evosm_eventtop_style');
-	if(!$eventtop_style) $eventtop_style = 'immersive';
+	if(!$eventtop_style) $eventtop_style = 'color';
+
+	$_class_attr[] = $eventtop_style;
+
+	$_class_attr[] = 'etttc_'. EVO()->cal->get_ett_color_prop();
+	if( EVO()->cal->check_yn( 'evo_rtl','evcal_1') ) $_class_attr[] =  'evortl';
 
 	?>
-	<div id='evcal_single_event_<?php echo esc_attr( get_the_ID() );?>' class='ajde_evcal_calendar eventon_single_event evo_sin_page<?php echo ($rtl?'evortl':'') .' '. esc_attr( $eventtop_style );?>' data-eid='<?php echo esc_attr( $event_id );?>' data-l='<?php echo esc_attr( EVO()->lang );?>' data-j='<?php echo wp_json_encode($json);?>'>
+	<div id='evcal_single_event_<?php echo esc_attr( get_the_ID() );?>' class='ajde_evcal_calendar eventon_single_event evo_sin_page <?php echo  esc_attr( implode(' ', $_class_attr) );?>' data-eid='<?php echo esc_attr( $event_id );?>' data-l='<?php echo esc_attr( EVO()->lang );?>' data-j='<?php echo wp_json_encode($json);?>'>
 	<?php
 
 	// event data 

@@ -370,6 +370,10 @@ class evo_cal_body{
 
 		// calendar parts
 			function cal_parts_arrows($args=''){
+				return "<p class='evo_arrows'>
+					<span id='evcal_prev' class='evcal_arrows evcal_btn_prev evodfx evofx_jc_c evofx_ai_c' ><i class='fa fa-chevron-left'></i></span>
+					<span id='evcal_next' class='evcal_arrows evo_arrow_next evcal_btn_next evodfx evofx_jc_c evofx_ai_c' ><i class='fa fa-chevron-right'></i></span>
+					</p>";
 				return "<p class='evo_arrows'><span id='evcal_prev' class='evcal_arrows evcal_btn_prev' ></span><span id='evcal_next' class='evcal_arrows evo_arrow_next evcal_btn_next' ></span></p>";
 			}
 
@@ -469,7 +473,7 @@ class evo_cal_body{
 					esc_html( $cal_header_title ) ."</p>";	
 				
 				// arrows
-				if(!$hide_arrows) echo wp_kses_post( $this->cal_parts_arrows() );
+				if(!$hide_arrows) echo $this->cal_parts_arrows();
 
 				echo "</div>";
 			}

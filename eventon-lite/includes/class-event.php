@@ -1,7 +1,7 @@
 <?php
 /**
  * Event Class for one event
- * @version 2.3.1
+ * @version 2.4
  */
 
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
@@ -34,6 +34,7 @@ class EVO_Event extends EVO_Data_Store{
 	private $help;
 
 	public $event_data, $end_unix_raw, $end_unix, $gmt; 
+	public string $tz_string;
 
 	public function __construct($event_id, $event_pmv='', $ri = 0, $force_data_set = true, $post=false){
 		
@@ -42,16 +43,13 @@ class EVO_Event extends EVO_Data_Store{
 		$this->post_type = 'ajde_events';		
 		$this->meta_array_key = '_edata';		
 		
-		if($force_data_set){			
-			$this->set_event_data($event_pmv);
-		} 		
-		
-		// set event offset from utc 0
-			$tz_string = $this->get_timezone_key();
-			$this->utc_offset = $this->utcoff = $this->help->_get_tz_offset_seconds( $tz_string );
-			$this->gmt = $this->help->get_timezone_gmt( $tz_string, $this->start_unix );
-			$this->event_tz = $this->tz = new DateTimeZone( $tz_string );
+		if($force_data_set)	$this->set_event_data( $event_pmv );
 
+		// Timezone setup
+		$this->tz_string = $this->get_timezone_key();
+		$this->utc_offset = $this->utcoff = $this->help->_get_tz_offset_seconds( $this->tz_string );			
+		$this->event_tz = $this->tz = new DateTimeZone( $this->tz_string );		
+		
 		$this->localize_edata();
 		$this->ri = $ri;
 
@@ -61,25 +59,25 @@ class EVO_Event extends EVO_Data_Store{
 		$this->DD->setTimezone( $this->event_tz );
 		$this->timenow_etz = $this->DD->format('U');
 
-		// set event post to class if available
-			if($post !== false){
-				$this->author = $post->post_author;
-				$this->post_date = $post->post_date;
-				$this->content = $post->post_content;
-				$this->excerpt = $post->post_excerpt;
-				$this->post_name = $post->post_name;
-				$this->post_title = $post->post_title;
-				$this->post_password = $post->post_password;
-				$this->post_type = $post->post_type;
-				$this->post_status = $post->post_status;
-
-				// validate post is indeed event
-				if( 'ajde_events' !== $this->post_type) return false;
-			}
+		// Post setup
+	    if ($post !== false)    $this->set_post_data($post);
 
 		$this->event_data = $this->meta_data;
-
 		$this->_process_eventtimes();
+
+		//echo $this->get_prop('_unix_start_ev').'--';
+	}
+
+	private function set_post_data(WP_Post $post): void {
+	    $this->author = $post->post_author;
+	    $this->post_date = $post->post_date;
+	    $this->content = $post->post_content;
+	    $this->excerpt = $post->post_excerpt;
+	    $this->post_name = $post->post_name;
+	    $this->post_title = $post->post_title;
+	    $this->post_password = $post->post_password;
+	    $this->post_type = $post->post_type;
+	    $this->post_status = $post->post_status;
 	}
 
 	// event building @+2.6.10
@@ -152,6 +150,8 @@ class EVO_Event extends EVO_Data_Store{
 				}
 
 				$this->_process_event_start_end( $start, $end );
+
+				$this->gmt = $this->help->get_timezone_gmt( $this->tz_string, $this->start_unix );
 			}
 
 		// load a repeat instance times info the object @u 4.5.7
@@ -180,10 +180,12 @@ class EVO_Event extends EVO_Data_Store{
 				$this->end_unix_raw = $this->_process_raw_time( $end , 'end' );
 				
 				// duration from raw
-				$this->duration = $this->end_unix_raw - $this->start_unix_raw;	
+				//$this->duration = $this->end_unix_raw - $this->start_unix_raw;	
 
 				// update new raw time to event tz based time
 				$this->_process_newraw_to_etz();
+
+				$this->duration = (int) $this->end_unix - (int)$this->start_unix;
 			}
 
 		// switch object times back to original event times
@@ -214,10 +216,12 @@ class EVO_Event extends EVO_Data_Store{
 
 		// convert utc0 based unix to event tz based unix
 		// @2.2.13
-			public function __get_tz_based_unix( $unix ){
+			public function __get_tz_based_unix( $unix , $time_type = 'start'){
+
+				
 				// create datetime obj @utc0 using unix
 				$this->DD->setTimezone( EVO()->calendar->timezone0 );
-				$this->DD->setTimestamp( $unix );
+				$this->DD->setTimestamp( (int)$unix );
 				
 				// create new datetime with event tz using date numbers from utc0
 				$newD = new DateTime( $this->DD->format( 'Y/m/d H:i'), $this->tz );
@@ -243,6 +247,7 @@ class EVO_Event extends EVO_Data_Store{
 					}
 				}
 
+				//echo $newD->format('Y/m/d H:i [U]').'-----';
 				return $newD->format('U');
 
 			}
@@ -351,40 +356,36 @@ class EVO_Event extends EVO_Data_Store{
 
 	// DATE TIME
 		// primary function to get event start end unix with repeat interval adjusted @u 2.2.12
-		function get_start_end_times($custom_ri='', $return_type = 'both', $utc=false){
-			
-			$start = $this->start_unix_raw; // get raw time
-			$end = $this->end_unix_raw;
-			
-			// if repeating event
-			if($this->is_repeating_event() ){
-				$repeat_interval = !empty($custom_ri)? (int)$custom_ri: (int)$this->ri;
-				$intervals = $this->get_prop('repeat_intervals');
+		private array $_cached_times = [];
+		public function get_start_end_times($custom_ri='', $return_type = 'both', $utc = false){
 
-				if(sizeof($intervals)>0 ){
-					$start = isset($intervals[$repeat_interval][0])? $intervals[$repeat_interval][0]: $intervals[0][0];
-					$end = isset($intervals[$repeat_interval][1])? $intervals[$repeat_interval][1]:$intervals[0][1];
+			if (!isset($this->_cached_times[$this->ri][$utc])) {
+		        $start = $this->start_unix_raw;
+		        $end = $this->end_unix_raw;
 
-					// process the raw times
-					$this->start_unix_raw = $this->_process_raw_time($start, 'start');
-					$this->end_unix_raw = $this->_process_raw_time($end, 'end');
-				}			
-			}
+		        if ($this->is_repeating_event() && !empty($custom_ri)) {
+		            $repeat_interval = (int)$custom_ri ?: $this->ri;
+		            $this->ri = $repeat_interval;
+		            $intervals = $this->get_repeats();
+		            if ($intervals && sizeof($intervals) > 0) {
+		                $start = $intervals[$repeat_interval][0] ?? $intervals[0][0];
+		                $end = $intervals[$repeat_interval][1] ?? $intervals[0][1];
+		                $this->start_unix_raw = $this->_process_raw_time($start, 'start');
+		                $this->end_unix_raw = $this->_process_raw_time($end, 'end');
+		            }
+		        }
 
-			// set event time in event tz
-			if( !$utc) $this->_process_newraw_to_etz();
+		        if (!$utc) $this->_process_newraw_to_etz();
 
-			if($return_type == 'both'){
-				if( $utc ){
-					return array('start'=>$this->start_unix_raw, 'end'=> $this->end_unix_raw);
-				}else{
-					
-					return array('start'=>$this->start_unix, 'end'=> $this->end_unix);
-				}
-			}
+		        $this->_cached_times[$this->ri][$utc] = [
+		            'start' => $utc ? $this->start_unix_raw : $this->start_unix,
+		            'end' => $utc ? $this->end_unix_raw : $this->end_unix
+		        ];
+		    }
 
-			if( $return_type == 'start') return $utc ? $this->start_unix_raw : $this->start_unix;
-			if( $return_type == 'end') return $utc ? $this->end_unix_raw : $this->end_unix;					
+		    $times = $this->_cached_times[$this->ri][$utc];
+		    return $return_type === 'both' ? $times : $times[$return_type];
+				
 		}
 
 		// @+ 2.6.10 @updated 2.2.12
@@ -605,8 +606,9 @@ class EVO_Event extends EVO_Data_Store{
 					case 'D':
 						$DT3[ $kk ] = eventon_return_timely_names_('day_num_to_name',$DT2['N']);	break;
 					case 'a':
-					case 'A':
 						$DT3[ $kk ] = eventon_return_timely_names_('ampm',$DT2['a']);	break;
+					case 'A':
+						$DT3[ $kk ] = eventon_return_timely_names_('ampm2',$DT2['A']);	break;
 					
 					default:
 						$DT3[ $kk ] = $vv;
@@ -1608,116 +1610,122 @@ class EVO_Event extends EVO_Data_Store{
 		public function print_get_ics_content($include_repeats = false ){
 			echo $this->get_ics_content( $include_repeats );
 		}
-		function get_ics_content($include_repeats = false){
-			$HELP = EVO()->helper;
+		public function get_ics_content($include_repeats = false){
+			$HELP = new evo_helper();
 
-			// Location information
-				$location = '';
-
-				// if its online only event
-				if( $this->get_attendance_mode() == 'online' && $vir_url = $this->get_virtual_url() ){
-					$location = $vir_url;
-				}else{
-
-					$lDATA = $this->get_location_data();
-
-					$location_address = '';
-					if($lDATA){
-						if($lDATA['name']) $location_name = $lDATA['name'];
-						if($lDATA['location_address']) $location_address = $lDATA['location_address'];
-						$location = ($location_name? $location_name . ' ':'') . ($location_address?$location_address:'');
-						$location = $HELP->esc_ical_text( stripslashes($location) );
-					}
-				}
+			$location = $this->get_attendance_mode() === 'online' && $vir_url = $this->get_virtual_url()
+		        ? $vir_url
+		        : $this->get_location_string($HELP);				
 			
 			$name = $summary = $this->get_title();
-
-			// summary for ICS file			
-				$content = (!empty($this->content))? $this->content:'';
-				if(!empty($content)){
-					$content = wp_strip_all_tags($content);
-					$content = str_replace(']]>', ']]&gt;', $content);
-					$summary = wp_trim_words($content, 50, '[..]');
-				}		
+		    $content = !empty($this->content) ? strip_tags(str_replace(']]>', ']]>', $this->content)) : $name;
+		    if (!empty($this->raw_content) && EVO()->cal->check_yn('evo_dis_icshtmldecode', 'evcal_1')) {
+		        $content = $this->raw_content;
+		    }
+		    $summary = wp_trim_words($content, 50, '[..]');
 			
 			$uid = uniqid();
+			$tz_key = $this->get_timezone_key();
 
-			// start and end time
-				//$dDATA = $this->get_non_adjusted_times();
-				$dDATA = $this->get_utc_adjusted_times();
+			$output = "BEGIN:VEVENT\n";
+		    $output .= "UID:{$uid}\n";
+		    $output .= "DTSTAMP:" . date_i18n('Ymd\THis') . "\n";
 
-				$format =  $this->is_all_day() ? 'Ymd' : 'Ymd\THi';
+		    $start_raw = (int)$this->get_prop('evcal_srow');
+    		$end_raw = $this->get_prop('evcal_erow') ? (int)$this->get_prop('evcal_erow') : $start_raw;
 
-				$start = date_i18n( $format, $dDATA['start'] );
-				$end = date_i18n( $format, $dDATA['end'] );				
-				
-				//$time = current_time('timestamp');
-				//$year = gmdate('Y', $time);
+    		// Apply repeat interval if applicable
+		    if ($this->is_repeating_event() && $this->ri > 0) {
+		        $intervals = $this->get_repeats();
+		        if ($intervals && isset($intervals[$this->ri])) {
+		            $start_raw = $intervals[$this->ri][0];
+		            $end_raw = $intervals[$this->ri][1];
+		        }
+		    }
+		    
+    		$is_all_day = $this->is_all_day();
+		    $format = $is_all_day ? 'Ymd' : 'Ymd\THis';
+		    $tz = new DateTimeZone($tz_key);
+    		$utc = new DateTimeZone('UTC');
 
-			ob_start();
+		    $this->DD->setTimezone($utc);
+    		$this->DD->setTimestamp($start_raw);
+		    $start = $this->DD->format($format);
+
+		    $end_unix = $is_all_day ? $end_raw + 86400 : $end_raw;
+		    $this->DD->setTimezone($utc);
+		    $this->DD->setTimestamp($end_unix);
+		    $this->DD->setTimezone($tz);
+		    $end = $this->DD->format($format);
+
+		    $output .= "DTSTART:" . $start . ($is_all_day ? '' : 'Z') . "\n";
+		    $output .= "DTEND:" . $end . ($is_all_day ? '' : 'Z') . "\n";
+		    $output .= "TZID:{$tz_key}\n";
+
+			// event link @4.9
+			$event_link = $this->is_virtual() && $this->is_virtual_url_public() ? $this->virtual_url() : $this->get_permalink();
+    		$desc_adds = EVO()->cal->check_yn('evosm_ics_link', 'evcal_1') ? '' : "\\n" . $event_link;
 			
-			//echo "METHOD:REQUEST\n"; // requied by Outlook
-			echo "BEGIN:VEVENT\n";
-			
-			echo "UID:". esc_attr( $uid )."\n"; // required by Outlok
-			echo "DTSTAMP:". esc_attr( date_i18n('Ymd\THis') )."\n"; // required by Outlook
-			
-			$_ending = $this->is_all_day() ? '': '00Z'; // 00 is for seconds
-			echo "DTSTART:". 	esc_attr( $start .$_ending ). "\n";
-			echo "DTEND:".	esc_attr( $end .$_ending ) . "\n";
+			$output .= "LOCATION:{$location}\n";
+		    $output .= "SUMMARY:" . html_entity_decode($HELP->esc_ical_text($name)) . "\n";
+		    $output .= "DESCRIPTION:" . $HELP->esc_ical_text($summary) . $desc_adds . "\n";
+		    $output .= "URL:" . $event_link . "\n";
 
-			// timezone
-			if($tz = $this->get_timezone_key()){
-				echo "TZID:". esc_attr( $tz ). "\r\n";
-			}
-
-
-			// Event links for descrition @since 4.5.2
-			$desc_adds = '';
-			if( !EVO()->cal->check_yn('evosm_ics_link','evcal_1')){
-				$desc_adds = "\\n" . ($this->is_virtual() ? $this->virtual_url() : $this->get_permalink() );
-			}
-
-			echo "LOCATION:". esc_attr( $location ). "\n";
-			echo "SUMMARY:". wp_kses_post( $HELP->esc_ical_text($name) ). "\n";
-			echo "DESCRIPTION: ". wp_kses_post( $HELP->esc_ical_text($summary) ) . wp_kses_post( $desc_adds ) . "\n";
-
-			echo "URL:" . ($this->is_virtual() ? esc_url( $this->virtual_url() ) : esc_url( $this->get_permalink() ) ) . "\n";
 
 			// plug @+3.1
 			do_action('evo_event_ics_content', $this);
-
-			echo "END:VEVENT\n";
+			$output .= "END:VEVENT\n";
 			
-
 
 			// Repeats
 			if( $include_repeats && $this->is_repeating_event()){
+				$repeats = $this->get_repeats();
+				if ($repeats) {
+		            foreach ($repeats as $key => $val) {
+		                if ($key == $this->ri) continue; // Skip current RI
 
-				foreach($this->get_repeats() as $key=>$val){
+		                $uid = uniqid();
+		                $output .= "BEGIN:VEVENT\n";
+		                $output .= "UID:{$uid}\n";
+		                $output .= "DTSTAMP:" . date_i18n('Ymd\THis') . "\n";
 
+		                $this->DD->setTimezone($utc);
+		                $this->DD->setTimestamp($val[0]);
+		                $this->DD->setTimezone($tz);
+		                $start = $this->DD->format($format);
 
-					$uid = uniqid();
-					echo "BEGIN:VEVENT\n";
-					echo "UID:". esc_attr( $uid ). "\n"; // required by Outlok
-					echo "DTSTAMP:". esc_attr( date_i18n('Ymd\THis') ) ."\n"; // required by Outlook
-						
-					$_ending = $this->is_all_day() ? '': '00Z'; // 00 is for seconds
-					$start0 = date_i18n( $format, ( $val[0] + $this->utc_offset ) );
-					$end0 = date_i18n( $format, ( $val[1] + $this->utc_offset ) );
+		                $end_unix = $is_all_day ? $val[1] + 86400 : $val[1];
+		                $this->DD->setTimezone($utc);
+		                $this->DD->setTimestamp($end_unix);
+		                $this->DD->setTimezone($tz);
+		                $end = $this->DD->format($format);
 
-					echo "DTSTART:" . esc_attr( $start0 ) ."\n"; 
-					echo "DTEND:" . esc_attr( $end0 ) ."\n";
-					
-					echo "LOCATION:". esc_attr( $location ) ."\n";
-					echo "SUMMARY:". wp_kses_post( html_entity_decode( $HELP->esc_ical_text($name)) ) ."\n";
-					echo "DESCRIPTION: ". wp_kses_post( $HELP->esc_ical_text($summary) ) ."\n" . ($this->is_virtual() ? esc_url( $this->virtual_url() ): esc_url( $this->get_permalink() ) ) . "\n";
-					
-					echo "END:VEVENT\n";
-				}
+		                $output .= "DTSTART:" . $start . ($is_all_day ? '' : 'Z') . "\n";
+		                $output .= "DTEND:" . $end . ($is_all_day ? '' : 'Z') . "\n";
+		                $output .= "TZID:{$tz_key}\n";
+		                $output .= "LOCATION:{$location}\n";
+		                $output .= "SUMMARY:" . html_entity_decode($HELP->esc_ical_text($name)) . "\n";
+		                $output .= "DESCRIPTION:" . $HELP->esc_ical_text($summary) . $desc_adds . "\n";
+		                $output .= "URL:{$event_link}\n";
+		                $output .= "END:VEVENT\n";
+		            }
+		        }
 			}
+			return $output;
+		}
 
-			return ob_get_clean();
+		private function get_location_string(evo_helper $HELP): string {
+		    $lDATA = $this->get_location_data();
+		    if (!$lDATA) return '';
+		    $location_name = $lDATA['name'] ?? '';
+		    $location_address = $lDATA['location_address'] ?? '';
+		    return $HELP->esc_ical_text(stripslashes(trim($location_name . ' ' . $location_address)));
+		}
+		private function is_virtual_url_public(){
+			$show = true;
+			if( $this->check_yn('_vir_after_rsvp') ) $show = false;
+			if( $this->check_yn('_vir_after_tix') ) $show = false;
+			return $show;
 		}
 		
 	// supportive

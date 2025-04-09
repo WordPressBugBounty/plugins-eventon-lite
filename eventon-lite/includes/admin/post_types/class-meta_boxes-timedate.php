@@ -1,7 +1,7 @@
 <?php
 /**
  * Event Meta box time and date fields
- * @version 2.3
+ * @version 2.4
  */
 							
 
@@ -36,7 +36,7 @@ $wp_date_format = $date_format;
 	<input type='hidden' name='_evo_time_format' value='<?php echo esc_attr( $used_timeFormat );?>'/>
 
 	<!-- Event Time -->
-	<div class='evo_datetimes evo_edit_field_box' style='background-color: #f5c485;background: linear-gradient(45deg, #f9d29f, #ffae5b);border-radius: 20px;' data-s='<?php echo esc_attr($EVENT->get_prop('evcal_srow'));?>' data-e='<?php echo esc_attr($EVENT->get_prop('evcal_erow'));?>' data-es="<?php echo esc_attr($EVENT->get_prop('_unix_start_ev'));?>" data-ee="<?php echo esc_attr($EVENT->get_prop('_unix_end_ev') );?>">
+	<div class='evo_datetimes evo_edit_field_box evodfx evofxdrr evogap20 evofxww' style='background-color: #f5c485;background: linear-gradient(45deg, #f9d29f, #ffae5b);border-radius: 20px;' data-s='<?php echo esc_attr($EVENT->get_prop('evcal_srow'));?>' data-e='<?php echo esc_attr($EVENT->get_prop('evcal_erow'));?>' data-es="<?php echo esc_attr($EVENT->get_prop('_unix_start_ev'));?>" data-ee="<?php echo esc_attr($EVENT->get_prop('_unix_end_ev') );?>">
 
 		<div class='evo_date_time_elem evo_start'>
 			<p class='evo_event_time_label' id='evcal_start_date_label'><?php esc_html_e('Event Start', 'eventon')?></p>
@@ -80,6 +80,48 @@ $wp_date_format = $date_format;
 		</div>
 	</div>
 
+	<!-- timezone value -->	
+	<div class='evo_edit_field_box'>	
+			
+		<?php 
+
+		$help = new evo_helper();
+		
+		// calendar time
+			$DD = new DateTime();
+			$DD->setTimezone( EVO()->calendar->cal_tz );
+			$DD->modify('now');
+			$cal_time = $DD->format( EVO()->calendar->date_format . ' '. EVO()->calendar->time_format) .' ('. EVO()->calendar->cal_tz_gmt . ' '. EVO()->calendar->cal_tz_string .')';
+
+
+		echo EVO()->elements->process_multiple_elements( array(
+			array(
+				'type'=>'dropdownS2',
+				'id'=>'_evo_tz',
+				'value'=> $EVENT->get_timezone_key(),
+				'name'=> __('Event Timezone','eventon'),
+				'options'=> $help->get_timezone_array( ),
+				'row_style'=>'padding-bottom:10px;',
+			),
+			array(
+				'type'=>'notice',
+				'name'=> __('Calendar time: ','eventon') . $cal_time,
+				'row_class'=>'evoop7',
+				'nesting_start'=>'time',
+			),
+			array(
+				'type'=>'text',
+				'id'=>'evo_event_timezone',
+				'name'=> __('(Optional) Event timezone text','eventon'),
+				'value'=> $EVENT->get_prop('evo_event_timezone'),
+				'tooltip'=> __('Timezone text typed in here (eg. PST) will appear next to event time on calendar.','eventon'),
+				'nesting_end'=> true,
+			)
+		));
+		?>
+	</div>
+		
+		
 	<!-- Time extended type selection -->
 	<div class='evo_time_edit_extensions evo_edit_field_box' style='background-color: #f4f4f4'>
 		<p class=''><?php esc_html_e('Event Time Extended Type','eventon');?> <?php EVO()->elements->tooltips(esc_html__('Select if you want to extend this event time to longer ranges based on event start time.','eventon'),'',true);?></p>
@@ -100,78 +142,52 @@ $wp_date_format = $date_format;
 			));
 		?>
 	</div>
-	
-	<!-- timezone value -->	
-	<div class='evo_edit_field_box'>	
-			
-		<?php 
-		
-		// calendar time
-			$DD = new DateTime();
-			$DD->setTimezone( EVO()->calendar->cal_tz );
-			$DD->modify('now');
-			$cal_time = $DD->format( EVO()->calendar->date_format . ' '. EVO()->calendar->time_format) .' ('. EVO()->calendar->cal_tz_gmt . ' '. EVO()->calendar->cal_tz_string .')';
-
-		EVO()->elements->print_process_multiple_elements( array(
-			array(
-				'type'=>'dropdownS2',
-				'id'=>'_evo_tz',
-				'value'=> esc_attr( $EVENT->get_timezone_key() ),
-				'name'=> esc_html__('Event Timezone','eventon'),
-				'options'=>  EVO()->helper->get_timezone_array( ) ,
-				'row_style'=>'padding-bottom:10px;',
-			),
-			array(
-				'type'=>'notice',
-				'name'=> esc_html__('Calendar time: ','eventon') . esc_html( $cal_time ),
-				'row_class'=>'padb10',
-				'row_style'=>'padding-bottom:10px;',
-			),
-			
-		));
-		?>
-	</div>
-		
-		
 	<?php
 	// date time related yes no values
-		EVO()->elements->print_process_multiple_elements(
+		echo EVO()->elements->process_multiple_elements(
 			array(
 			array(
-				'type'=>'yesno_btn',
-				'label'=> esc_html__('Hide End Time from calendar', 'eventon'), 
+				'type'=>'block_button',
+				'label'=> __('Repeat Event', 'eventon'),
+				//'value_2'=> 'fa-rotate',
+				'id'=> 'evcal_repeat',
+				'value'=> $EVENT->get_prop('evcal_repeat'),
+				'afterstatement'=> 'evo_editevent_repeatevents',
+				'nesting_start'=>' evomarb10',
+			),			
+			array(
+				'type'=>'block_button',
+				'label'=> __('Hide End Time', 'eventon'), 
 				'id'=> 'evo_hide_endtime',
-				'value'=> esc_attr( $EVENT->get_prop('evo_hide_endtime') ),											
+				'value'=> $EVENT->get_prop('evo_hide_endtime'),											
 				'afterstatement'=> '_evo_span_hidden_end',
 			),
 			array(
+				'type'=>'block_button',
+				'label'=> __('Hide live progress bar', 'eventon'),
+				'tooltip'=> __('This will hide live event progress bar and time left from eventtop','eventon'), 
+				'id'=> '_edata[hide_progress]',
+				'value'=> $EVENT->get_eprop('hide_progress'),
+				'nesting_end'=>true,
+			),
+			
+			
+			
+			array(
 				'type'=>'begin_afterstatement',
 				'id'=>'_evo_span_hidden_end',
-				'value'=> esc_attr( $EVENT->get_prop('evo_hide_endtime') )
+				'value'=> $EVENT->get_prop('evo_hide_endtime')
 			),
 				array(
 					'type'=>'yesno_btn',
-					'label'=> esc_html__('Span the event until hidden end time', 'eventon'), 
-					'tooltip'=> esc_html__('If event end time goes beyond start time +  and you want the event to show in the calendar until end time expire, select this.','eventon'),
+					'label'=> __('Span the event until hidden end time', 'eventon'), 
+					'tooltip'=> __('If event end time goes beyond start time +  and you want the event to show in the calendar until end time expire, select this.','eventon'),
 					'id'=> 'evo_span_hidden_end',
-					'value'=> esc_attr( $EVENT->get_prop('evo_span_hidden_end') )
+					'value'=> $EVENT->get_prop('evo_span_hidden_end')
 				),
 			array('type'=>'end_afterstatement',	),
 			
-			array(
-				'type'=>'yesno_btn',
-				'label'=> esc_html__('Hide live event progress bar', 'eventon'),
-				'tooltip'=> esc_html__('This will hide live event progress bar and time left from eventtop','eventon'), 
-				'id'=> '_edata[hide_progress]',
-				'value'=> esc_attr( $EVENT->get_eprop('hide_progress') )
-			),
-			array(
-				'type'=>'yesno_btn',
-				'label'=> esc_html__('Repeating Event - Enable repeating instances for this event', 'eventon'),
-				'id'=> 'evcal_repeat',
-				'value'=> esc_attr( $EVENT->get_prop('evcal_repeat') ),
-				'afterstatement'=> 'evo_editevent_repeatevents'
-			),
+			
 			)
 		);
 		
@@ -197,7 +213,7 @@ $wp_date_format = $date_format;
 		$evcal_rep_freq = $EVENT->get_prop('evcal_rep_freq');
 		
 	?>
-	<div id='evo_editevent_repeatevents' class='evcalr_2 evo_edit_field_box' style='display:<?php echo esc_attr($display); ?>'>
+	<div id='evo_editevent_repeatevents' class='evo_elm_afterstatement evo_editevent_repeatevents evcalr_2 evo_edit_field_box' style='display:<?php echo esc_attr($display); ?>'>
 		
 		<!-- REPEAT SERIES -->
 		<div class='repeat_series'>
@@ -491,9 +507,13 @@ $wp_date_format = $date_format;
 					}								
 				}
 				echo "</ul>";
-				echo ( !empty($ev_vals['repeat_intervals']))? 
-					"<p class='evo_custom_repeat_list_count' data-cnt='". esc_attr($count)."' style='padding-bottom:20px'>There are ". esc_attr($count-1)." repeat intervals. ". ($count>3? "<span class='evo_repeat_interval_view_all' data-show='no'>".esc_html__('View All','eventon')."</span>":'') ."</p>"
-					:null;
+				
+				// See additional repeats
+				if( $EVENT->is_repeating_event() ){
+					$_this_text = '<span class="evodib evomarr10">' . sprintf(__('There are %d Repeat Intervals','eventon'), ($count-1) ) . '</span>';
+					$_view_all = $count>4 ? "<span class='evo_repeat_interval_view_all evo_admin_btn' data-show='no'>".__('View All','eventon')."</span>":'';
+					echo "<p class='evo_custom_repeat_list_count evotar' data-cnt='{$count}' style='padding-bottom:20px'>". $_this_text . $_view_all ."</p>";
+				}
 			?>
 			<div class='evo_repeat_interval_new evo_edit_field_box' style='display:none'>
 

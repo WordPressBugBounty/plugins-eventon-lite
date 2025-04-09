@@ -3,7 +3,7 @@
  * calendar outter shell content.
  *
  * @class 		evo_cal_shell
- * @version		L 2.2.15
+ * @version		2.4
  * @package		EventON/Classes
  * @category	Class
  * @author 		AJDE
@@ -16,15 +16,12 @@ class evo_cal_shell {
 	}
 	
 	// Event types and other functions
-		public function get_event_types(){
-			$output;
-			$output[0]='';
-			for($x = 1; $x <= evo_max_ett_count() ; $x++){
-				$ab = ($x==1)? '':'_'.$x;
-				$event_type = 'event_type'.$ab;
-				$output[$x] = $event_type;
-			}
-			return $output;
+		public function get_event_types() {
+		    $output = [0 => ''];
+		    foreach (eventon_get_valid_ett() as $key => $nn) {
+		        $output[$key] = 'event_type' . ($key == 1 ? '' : '_' . $key);
+		    }
+		    return $output;
 		}
 		public function get_extra_tax(){
 			$output;

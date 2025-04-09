@@ -1,8 +1,7 @@
 <?php
 /**
  * Google Maps
- * @version 2.3
- * @version 4.7.4
+ * @version 2.4
  */
 
 

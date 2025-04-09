@@ -3,8 +3,7 @@
  * EVO_generator class.
  *
  * @class 		EVO_generator
- * @version		2.3
- * @version		4.7.4
+ * @version		2.4
  * @package		EventON/Classes
  * @category	Class
  * @author 		AJDE
@@ -61,6 +60,7 @@ class EVO_generator extends EVO_Cal_Time{
 			include_once('class-shortcode-defaults.php');
 			include_once('class-calendar-body.php');
 			include_once('class-calendar-filtering.php');
+			require_once('class-calendar-event-top.php');
 			require_once('class-calendar-event-structure.php');
 
 			$this->__calendar_type = 'default';
@@ -156,10 +156,10 @@ class EVO_generator extends EVO_Cal_Time{
 			if( EVO()->cal->check_yn('evo_timeF','evcal_1')){
 
 				$date_format = EVO()->cal->get_prop('evo_timeF_v','evcal_1');
-				$this->date_format = empty( $date_format ) ? 'F j(l)': stripslashes($date_format);
+				$this->date_format = empty( $date_format ) ? 'F j (l)': esc_html($date_format);
 
 				$time_format = EVO()->cal->get_prop('evo_timeF_tf','evcal_1');
-				$this->time_format = empty( $time_format ) ? 'g:ia': stripslashes( $time_format );
+				$this->time_format = empty( $time_format ) ? 'g:ia': esc_html($time_format);
 			}
 
 			return array( 'date_format'=> $this->date_format, 'time_format'=> $this->time_format);
@@ -382,6 +382,7 @@ class EVO_generator extends EVO_Cal_Time{
 			
 			$O .= $this->body->get_calendar_footer();
 
+
 			$this->_cal_reset('end');
 			return  $O;	
 		}
@@ -541,7 +542,6 @@ class EVO_generator extends EVO_Cal_Time{
 
 			$this->events_list = $this->JSON_event_data = $new_events_data;
 			
-
 			$RR = apply_filters('evo_generate_events_results', array(
 				'html'=> $content,
 				'data'=> $new_events_data,
@@ -632,7 +632,20 @@ class EVO_generator extends EVO_Cal_Time{
 		// for a month by default but can change to set time line with args
 			public function evo_get_wp_events_array(	$wp_argument_additions='', $shortcode_args='' ){
 
-				$ecv = $this->shortcode_args;
+				$ecv = $SC = $this->shortcode_args;
+				$scO = (object)$SC;
+
+				$is_cal_cache_active = EVO()->cal->check_yn('evo_cache_events','evcal_1');
+
+				$event_list_array = false;
+				if( $is_cal_cache_active){
+					$cache_key = 'evo_events_' . md5(serialize($ecv) . serialize($wp_argument_additions));		
+					$use_persistent_cache = function_exists('wp_using_ext_object_cache') && wp_using_ext_object_cache();
+	    			$event_list_array = $use_persistent_cache ? wp_cache_get($cache_key, 'eventon') : get_transient($cache_key);
+				}
+
+    			// return events using cache
+    			if ($event_list_array !== false) {      return $event_list_array;	    }
 
 				$this->reused();
 
@@ -645,37 +658,27 @@ class EVO_generator extends EVO_Cal_Time{
 						'orderby' => 		'menu_order'
 					);
 
-					//search query addition
-						if(!empty($ecv['s'])){
-							$wp_arguments_ = array_merge($wp_arguments_, array('s'=>$ecv['s']));
-						}
-
-					// sort query 
-					if( isset($ecv['sort_by']) && $ecv['sort_by'] == 'sort_posted'){
-						$wp_arguments_['orderby'] = 'date';
-
-						if(isset($ecv['event_order'])) $wp_arguments_['order'] = $ecv['event_order'];
-					}
+					if (!empty($scO->s)) $wp_arguments_['s'] = $scO->s;
+				    if (isset($scO->event_order)) $wp_arguments_['order'] = $scO->event_order;
+				    if (isset($scO->sort_by)) {
+				        switch ($scO->sort_by) {
+				            case 'sort_posted': $wp_arguments_['orderby'] = 'date'; break;
+				            case 'sort_menu_order': $wp_arguments_['orderby'] = 'menu_order'; break;
+				        }
+				    }
 
 					$meta_query = array();
 
 
 					// if hide cancelled events = yes
-						if( isset($ecv['hide_cancels']) && $ecv['hide_cancels'] == 'yes'){
-							$meta_query[] = array(
-								'key'     => '_status',
-								'value'   => 'cancelled',
-								'compare'=> '!='
-							);
-						}
+						if (isset($scO->hide_cancels) && $scO->hide_cancels == 'yes') {
+					        $meta_query[] = array('key' => '_status', 'value' => 'cancelled', 'compare' => '!=');
+					    }
 
 					// virtual event filter at query level
-						if( isset($ecv['event_virtual']) && $ecv['event_virtual'] != 'all'){
-							$meta_query[] = array(
-								'key'     => '_virtual',
-								'value'   => $ecv['event_virtual'] == 'nvir' ? 'no':'yes',
-							);
-						}
+						if (isset($scO->event_virtual) && $scO->event_virtual != 'all') {
+					        $meta_query[] = array('key' => '_virtual', 'value' => $scO->event_virtual == 'nvir' ? 'no' : 'yes');
+					    }
 
 					// event status filtering
 						if( isset($SC['event_status']) && $SC['event_status'] != 'all' && $SC['hide_cancels'] == 'no'){
@@ -707,33 +710,26 @@ class EVO_generator extends EVO_Cal_Time{
 						}
 
 
-					if( count($meta_query)>0 ){
-						$wp_arguments_['meta_query'] = $meta_query;
-					}
+					if (count($meta_query) > 0) $wp_arguments_['meta_query'] = $meta_query;
 
-					$wp_arguments = (!empty($wp_argument_additions))?
-						array_merge($wp_arguments_, $wp_argument_additions): $wp_arguments_;
-
-				// apply other filters to wp argument
-					$wp_arguments = $this->filtering->apply_evo_filters_to_wp_argument($wp_arguments);
-
-
-				// hook for addons
-					$wp_arguments = apply_filters('eventon_wp_query_args',$wp_arguments, array(), $ecv);
+				$wp_arguments = (!empty($wp_argument_additions)) ? array_merge($wp_arguments_, $wp_argument_additions) : $wp_arguments_;
+			    $wp_arguments = $this->filtering->apply_evo_filters_to_wp_argument($wp_arguments);
+			    $wp_arguments = apply_filters('eventon_wp_query_args', $wp_arguments, array(), $SC);
 
 				$this->wp_arguments = $wp_arguments;
 
-				//print_r($wp_arguments);
-				
-				// ========================
-				// GET: list of events for wp argument
-				$event_list_array = $this->wp_query_event_cycle(	$wp_arguments	);
+				$event_list_array = $this->wp_query_event_cycle($wp_arguments);
+			    $event_list_array = apply_filters('eventon_wp_queried_events_list', $event_list_array, $SC);
+			    $event_list_array = $this->shell->evo_sort_events_array($event_list_array);
 
-				// @~ 2.6.12
-				$event_list_array = apply_filters('eventon_wp_queried_events_list', $event_list_array, $ecv);
-
-				// sort events by date and default values
-				$event_list_array = $this->shell->evo_sort_events_array($event_list_array);
+				// Store in cache or transient based on persistence
+			    if( $is_cal_cache_active ){
+				    if ($use_persistent_cache) {
+				        $cache_set = wp_cache_set($cache_key, $event_list_array, 'eventon', 3600);
+				    } else {
+				        set_transient($cache_key, $event_list_array, 3600);
+				    }
+				}
 
 				return $event_list_array;
 			}
@@ -1095,7 +1091,7 @@ class EVO_generator extends EVO_Cal_Time{
 				$event_tax_meta_options = get_option( "evo_tax_meta");
 			
 			// Number of activated taxnomonies v 2.2.15
-				$_active_tax = evo_get_ett_count($this->evopt1);
+				$_valid_taxes = eventon_get_valid_ett();
 
 				
 
@@ -1263,12 +1259,11 @@ class EVO_generator extends EVO_Cal_Time{
 						if(!empty($eventop_fields)){
 							
 							// foreach active tax
-							for($b=1; $b<=$_active_tax; $b++){
+							foreach( $_valid_taxes as $key=> $nn){
+								
+								$__tax_slug = 'event_type'.($key==1?'':'_'.$key);
+								$__tax_fields = 'eventtype'.($key==1?'':$key);
 								$__tx_content = '';
-
-								$__tax_slug = 'event_type'.($b==1?'':'_'.$b);
-								$__tax_fields = 'eventtype'.($b==1?'':$b);
-
 
 								if(in_array($__tax_fields,$eventop_fields)  ){
 
@@ -1414,6 +1409,7 @@ class EVO_generator extends EVO_Cal_Time{
 						$_eventcard['location'] = array();	
 						$_eventcard['time'] = array(
 							'timetext'=> ucfirst( $_event_date_HTML['html_prettytime'] ),
+							'timezone'=> $EVENT->get_prop('evo_event_timezone'),
 							'date_times' => $_event_date_HTML,
 							'focus_start' => $focus_month_beg_range,
 							'_evo_tz'=> $EVENT->get_timezone_key(),
@@ -1598,7 +1594,7 @@ class EVO_generator extends EVO_Cal_Time{
 							'tags'=> wp_get_post_tags($EVENT->ID),
 							'cmdcount'=>$_cmf_count,
 							'cmf_data'=> $cmf_etop_data,
-							'timezone'=>'',
+							'timezone'=> $EVENT->get_prop('evo_event_timezone'),
 							'_evo_tz'=> $EVENT->get_timezone_key(),
 						);
 
@@ -2159,8 +2155,8 @@ class EVO_generator extends EVO_Cal_Time{
 						}
 
 					// event types
-						for($y=1; $y<=evo_get_ett_count($evo_opt);  $y++){
-							$_ett_name = ($y==1)? 'event_type': 'event_type_'.$y;
+						foreach( eventon_get_valid_ett() as $key => $nn){
+							$_ett_name = ($key==1)? 'event_type': 'event_type_'.$key;
 							$terms = get_the_terms( $event_id, $_ett_name );
 
 							if ( $terms && ! is_wp_error( $terms ) ){
