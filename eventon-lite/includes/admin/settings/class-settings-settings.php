@@ -1,7 +1,7 @@
 <?php
 /**
   * evo settings class
-  * @version 2.4
+  * @version 2.4.1
   */
 class evo_settings_settings{
 	
@@ -1031,9 +1031,8 @@ class evo_settings_settings{
 			// reused array parts
 			$__additions_009_1 = apply_filters('eventon_cmd_field_types', array(
 				'text'=>__('Single line Text','eventon'),
-				'textarea'=>__('Multiple lines of text (WP Editor)','eventon'), 
-				'textarea_trumbowig'=>__('Multiple lines of text (Trumbowig Editor)','eventon'), 
-				'textarea_basic'=>__('Multiple lines of text (Text Field)','eventon'), 
+				'textarea'=>__('Multiple lines Text Editor','eventon'),
+				'wp_editor'=>__('Multiple lines WP Classic Editor','eventon'),
 				'button'=>__('Button','eventon')
 			) );
 

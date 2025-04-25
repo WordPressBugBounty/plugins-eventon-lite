@@ -1,7 +1,7 @@
 <?php
 /**
  * Function ajax for backend
- * @version   2.4
+ * @version   2.4.1
  */
 class EVO_admin_ajax{
 	public $helper;
@@ -139,17 +139,36 @@ class EVO_admin_ajax{
 				));	wp_die();
 			}
 
+			// nonce validation
+			if( empty($_POST['nn']) || !wp_verify_nonce( $_POST['nn'], 'eventon_admin_nonce' ) ){
+				wp_send_json(array(
+					'status'=>'bad','msg'=> __('Nonce validation failed','eventon')
+				));	wp_die();
+			}
+
 			$post_data = $this->helper->sanitize_array( $_POST);
+			$settings_file_key = isset($post_data['setitngs_file_key']) ? $post_data['setitngs_file_key'] : '';
+			$allowed_files = array(
+			    'cmf_settings' => plugin_dir_path(__FILE__) . 'views/cmf_settings.php',
+			);
+			
 
-			$settings_file = $post_data[ 'settings_file' ];
-
-			ob_start();
-
-			include_once( $settings_file );
-
-			wp_send_json(array(
-				'status'=>'good','content'=> ob_get_clean()
-			)); wp_die();
+			if (array_key_exists($settings_file_key, $allowed_files) && file_exists($allowed_files[$settings_file_key])) {
+			    ob_start();
+			    include_once($allowed_files[$settings_file_key]);
+			    wp_send_json([
+			        'status' => 'good',
+			        'content' => ob_get_clean()
+			    ]);
+			} else {
+				error_log('Invalid settings file key attempted: ' . $settings_file_key);
+			    wp_send_json([
+			        'status' => 'bad',
+			        'msg' => __('Invalid settings file requested', 'eventon')
+			    ]);
+			}
+			wp_die();
+			
 		}
 		public function save_secondary_settings(){
 			// validate if user has permission
@@ -1008,9 +1027,14 @@ class EVO_admin_ajax{
 		public function settings_save(){
 
 			// Check for nonce validation
-	        if (!isset($_POST['nn']) || !wp_verify_nonce($_POST['nn'], 'eventon_admin_nonce')) {
+	        if (!isset($_POST['evoajax']) || !wp_verify_nonce($_POST['evoajax'], 'eventon_settings_save_nonce')) {
 	            wp_send_json_error(array('message' => 'Invalid nonce')); wp_die();
 	        }
+
+	        // check if admin and loggedin
+			if( !current_user_can('edit_eventons') ){
+				wp_send_json_error(array('message' => 'You do not have proper permission')); wp_die();
+			}
 
 	        // Decode JSON data and validate it
 		    $form_data = json_decode(stripslashes($_POST['formData']), true);
@@ -1145,8 +1169,12 @@ class EVO_admin_ajax{
 
 
 					// save custom styles and php code
-						if( isset($new_settings['evcal_styles']) ) 
-							update_option('evcal_styles', sanitize_text_field( $new_settings['evcal_styles']) );
+						if( isset($new_settings['evcal_styles']) ){
+							$styles = urldecode($new_settings['evcal_styles']); // Decode the encoded CSS
+						    $sanitized_styles = eventon_sanitize_css($styles);
+						    
+						    if (!empty($sanitized_styles)) update_option('evcal_styles', $sanitized_styles);
+						}
 
 						if( isset($new_settings['evcal_php']) )	
 							update_option('evcal_php', strip_tags(stripslashes($new_settings['evcal_php'])) );

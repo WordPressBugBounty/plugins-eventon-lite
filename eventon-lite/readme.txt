@@ -4,8 +4,8 @@ Plugin Name: EventON Lite
 Author URI: http://ashanjay.com/
 Tags: calendar, event calendar, virtual events, events, event management
 Requires at least: 6.0
-Tested up to: 6.7.2
-Stable tag: 2.4
+Tested up to: 6.8
+Stable tag: 2.4.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -236,6 +236,14 @@ Yes, EventON Lite supports different timezones for each event. You can even disp
 For support with the Lite version, visit [support forum here](https://wordpress.org/support/plugin/eventon-lite/). For premium support or queries related to the Full version, please contact us through [our helpdesk](https://helpdesk.ashanjay.com).
 
 == Changelog ==
+= 2.4.1 (2025-4-24) = 
+FIXED: event type name not showing in eventtop
+FIXED: ics start time not correct
+FIXED: Long event description folded for ICS content
+FIXED: Save settings XSS vulnerability
+FIXED: local file inclusion at secondary settings ajax
+FIXED: " in custom styles not printing correct on page
+
 = 2.4 (2025-4-9) = 
 ADDED: Filter admin events by event status
 ADDED: object cache for event list - option in settings

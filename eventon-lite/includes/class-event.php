@@ -1,7 +1,7 @@
 <?php
 /**
  * Event Class for one event
- * @version 2.4
+ * @version 2.4.1
  */
 
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
@@ -250,6 +250,12 @@ class EVO_Event extends EVO_Data_Store{
 				//echo $newD->format('Y/m/d H:i [U]').'-----';
 				return $newD->format('U');
 
+			}
+			public function __convert_utc_to_unix_etz($unix, $format = 'U'){
+				$this->DD->setTimezone( EVO()->calendar->timezone0 );
+				$this->DD->setTimestamp( (int)$unix );
+				$newD = new DateTime( $this->DD->format( 'Y/m/d H:i'), $this->tz );
+				return $newD->format( $format );
 			}
 
 		// current and future @u 2.2.12
@@ -1612,6 +1618,9 @@ class EVO_Event extends EVO_Data_Store{
 		}
 		public function get_ics_content($include_repeats = false){
 			$HELP = new evo_helper();
+			$is_all_day = $this->is_all_day();
+    		$extend_type = $this->get_time_ext_type();
+    		$ics_format = EVO()->cal->get_prop('evo_ics_format','evcal_1') ?: 'utc'; 
 
 			$location = $this->get_attendance_mode() === 'online' && $vir_url = $this->get_virtual_url()
 		        ? $vir_url
@@ -1627,9 +1636,14 @@ class EVO_Event extends EVO_Data_Store{
 			$uid = uniqid();
 			$tz_key = $this->get_timezone_key();
 
+			// Add VTIMEZONE for local timezone if needed
+		    if ($ics_format != 'utc' && $extend_type == 'n' ) {
+		        $output .= eventon_get_vtimezone($tz_key); // Implement this function
+		    }
+
 			$output = "BEGIN:VEVENT\n";
 		    $output .= "UID:{$uid}\n";
-		    $output .= "DTSTAMP:" . date_i18n('Ymd\THis') . "\n";
+		    $output .= "DTSTAMP:" . gmdate('Ymd\THis') . "Z\n";
 
 		    $start_raw = (int)$this->get_prop('evcal_srow');
     		$end_raw = $this->get_prop('evcal_erow') ? (int)$this->get_prop('evcal_erow') : $start_raw;
@@ -1643,34 +1657,50 @@ class EVO_Event extends EVO_Data_Store{
 		        }
 		    }
 		    
-    		$is_all_day = $this->is_all_day();
-		    $format = $is_all_day ? 'Ymd' : 'Ymd\THis';
-		    $tz = new DateTimeZone($tz_key);
+    		$format = $extend_type != 'n' ? 'Ymd' : 'Ymd\THis';
     		$utc = new DateTimeZone('UTC');
 
-		    $this->DD->setTimezone($utc);
-    		$this->DD->setTimestamp($start_raw);
-		    $start = $this->DD->format($format);
+    		if ($extend_type != 'n' || $is_all_day) {
+		        $start_date = gmdate('Y-m-d', $start_raw);
+			    if ($extend_type == 'yl') {
+			        $start_raw = strtotime("$start_date first day of january");
+			        $end_raw = strtotime("$start_date last day of december 23:59:59");
+			    } elseif ($extend_type == 'ml') {
+			        $start_raw = strtotime("$start_date first day of this month");
+			        $end_raw = strtotime("$start_date last day of this month 23:59:59");
+			    } else {
+			        // 'dl' or generic all-day
+			        $start_raw = strtotime("$start_date 00:00:00");
+			        $end_raw = strtotime("$start_date 23:59:59");
+			    }
+		        $start = gmdate('Ymd', $start_raw);
+		        $end = gmdate('Ymd', $end_raw + 86400);
+		    } else {
+    			// start
+    			$this->DD->setTimestamp( $this->__convert_utc_to_unix_etz( $start_raw ) );
+	    		if( $ics_format == 'utc') $this->DD->setTimezone( $utc );
+	    		$start = ( $ics_format == 'utc' ? $this->DD->format( $format ) .'Z': ";TZID={$tz_key}:". $this->DD->format( $format ));
 
-		    $end_unix = $is_all_day ? $end_raw + 86400 : $end_raw;
-		    $this->DD->setTimezone($utc);
-		    $this->DD->setTimestamp($end_unix);
-		    $this->DD->setTimezone($tz);
-		    $end = $this->DD->format($format);
+	    		// end
+	    		$this->DD->setTimestamp( $this->__convert_utc_to_unix_etz( $end_raw ) );
+	    		if( $ics_format == 'utc') $this->DD->setTimezone( $utc );
+	    		$end = ( $ics_format == 'utc' ? $this->DD->format( $format ) .'Z': ";TZID={$tz_key}:". $this->DD->format( $format ));
+    		}
 
-		    $output .= "DTSTART:" . $start . ($is_all_day ? '' : 'Z') . "\n";
-		    $output .= "DTEND:" . $end . ($is_all_day ? '' : 'Z') . "\n";
-		    $output .= "TZID:{$tz_key}\n";
+		    $output .= "DTSTART:" . $start .  "\n";
+		    $output .= "DTEND:" . $end .  "\n";
 
 			// event link @4.9
 			$event_link = $this->is_virtual() && $this->is_virtual_url_public() ? $this->virtual_url() : $this->get_permalink();
     		$desc_adds = EVO()->cal->check_yn('evosm_ics_link', 'evcal_1') ? '' : "\\n" . $event_link;
 			
+			$description = $HELP->esc_ical_text($summary) . $desc_adds;
+    		$folded_description = $this->fold_ics_line("DESCRIPTION", $description);
+
 			$output .= "LOCATION:{$location}\n";
 		    $output .= "SUMMARY:" . html_entity_decode($HELP->esc_ical_text($name)) . "\n";
-		    $output .= "DESCRIPTION:" . $HELP->esc_ical_text($summary) . $desc_adds . "\n";
+		    $output .= $folded_description . "\n";
 		    $output .= "URL:" . $event_link . "\n";
-
 
 			// plug @+3.1
 			do_action('evo_event_ics_content', $this);
@@ -1687,25 +1717,28 @@ class EVO_Event extends EVO_Data_Store{
 		                $uid = uniqid();
 		                $output .= "BEGIN:VEVENT\n";
 		                $output .= "UID:{$uid}\n";
-		                $output .= "DTSTAMP:" . date_i18n('Ymd\THis') . "\n";
+		                $output .= "DTSTAMP:" . gmdate('Ymd\THis') . "Z\n";
 
-		                $this->DD->setTimezone($utc);
-		                $this->DD->setTimestamp($val[0]);
-		                $this->DD->setTimezone($tz);
-		                $start = $this->DD->format($format);
+		                if ($extend_type != 'n') {
+			                $start = gmdate('Ymd', $val[0]);
+			                $end = gmdate('Ymd', $val[1] + 86400);
+			            } else {
 
-		                $end_unix = $is_all_day ? $val[1] + 86400 : $val[1];
-		                $this->DD->setTimezone($utc);
-		                $this->DD->setTimestamp($end_unix);
-		                $this->DD->setTimezone($tz);
-		                $end = $this->DD->format($format);
+			    			$this->DD->setTimestamp( $this->__convert_utc_to_unix_etz( $val[0] ) );
+				    		if( $ics_format == 'utc') $this->DD->setTimezone( $utc );
+				    		$start = ( $ics_format == 'utc' ? $this->DD->format( $format ) .'Z': ";TZID={$tz_key}:". $this->DD->format( $format ));
 
-		                $output .= "DTSTART:" . $start . ($is_all_day ? '' : 'Z') . "\n";
-		                $output .= "DTEND:" . $end . ($is_all_day ? '' : 'Z') . "\n";
-		                $output .= "TZID:{$tz_key}\n";
+	    					$this->DD->setTimestamp( $this->__convert_utc_to_unix_etz( $val[1] ) );
+				    		if( $ics_format == 'utc') $this->DD->setTimezone( $utc );
+				    		$end = ( $ics_format == 'utc' ? $this->DD->format( $format ) .'Z': ";TZID={$tz_key}:". $this->DD->format( $format ));
+				    	}
+
+
+		                $output .= "DTSTART:" . $start .  "\n";
+		    			$output .= "DTEND:" . $end .  "\n";
 		                $output .= "LOCATION:{$location}\n";
 		                $output .= "SUMMARY:" . html_entity_decode($HELP->esc_ical_text($name)) . "\n";
-		                $output .= "DESCRIPTION:" . $HELP->esc_ical_text($summary) . $desc_adds . "\n";
+		                $output .= $folded_description . "\n";
 		                $output .= "URL:{$event_link}\n";
 		                $output .= "END:VEVENT\n";
 		            }
@@ -1714,6 +1747,30 @@ class EVO_Event extends EVO_Data_Store{
 			return $output;
 		}
 
+		// Helper function to fold lines per RFC 5545
+		private function fold_ics_line($field, $text) {
+		    $max_length = 75;
+		    $line = $field . ":" . $text;
+		    
+		    // If the line is within 75 characters, return it as is
+		    if (strlen($line) <= $max_length) {
+		        return $line;
+		    }
+
+		    // Split the line into chunks
+		    $folded = '';
+		    $current_line = $line;
+		    
+		    while (strlen($current_line) > $max_length) {
+		        $folded .= substr($current_line, 0, $max_length) . "\n ";
+		        $current_line = substr($current_line, $max_length);
+		    }
+		    
+		    // Append the remaining part
+		    $folded .= $current_line;
+		    
+		    return $folded;
+		}
 		private function get_location_string(evo_helper $HELP): string {
 		    $lDATA = $this->get_location_data();
 		    if (!$lDATA) return '';

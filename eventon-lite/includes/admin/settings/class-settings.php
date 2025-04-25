@@ -55,6 +55,9 @@ class EVO_Settings extends EVO_Settings_Designer{
 
 	public function register_scripts(){
 		wp_register_script('settings_script',EVO()->assets_path.'lib/settings/settings.js', array('jquery', 'jquery-ui-core', 'jquery-ui-sortable'), EVO()->version, true );
+		wp_localize_script('settings_script', 'evoajax', [
+	        'nonce' => wp_create_nonce('eventon_settings_save_nonce'),
+	    ]);
 		
 		EVO()->elements->register_shortcode_generator_styles_scripts();
 	}

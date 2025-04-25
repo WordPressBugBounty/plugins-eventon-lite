@@ -241,6 +241,8 @@ class evo_admin {
 
 				$eventon_JQ_UI_tp = AJDE_EVCAL_URL.'/assets/lib/jqtimepicker/jquery.timepicker.css';
 				wp_enqueue_style( 'eventon_JQ_UI_tp',$eventon_JQ_UI_tp);
+
+				 $this->evo_enqueue_classic_editor_scripts();
 			
 				// other scripts 
 				wp_register_script( 'evo_handlebars',EVO()->assets_path.'js/lib/handlebars.js',array('jquery'), EVO()->version, true);
@@ -254,6 +256,20 @@ class evo_admin {
 				// hook for plugins
 				do_action('eventon_admin_post_script');
 			}
+		}
+
+		private function evo_enqueue_classic_editor_scripts() {
+		    wp_enqueue_editor();
+		    wp_enqueue_script('wp-editor', includes_url('js/tinymce/wp-tinymce.js'), ['jquery'], false, true);
+		    wp_enqueue_script('quicktags', includes_url('js/quicktags.min.js'), ['jquery'], false, true);
+		    wp_enqueue_style('editor-buttons', includes_url('css/editor.min.css'), [], false);
+		    //wp_enqueue_script('wordpress', includes_url('js/tinymce/plugins/wordpress/plugin.min.js'), ['wp-editor'], false, true);
+		    wp_enqueue_script('wplink', includes_url('js/tinymce/plugins/wplink/plugin.min.js'), ['wp-editor'], false, true);
+		    wp_enqueue_script('jquery-ui-core');
+		    wp_enqueue_script('jquery-ui-dialog');
+		    wp_enqueue_style('wp-jquery-ui-dialog');
+		    wp_enqueue_script('jquery');
+		    wp_enqueue_media();
 		}
 
 	// scripts and styles for wp-admin
@@ -334,7 +350,6 @@ class evo_admin {
 			
 			//$css_dir = get_template_directory() . '/css/'; // Shorten code, save 1 call
 			$css_dir = AJDE_EVCAL_DIR . '/'. EVENTON_BASE.  '/assets/css/'; 
-			//$css_dir = plugin_dir_path( __FILE__ ).  '/assets/css/'; 
 			
 			//echo $css_dir;
 

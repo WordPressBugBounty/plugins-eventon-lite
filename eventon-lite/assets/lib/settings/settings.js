@@ -74,7 +74,8 @@ jQuery(document).ready(function($){
 				data: {
 					formData: jsonData,
 					lang: $('body').find('.evo_lang_selection').val(),	
-					page: 	getQueryParam('page'),				
+					page: 	getQueryParam('page'),	
+					evoajax: evoajax.nonce,			
 				},
 				loader_btn_el:true,
 				show_snackbar: {duration:2000},

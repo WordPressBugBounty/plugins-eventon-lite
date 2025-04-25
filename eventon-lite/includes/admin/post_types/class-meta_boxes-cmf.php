@@ -51,7 +51,7 @@ if( $_has_cmf ):
 			'ajax_data'=>array(
 				'a'=>'eventon_get_secondary_settings',
 				'event_id'=>		$EVENT->ID,
-				'settings_file'=> 'views/cmf_settings.php'
+				'setitngs_file_key' => 'cmf_settings',
 			),
 		),
 	));

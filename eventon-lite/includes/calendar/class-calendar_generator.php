@@ -1269,12 +1269,12 @@ class EVO_generator extends EVO_Cal_Time{
 
 									$ett_terms = wp_get_post_terms($event_id,'event_type');
 
-									$evcal_terms = ($b==1)? $ett_terms: wp_get_post_terms($event_id,$__tax_slug);
+									$evcal_terms = ($key==1)? $ett_terms: wp_get_post_terms($event_id,$__tax_slug);
 									if($evcal_terms){
 
-										$__tax_name = $_tax_names_array[$b];
+										$__tax_name = $_tax_names_array[$key];
 
-										$__tx_content .="<span class='evcal_event_types level_4 ett{$b}'><em><i>".$__tax_name.":</i></em>";
+										$__tx_content .="<span class='evcal_event_types level_4 ett{$key}'><em><i>".$__tax_name.":</i></em>";
 										$i=1;
 										foreach($evcal_terms as $termA):
 											// get translated tax term name
@@ -1290,7 +1290,7 @@ class EVO_generator extends EVO_Cal_Time{
 										endforeach;
 										$__tx_content .="<i class='clear'></i></span>";
 
-										$html_event_type_tax_ar[$b] = $__tx_content;
+										$html_event_type_tax_ar[$key] = $__tx_content;
 									}
 								}
 							}

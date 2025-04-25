@@ -7,7 +7,7 @@
  * @author 		AJDE
  * @category 	Admin
  * @package 	EventON/Admin
- * @version     L 2.2.21
+ * @version    	2.4.1
  */
 
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
@@ -174,6 +174,73 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 			$time_format = !empty($post_data['_evo_time_format']) ? $post_data['_evo_time_format']: get_option('time_format');
 
 			return eventon_get_unix_time($date_POST_values, $date_format, $time_format, $tz);
+	}
+
+// Sanitize CSS @version 2.4.1
+	function eventon_sanitize_css($css) {
+	    // Check if input is empty or not a string
+	    if (empty($css) || !is_string($css)) {
+	        return '';
+	    }
+
+	    // Limit input size to prevent abuse (e.g., 1MB max)
+	    if (strlen($css) > 1048576) {
+	        return '';
+	    }
+
+	    // Normalize line endings and decode HTML entities to preserve quotes
+	    $css = str_replace(array("\r\n", "\r"), "\n", $css);
+	    $css = html_entity_decode($css, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+
+	    // Remove dangerous content
+	    // Strip <script> tags and their content
+	    $css = preg_replace('/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/i', '', $css);
+	    // Remove JavaScript/VBScript protocols
+	    $css = preg_replace('/(javascript|vbscript|data):/i', '', $css);
+	    // Remove expression() and other CSS-based JS injections
+	    $css = preg_replace('/expression\s*\([^)]*\)/i', '', $css);
+	    // Remove @import rules to prevent external resource loading
+	    $css = preg_replace('/@import\s*(url\s*\([^)]*\)|[^;]*);?/i', '', $css);
+
+	    // Strip HTML tags and CSS comments
+	    $css = wp_strip_all_tags($css);
+	    $css = preg_replace('/\/\*[\s\S]*?\*\//', '', $css);
+
+	    // Preserve valid CSS characters, including quotes
+	    // Allow: alphanumeric, whitespace, and CSS-specific characters like {}:;,.#()"'-@*
+	    $css = preg_replace('/[^\w\s\d{}:;,.#()"\'\-@*\/]/', '', $css);
+
+	    // Ensure double quotes are not escaped unnecessarily
+	    $css = str_replace(array('\"', '&quot;'), '"', $css);
+
+	    // Clean up specific CSS properties and values
+	    // Remove potentially dangerous properties like behavior, -moz-binding
+	    $css = preg_replace('/\b(behavior|-moz-binding)\s*:[^;]*;/i', '', $css);
+
+	    // Sanitize URLs in CSS (e.g., background: url(...))
+	    $css = preg_replace_callback(
+	        '/url\s*\(\s*[\'"]?([^\'"]*)[\'"]?\s*\)/i',
+	        function ($matches) {
+	            $url = trim($matches[1]);
+	            // Allow only http, https, or relative URLs
+	            if (preg_match('/^(https?:\/\/|\/|[a-z0-9_-]+\.[a-z0-9_-]+\/)/i', $url)) {
+	                return 'url("' . esc_url_raw($url) . '")';
+	            }
+	            return ''; // Remove invalid URLs
+	        },
+	        $css
+	    );
+
+	    // Remove excessive whitespace and normalize
+	    $css = preg_replace('/\s+/', ' ', $css);
+	    $css = trim($css);
+
+	    // Final check: ensure the CSS is not empty
+	    if (empty($css)) {
+	        return '';
+	    }
+
+	    return $css;
 	}
 
 // LEGACY

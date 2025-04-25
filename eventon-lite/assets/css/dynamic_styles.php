@@ -2,7 +2,7 @@
 /**
  * dynamic styles for front end
  *
- * @version		2.4
+ * @version		2.4.1
  * @package		eventon/Styles
  * @author 		AJDE
  */
@@ -680,4 +680,22 @@
 	// (---) Hook for addons
 	do_action('eventon_inline_styles');
 	
-	echo esc_html( get_option('evcal_styles') );
+// Print custom styles added via styles settings 
+	// Retrieve CSS from wp_options
+    $css = get_option('evcal_styles', '');
+
+    if (!empty($css)) {
+        // Ensure quotes are preserved
+        $css = html_entity_decode($css, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        $css = str_replace(array('\"', '"'), '"', $css);
+
+        // Additional cleanup for CSS output
+        $css = wp_strip_all_tags($css); // Ensure no HTML tags
+        $css = preg_replace('/\/\*[\s\S]*?\*\//', '', $css); // Remove CSS comments
+        $css = preg_replace('/\s+/', ' ', $css); // Normalize whitespace
+        $css = trim($css);
+
+        // Output the CSS
+        echo $css;
+    }
+

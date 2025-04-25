@@ -87,7 +87,6 @@ require EVO_ABSPATH. 'includes/evo-conditional-functions.php';
 			$_lang_variation = (!empty($shortcode_arg['lang']))? $shortcode_arg['lang']:'L1';
 		}
 
-		
 		// foreach event type upto activated event type categories
 		for( $x=1; $x <= evo_max_ett_count(); $x++){
 			$ab = ($x==1)? '':$x;
@@ -1232,6 +1231,99 @@ require EVO_ABSPATH. 'includes/evo-conditional-functions.php';
 			}
 			return false;
 		}
+
+	// return VTIMEZONE components for ICS file
+	// @version 2.4.1
+	function eventon_get_vtimezone($tz_key, $start_raw) {
+	    // Validate timezone
+	    try {
+	        $tz = new DateTimeZone($tz_key);
+	    } catch (Exception $e) {
+	        return ''; // Invalid timezone, return empty string
+	    }
+
+	    // Get year from start_raw (Unix timestamp)
+	    $year = gmdate('Y', $start_raw); // e.g., 2025
+
+	    // Get timezone transitions for the year
+	    $transitions = $tz->getTransitions($start_raw, strtotime("$year-12-31 23:59:59 UTC"));
+	    $has_dst = false;
+	    $std_offset = null;
+	    $dst_offset = null;
+	    $std_start = null;
+	    $dst_start = null;
+	    $std_name = 'STD';
+	    $dst_name = 'DST';
+
+	    // Analyze transitions to find STD and DST for the year
+	    foreach ($transitions as $transition) {
+	        if ($transition['isdst']) {
+	            $dst_offset = $transition['offset'] / 3600; // e.g., -4 for EDT
+	            $dst_start = $transition['ts'];
+	            $dst_name = $transition['abbr'] ?: 'DST';
+	            $has_dst = true;
+	        } else {
+	            $std_offset = $transition['offset'] / 3600; // e.g., -5 for EST
+	            $std_start = $transition['ts'];
+	            $std_name = $transition['abbr'] ?: 'STD';
+	        }
+	    }
+
+	    // Format offset for iCalendar (e.g., -0500 for -5 hours)
+	    $format_offset = function($offset) {
+	        $sign = $offset >= 0 ? '+' : '-';
+	        $hours = abs(floor($offset));
+	        $minutes = abs(($offset - floor($offset)) * 60);
+	        return sprintf('%s%02d%02d', $sign, $hours, $minutes);
+	    };
+
+	    // Start VTIMEZONE
+	    $output = "BEGIN:VTIMEZONE\n";
+	    $output .= "TZID:$tz_key\n";
+
+	    // STANDARD component (always present)
+	    if ($std_offset !== null) {
+	        $std_offset_str = $format_offset($std_offset);
+	        $output .= "BEGIN:STANDARD\n";
+	        $output .= "TZOFFSETFROM:" . ($has_dst ? $format_offset($dst_offset) : $std_offset_str) . "\n";
+	        $output .= "TZOFFSETTO:$std_offset_str\n";
+	        $output .= "TZNAME:$std_name\n";
+
+	        // Approximate transition (e.g., first Sunday in November)
+	        if ($std_start && $has_dst) {
+	            $std_date = new DateTime("@$std_start", new DateTimeZone('UTC'));
+	            $month = $std_date->format('n'); // e.g., 11 for November
+	            $day = $std_date->format('j');
+	            $week = ceil($day / 7); // e.g., 1 for first week
+	            $output .= "DTSTART:" . $std_date->format('Ymd\THis') . "\n";
+	            $output .= "RRULE:FREQ=YEARLY;BYMONTH=$month;BYDAY={$week}SU\n";
+	        } else {
+	            // No DST, use a default start (e.g., 19700101)
+	            $output .= "DTSTART:19700101T000000\n";
+	        }
+	        $output .= "END:STANDARD\n";
+	    }
+
+	    // DAYLIGHT component (if DST exists)
+	    if ($has_dst && $dst_offset !== null) {
+	        $dst_offset_str = $format_offset($dst_offset);
+	        $output .= "BEGIN:DAYLIGHT\n";
+	        $output .= "TZOFFSETFROM:" . $format_offset($std_offset) . "\n";
+	        $output .= "TZOFFSETTO:$dst_offset_str\n";
+	        $output .= "TZNAME:$dst_name\n";
+	        $dst_date = new DateTime("@$dst_start", new DateTimeZone('UTC'));
+	        $month = $dst_date->format('n'); // e.g., 3 for March
+	        $day = $dst_date->format('j');
+	        $week = ceil($day / 7); // e.g., 2 for second week
+	        $output .= "DTSTART:" . $dst_date->format('Ymd\THis') . "\n";
+	        $output .= "RRULE:FREQ=YEARLY;BYMONTH=$month;BYDAY={$week}SU\n";
+	        $output .= "END:DAYLIGHT\n";
+	    }
+
+	    $output .= "END:VTIMEZONE\n";
+
+	    return $output;
+	}
 
 // LANGUAGE
 	// Get the current eventON language value

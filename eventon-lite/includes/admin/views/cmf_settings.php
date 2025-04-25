@@ -1,8 +1,7 @@
 <?php 
 /**
  * Event CMF settings
- * @version 2.3
- * @version 4.7.4
+ * @version 2.4.1
  */
 
 $EVENT = new EVO_Event( $post_data['event_id'] );
@@ -83,9 +82,14 @@ $metabox_array = array();
 					$__saved_field_value = ($EVENT->get_meta_null( $__field_id ) );
 					
 					switch ($__field_type) {
-						case 'textareaX':
-							wp_editor($__saved_field_value, $__field_id, array('wpautop' => true ));
-							break;
+						// support for classic wordpress editor @version 2.4.1
+			            case 'wp_editor':
+
+				            // Classic editor container
+							echo "<div class='evo_classic_editor_container evomart15' data-field-id='{$__field_id}'>";
+							echo "<label class='evomarb5 evodb'>" . __('Field Content', 'eventon') . "</label>";
+							echo "<textarea name='{$__field_id}' id='{$__field_id}' class='evo_classic_editor_textarea evow100pi'>" . esc_textarea($__saved_field_value) . "</textarea>";
+							echo "</div>";
 
 						case 'textarea':
 						case 'textarea_trumbowig':
@@ -93,7 +97,8 @@ $metabox_array = array();
 								'type'=> 'wysiwyg',
 								'id'=> $__field_id,
 								'name'=> __('Field Content','eventon'),
-								'value'=> $__saved_field_value
+								'value'=> $__saved_field_value,
+								'row_class'=> 'evomart15'
 							));	
 							break;
 
@@ -178,6 +183,140 @@ $metabox_array = array();
 					)
 				),'trig_form_submit');
 			
+			// Inline styles for classic editor
+			echo "<style>
+			    .evo_classic_editor_container .mce-tinymce, 
+			    .evo_classic_editor_container .mce-edit-area, 
+			    .evo_classic_editor_container .mce-edit-area iframe {
+			        min-height: 200px !important;
+			    }
+			    .evo_classic_editor_container .mce-toolbar-grp {
+			        display: flex !important;
+			    }
+			</style>";
+
+			// inline scripts for classic editor
+			?>
+			<script>
+			(function($) {
+			    function initializeClassicEditor(fieldId, retryCount = 0, maxRetries = 5) {
+			        if (typeof wp === 'undefined' || typeof wp.editor === 'undefined' || typeof $.ui === 'undefined') {
+			            if (retryCount < maxRetries) {
+			                setTimeout(function() {
+			                    initializeClassicEditor(fieldId, retryCount + 1, maxRetries);
+			                }, 500);
+			            } else {
+			                console.error('Failed to initialize Classic Editor for field: ' + fieldId);
+			            }
+			            return;
+			        }
+
+			        const $textarea = $('#' + fieldId);
+			        if (!$textarea.length) {
+			            console.error('Textarea not found for field: ' + fieldId);
+			            return;
+			        }
+
+			        try {
+			            wp.editor.remove(fieldId);
+			        } catch (e) {}
+
+			        wp.editor.initialize(fieldId, {
+			            tinymce: {
+			                wpautop: false,
+			                plugins: 'charmap colorpicker compat3x directionality hr image lists media paste tabfocus textcolor wordpress wpautoresize wpdialogs wpeditimage wpemoji wpgallery wplink wptextpattern wpview',
+			                toolbar1: 'bold italic underline strikethrough | bullist numlist | blockquote hr | alignleft aligncenter alignright | link unlink | image wp_more | spellchecker',
+			                toolbar2: 'formatselect fontselect fontsizeselect | forecolor backcolor | pastetext removeformat | charmap | outdent indent | undo redo | wp_help',
+			                content_css: '<?php echo includes_url('css/editor.min.css'); ?>,<?php echo includes_url('css/dashicons.min.css'); ?>',
+			                height: 300,
+			                setup: function(editor) {
+			                    editor.on('init', function() {
+			                        editor.setContent($textarea.val());
+			                        editor.hide();
+			                        setTimeout(function() {
+			                            editor.show();
+			                        }, 100);
+			                    });
+			                    editor.on('change', function() {
+			                        editor.save();
+			                    });
+			                    editor.on('change keyup', function() {
+								    $textarea.val(editor.getContent());
+								});
+			                    // Sync content when switching to Text mode
+			                    editor.on('SetContent', function() {
+			                        $textarea.val(editor.getContent());
+			                        setTimeout(function() {
+			                            const qtTextarea = $('#qt_' + fieldId + '_content');
+			                            if (qtTextarea.length) {
+			                                qtTextarea.val($textarea.val());
+			                            }
+			                        }, 100);
+			                    });
+			                },
+			            },
+			            quicktags: {
+			                buttons: 'strong,em,link,block,del,ins,img,ul,ol,li,code,more,close',
+			                id: fieldId
+			            }
+			        });
+
+			        // Initialize Quicktags and sync content
+			        if (typeof QTags !== 'undefined') {
+			            QTags({ id: fieldId, buttons: 'strong,em,link,block,del,ins,ul,ol,li,code,more,close' });
+			            QTags._buttonsInit();
+			            setTimeout(function() {
+			                const qtTextarea = $('#qt_' + fieldId + '_content');
+			                if (qtTextarea.length) {
+			                    qtTextarea.val($textarea.val());
+			                } else {
+			                    console.warn('Quicktags textarea not found for field: ' + fieldId);
+			                    // Retry sync
+			                    setTimeout(function() {
+			                        const retryQtTextarea = $('#qt_' + fieldId + '_content');
+			                        if (retryQtTextarea.length) {
+			                            retryQtTextarea.val($textarea.val());
+			                        }
+			                    }, 2000);
+			                }
+			            }, 1500);
+			        }
+
+			        // Add media button above the editor
+			        setTimeout(function() {
+			            const $container = $('.evo_classic_editor_container[data-field-id="' + fieldId + '"]');
+			            if ($container.find('.wp-media-buttons').length === 0) {
+			            	$container.find('.wp-editor-tabs').before('<div class="wp-media-buttons"><button type="button" class="button insert-media add_media" data-editor="' + fieldId + '"><span class="wp-media-buttons-icon"></span> Add Media</button></div>');
+			                // Bind media button click
+			                $container.find('.add_media').on('click', function() {
+			                    wp.media.editor.setContent = function(content) {
+			                        var editor = tinymce.get(fieldId);
+			                        if (editor) {
+			                            editor.setContent(content);
+			                        }
+			                        $textarea.val(content);
+			                        // Sync to Quicktags
+			                        setTimeout(function() {
+			                            const qtTextarea = $('#qt_' + fieldId + '_content');
+			                            if (qtTextarea.length) {
+			                                qtTextarea.val(content);
+			                            }
+			                        }, 100);
+			                    };
+			                    wp.media.editor.open(fieldId);
+			                });
+			            }
+			        }, 1500);
+			    }
+
+			    $('.evo_classic_editor_textarea').each(function() {
+		            const fieldId = $(this).attr('id');
+		            initializeClassicEditor(fieldId);
+		        });
+
+			})(jQuery);
+			</script>
+			<?php 
 
 		else:
 			echo '<p class="pad20"><span class="evomarb10" style="display:block">' . __('You do not have any custom meta fields activated.') . '</span><a class="evo_btn" href="'. get_admin_url(null, 'admin.php?page=eventon#evcal_009','admin') .'">'. __('Activate Custom Meta Fields','eventon') . '</a></p>';

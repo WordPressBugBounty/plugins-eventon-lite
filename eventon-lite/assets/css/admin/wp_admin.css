@@ -1,7 +1,6 @@
 /**
  * EventON wp-admin all styles
- * @version 2.3
- * @fullversion 4.9.2
+ * @version 2.4.1
  */
 
 	:root{
@@ -192,7 +191,7 @@
 	/* sizing */
 		.evow100p{width: 100%;}.evow50p{width: 50%;}.wid33,.evow33p{width:33.3%}.wid66,.evow66p{width:66.6%}
 		.evoh100p{height: 100%;}.evoh50p{height: 50%;}.evoh33p{height:33.3%}.evoh66p{height:66.6%}
-		.evow100pi{width: 100%!important}.evoh100pi{height: 100%!important}	.evow100pi{width: 50%!important}
+		.evow100pi{width: 100%!important}.evoh100pi{height: 100%!important}	.evow50pi{width: 50%!important}
 	/* text decoration */
 		.ttu,.evottu, .evottuc{text-transform:uppercase}
 		.evottc{text-transform:capitalize;}
