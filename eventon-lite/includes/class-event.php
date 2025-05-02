@@ -160,15 +160,16 @@ class EVO_Event extends EVO_Data_Store{
 				if( !$this->is_repeating_event() ) return;
 
 				$repeat_interval = (int)$this->ri;
-				$intervals = $this->get_prop('repeat_intervals');
+				$intervals = $this->get_repeats();
 
+				if(!$intervals) return;
 				if(!is_array($intervals)) return;
 				if( sizeof($intervals) == 0) return;
 
 				$start = isset($intervals[$repeat_interval][0])? $intervals[$repeat_interval][0]: $intervals[0][0];
 				$end = isset($intervals[$repeat_interval][1])? $intervals[$repeat_interval][1]:$intervals[0][1];	
 
-				$this->_process_event_start_end( $start, $end );			
+				$this->_process_event_start_end( $start, $end );		
 								
 			}
 

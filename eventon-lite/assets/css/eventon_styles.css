@@ -3287,6 +3287,7 @@
 			    height: 100%!important;
     		width: 100%; position: absolute;
 		}
+		.ajde_evcal_calendar.boxy.boxstyle3 .eventon_list_event{cursor: pointer;}
 		.ajde_evcal_calendar.boxy.boxstyle3 #evcal_list .eventon_list_event .evoet_c2.evoet_cx .evoet_dayblock{
 			margin: 10px;
 		    background-color: #000000bd!important;

@@ -855,7 +855,9 @@ class EVO_generator extends EVO_Cal_Time{
 								// using UTC0 time
 								$_is_event_current = $EVENT->is_current_event( ($hide_past_by=='ee'?'end':'start') );								
 								$_is_event_inrange = $EVENT->is_event_in_date_range( $range_data['start'],$range_data['end'] , '', '', true );
-								$_is_in_visible_range = $EVENT->is_in_visible_range( $_cal_visible_range , $range_data['start'],$range_data['end']);
+								$_is_in_visible_range = $EVENT->is_in_visible_range( $_cal_visible_range );
+
+
 								
 								
 								// hide past event set - past events set to hide

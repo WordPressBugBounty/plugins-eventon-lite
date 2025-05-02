@@ -1026,10 +1026,12 @@ class EVO_admin_ajax{
 		// save language settings
 		public function settings_save(){
 
-			// Check for nonce validation
-	        if (!isset($_POST['evoajax']) || !wp_verify_nonce($_POST['evoajax'], 'eventon_settings_save_nonce')) {
-	            wp_send_json_error(array('message' => 'Invalid nonce')); wp_die();
-	        }
+			// Check nonce and referer
+		    if (!check_admin_referer('eventon_settings_save_nonce', 'evoajax')) {
+		        EVO_Debug('Invalid nonce or referer in settings_save: ' . print_r($_POST, true));
+		        wp_send_json_error(array('message' => 'Invalid nonce or referer'));
+		        wp_die();
+		    }
 
 	        // check if admin and loggedin
 			if( !current_user_can('edit_eventons') ){
@@ -1037,8 +1039,7 @@ class EVO_admin_ajax{
 			}
 
 	        // Decode JSON data and validate it
-		    $form_data = json_decode(stripslashes($_POST['formData']), true);
-		    
+		    $form_data = json_decode(stripslashes($_POST['formData']), true);		    
 		    if (json_last_error() !== JSON_ERROR_NONE) {
 		        wp_send_json_error(array('message' => 'Invalid JSON data'));
 		        wp_die();
@@ -1060,7 +1061,6 @@ class EVO_admin_ajax{
 
 		    // load existing settings values
 		    	EVO()->cal->set_cur( $current_tab );
-
 		    	$saved_settings = EVO()->cal->get_op( $current_tab );
 				$saved_settings = !empty($saved_settings) && is_array($saved_settings)? $saved_settings : array();
 
@@ -1070,24 +1070,27 @@ class EVO_admin_ajax{
 
 					// Process duplicates and sanitize each value
 				    foreach ($form_data as $item) {
-				        if (isset($item['name']) && isset($item['value'])) {
-				            $key = sanitize_text_field($item['name']);
-				            $value = sanitize_text_field($item['value']);
+				        // skip saving unnecessary text
+				    	if( in_array($itemkey, array('action','option_page','_wp_http_referer','_wpnonce','evcal_noncename','evo_current_lang','evo_translated_text'))) continue;
+
+				        if( !empty($itemvalue )) {
+				            $key = sanitize_text_field( $itemkey );
+				            $value = sanitize_textarea_field( $itemvalue );
 
 				            if (strpos($key, '_v_') !== false) {
 				                $key = str_replace('_v_', '', $key);
 				            }
 
-				            $form_data[$key] = $value;
+				            $sanitized_form_data[$key] = $value;
 				        }
 				    }
 
 					$lang_opt = get_option('evcal_options_evcal_2');
 					if(!empty($lang_opt) ){
-						$new_settings[$_lang_version] = $form_data;
+						$new_settings[$_lang_version] = $sanitized_form_data;
 						$new_settings = array_merge($lang_opt, $new_settings);
 					}else{
-						$new_settings[$_lang_version] = $form_data;
+						$new_settings[$_lang_version] = $sanitized_form_data;
 					}
 
 					// Update the option with sanitized data

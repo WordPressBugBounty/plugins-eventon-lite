@@ -208,7 +208,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
 	    // Preserve valid CSS characters, including quotes
 	    // Allow: alphanumeric, whitespace, and CSS-specific characters like {}:;,.#()"'-@*
-	    $css = preg_replace('/[^\w\s\d{}:;,.#()"\'\-@*\/]/', '', $css);
+	    $css = preg_replace('/[^\w\s\d{}:;,.#()"\'\-@*!\/]/', '', $css);
 
 	    // Ensure double quotes are not escaped unnecessarily
 	    $css = str_replace(array('\"', '&quot;'), '"', $css);

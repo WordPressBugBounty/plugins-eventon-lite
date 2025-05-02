@@ -849,6 +849,12 @@ jQuery(document).ready(function($){
 
 			$('body').trigger('evolightbox_opened',[ lb_class ]);
 		});
+
+		// click on tile box style 3
+			$('body').on('click','.ajde_evcal_calendar.boxstyle3 .eventon_list_event',function(e){
+				e.preventDefault(); e.stopPropagation();
+				$(this).find('.desc_trig').trigger('click');
+			})
 		
 	// OPENING event card -- USER INTREACTION and loading google maps
 		//event full description\		

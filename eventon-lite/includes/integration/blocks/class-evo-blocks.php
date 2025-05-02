@@ -1,7 +1,7 @@
 <?php
 /**
  * EventON Blocks Integration
- * @version  4.4
+ * @version  2.4.2
  */
 
 class EVO_Blocks{
@@ -13,7 +13,7 @@ class EVO_Blocks{
 		add_action( 'init', array($this,'block_registering') );
 		add_filter( 'block_categories_all', array($this,'evo_category'), 10, 2);
 	}
-	function block_registering(){
+	public function block_registering(){
 
 
 		wp_register_script(
@@ -53,22 +53,35 @@ class EVO_Blocks{
 	    
 	}
 
-	function evo_block_render_callback($attributes, $content){
+	public function evo_block_render_callback($attributes, $content){
 
-		$template_slug = $attributes['template'];
+		$template_slug = isset($attributes['template']) ? sanitize_file_name($attributes['template']) : '';
+
+		// Check for empty or invalid slug
+	    if (empty($template_slug) || !preg_match('/^[a-zA-Z0-9_-]+$/', $template_slug)) {
+	        error_log("Invalid template slug detected: " . $attributes['template']);
+	        return '<!-- Invalid or missing template -->';
+	    }
+
 		$classic_file = $template_slug .'.php';
 
 		$template = locate_template( $classic_file );
-		if( !$template){
-			$template = EVO()->plugin_path() . '/templates/' . $classic_file;		
-		}
 
+		// Fallback to plugin's template directory if not found in theme
+	    if (!$template) {
+	        $plugin_template_path = EVO()->plugin_path() . '/templates/' . $classic_file;
+	        // Ensure the file exists and is within the expected directory
+	        if (file_exists($plugin_template_path) && strpos(realpath($plugin_template_path), realpath(EVO()->plugin_path() . '/templates/')) === 0) {
+	            $template = $plugin_template_path;
+	        } else {
+	            return '<!-- Template not found -->';
+	        }
+	    }
+		
 		ob_start();
 		
 		load_template( $template );
-
-		$template_content = ob_get_clean();
-		
+		$template_content = ob_get_clean();	
 
 		return $template_content;
 	}
