@@ -1,7 +1,7 @@
 <?php
 /**
  * EventON Lite Setup
- * @version 2.4.2
+ * @version 2.4.3
  * 
  */
 
@@ -11,7 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 class EventON {
 
 	// defines
-		public $version = '2.4.2';
+		public $version = '2.4.3';
 				
 		public $template_url;
 		public $print_scripts=false;
@@ -119,6 +119,7 @@ class EventON {
 		include_once( EVO_ABSPATH.'includes/integration/blocks/class-evo-blocks.php' );
 		include_once( EVO_ABSPATH.'includes/integration/class-intergration-visualcomposer.php' );	
 		include_once( EVO_ABSPATH.'includes/integration/elementor/class-elementor-init.php' );
+		include_once( EVO_ABSPATH.'includes/integration/openai/class-ai.php' );
 		
 		include_once( EVO_ABSPATH.'includes/class-evo-shortcodes.php' );
 

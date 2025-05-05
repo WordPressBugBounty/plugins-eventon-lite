@@ -5,7 +5,7 @@
  * @author 		AJDE
  * @category 	Admin
  * @package 	eventon/Admin
- * @version     L 2.2.3
+ * @version     2.4.3
  */
 
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
@@ -83,6 +83,9 @@ class evo_admin {
 		   		wp_enqueue_style('evo_wyg_editor');
 		   		wp_enqueue_script('evo_wyg_editor');
 			}
+
+			do_action('evo_admin_event_only_page', $page, $post, $postType);
+
 		}else{
 			$this->eventon_shortcode_button_init();
 		}

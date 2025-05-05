@@ -1,10 +1,11 @@
 <?php
 /**
  * Function ajax for backend
- * @version   2.4.1
+ * @version   2.4.3
  */
 class EVO_admin_ajax{
 	public $helper;
+	public $post_data;
 	
 	public function __construct(){
 		$ajax_events = array(		
@@ -46,7 +47,8 @@ class EVO_admin_ajax{
 		add_action('wp_ajax_eventon-feature-event', array($this, 'eventon_feature_event'));
 
 		$this->helper = EVO()->helper;
-	}
+		$this->post_data = $this->helper->sanitize_array( $_POST );
+	}	
 
 	// shortcode generator
 		function get_shortcode_generator(){
@@ -75,6 +77,8 @@ class EVO_admin_ajax{
 			}
 
 			$PD = $this->post_data;
+
+			EVO_Debug($PD);
 
 
 			// required data check

@@ -1,7 +1,7 @@
 <?php
 /**
  * EventON Various admin settings view designer
- * @version 2.4
+ * @version 2.4.3
  */
 
 class EVO_Settings_Designer{
@@ -633,7 +633,9 @@ class EVO_Settings_Designer{
 							
 							$rightside.= "<div class='backender_yn_sec' id='".$field['id']."' style='display:".(($yesno_val=='yes')?'block':'none')."'><div class='evosettings_field_child'>";
 						break;
-						case 'end_afterstatement': $rightside.= "</div><em class='hr_line evosettings_end_field w1'></em><em class='hr_line evosettings_end_field w2'></em></div>"; break;
+						case 'end_afterstatement': 
+							$rightside.= "</div></div><em class='hr_line evosettings_end_field w1'></em>"; 
+							break;
 						
 						// hidden section open
 						case 'hiddensection_open':
@@ -662,8 +664,9 @@ class EVO_Settings_Designer{
 							$rightside .= (!empty($field['code'])? $field['code']:'');						
 						break;
 					}
-					if(!empty($field['type']) && !in_array($field['type'], $__no_hr_types) ){ 
-						$rightside.= "<em class='hr_line'></em>";}
+					if(!empty($field['type']) && !in_array($field['type'], $__no_hr_types) && !isset($field['afterstatement']) ){ 
+						$rightside.= "<em class='hr_line'></em>";
+					}
 					
 				}		
 				$rightside.= "</div>";//<!-- nfer-->

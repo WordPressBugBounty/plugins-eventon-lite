@@ -820,20 +820,17 @@
 		color: #32373c;
 		line-height: 1.4em;
 		border-bottom: 1px solid #e1e1e1;
-		font-weight: 400;
+		font-weight: 700;
 		text-align: left;
 	    font-size: 14px;
 	}
-	table.evo_admin_table tbody tr{
-		background-color: #f9f9f9
-	}
-	table.evo_admin_table tbody tr:nth-child(odd){background-color: #f3f3f3;	}
 	table.evo_admin_table tbody tr.colspan-row{background-color: #ffebd1;	}
 	table.evo_admin_table td, 
 	table.evo_admin_table th{
 		padding: 8px 10px;
 		color: #555;
 	}
+	table.evo_admin_table tbody tr:last-child td{border-bottom: none;}
 	table.evo_admin_table td{
 		font-size: 13px;
    		line-height: 1.5em;

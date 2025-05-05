@@ -834,6 +834,7 @@ class EVO_General_Elements extends EVO_Elm_Trigs{
 			'date_format_hidden'=>'Y/m/d',
 			'unix'=> '',				
 			'type'=>'start',
+			'subtype'=>'',
 			'assoc'=>'reg',
 			'names'=>true,
 			'rand'=>'',
@@ -863,11 +864,17 @@ class EVO_General_Elements extends EVO_Elm_Trigs{
 		$minute = $DD->format( 'i');
 		$ampm = $DD->format( 'a');
 
-		echo "<span class='evo_date_time_select ". esc_attr( $type )."' data-id='". esc_attr( $rand )."' data-unix='". esc_attr( $unix )."'> ";
+		echo "<span class='evo_date_time_select ". esc_attr( $type )." ". esc_attr( $subtype )."' data-id='". esc_attr( $rand )."' data-unix='". esc_attr( $unix )."'> ";
+
 			
 		if($selector != 'time' ):
+
+			$__class = ($disable_date_editing?'':"datepicker". esc_attr( $type ). "date");
+			$__class .= ($assoc != 'rp'? 'req':'')." ". esc_attr( $type ). " evo_dpicker ";
+			$__class .= ' '. esc_attr( $subtype );
+
 			echo " <span class='evo_date_edit'>
-				<input id='evo_". esc_attr( $type ). "_date_". esc_attr( $rand ). "' class='". ($disable_date_editing?'':"datepicker". esc_attr( $type ). "date")." ". ($assoc != 'rp'? 'req':'')." ". esc_attr( $type ). " evo_dpicker ' readonly='true' type='text' data-role='none' name='event_". esc_attr( $type ). "_date' value='". esc_attr( $date_val ) ."' data-assoc='". esc_attr( $assoc ). "' />	
+				<input id='evo_". esc_attr( $type ). "_date_". esc_attr( $rand ). "' class='". esc_attr($__class) ."'  readonly='true' type='text' data-role='none' name='event_". esc_attr( $type ). "_date' value='". esc_attr( $date_val ) ."' data-assoc='". esc_attr( $assoc ). "' />	
 				<input type='hidden' name='event_". esc_attr( $type )."_dateformat' value='". esc_attr( $date_format )."'/>
 
 				<input type='hidden' name='".($names? "event_". esc_attr( $type )."_date_x":'')."' class='evo_". esc_attr( $type )."_alt_date alt_date' value='". esc_attr( $date_val_x )."'/>

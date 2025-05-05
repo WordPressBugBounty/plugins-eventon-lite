@@ -1,6 +1,6 @@
 /*
  * EventON Back end scripts for general backend of wordpress
- * @version 2.3.3
+ * @version 2.4.3
  */
 jQuery(document).ready(function($){	
 
@@ -966,7 +966,7 @@ jQuery(document).ready(function($){
 		$('.evo_lang_selection').change(function(){
 			var val = $(this).val();
 			var url = $(this).data('url');
-			window.location.replace(url+'?page=eventon&tab=evcal_2&lang='+val);
+			window.location.replace(url+'?page=eventon-lang&tab=evcal_2&lang='+val);
 		});
 
 	// duplicate editing

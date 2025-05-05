@@ -5,7 +5,7 @@ Author URI: http://ashanjay.com/
 Tags: calendar, event calendar, virtual events, events, event management
 Requires at least: 6.0
 Tested up to: 6.8.1
-Stable tag: 2.4.2
+Stable tag: 2.4.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -58,6 +58,7 @@ Over the years we have added many amazing features to EventON.
 * Responsive for any device
 * Event Schema and JSON-LD for event SEO
 * Basic paypal payments support
+* OpenAI Integration for Event title, subtitle, description and X post
 
 
 Try it now to see how easy it is to manage events on your website!
@@ -153,9 +154,9 @@ Our Most Popular Addons:
 * **[Event Countdown Addon](https://www.myeventon.com/addons/event-countdown/)** - Display a real-time countdown timer for events to increase demand for your events and drive audience attention.
 
 
-Most recently crafted addons for EventON!
+Our Newest Addon!
 
-* **[Filters Plus Addon](https://www.myeventon.com/addons/filters-plus/)** - Extends your EventON Calendar filter capabilities to the next level and allow your visitors to interactively filter and find events easily.
+* **[Check-ins](https://www.myeventon.com/addons/check-ins/)** - Boost your events with Check-Ins: a fast, user-friendly addon delivering seamless guest check-ins and real-time attendance insights.
 
 Check out **[all EventON Addons](https://www.myeventon.com/addons/)**.
 
@@ -236,6 +237,11 @@ Yes, EventON Lite supports different timezones for each event. You can even disp
 For support with the Lite version, visit [support forum here](https://wordpress.org/support/plugin/eventon-lite/). For premium support or queries related to the Full version, please contact us through [our helpdesk](https://helpdesk.ashanjay.com).
 
 == Changelog ==
+= 2.4.3 (2025-5-5) =
+ADDED: OpenAI support for AI features
+FIXED: Custom repeat adding not working
+FIXED: Language switching no longer working in settings
+
 = 2.4.2 (2025-5-2) = 
 FIXED: Repeats events showing when hide past events set
 FIXED: XSS vulnerability when saving language settings data
