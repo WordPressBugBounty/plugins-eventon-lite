@@ -1071,9 +1071,10 @@ class EVO_admin_ajax{
 		    // for language settings
 			    if( $current_tab == 'evcal_2'):
 					$_lang_version = (!empty($_POST['lang']))? sanitize_text_field($_POST['lang']): 'L1';
+					$sanitized_form_data = array();
 
 					// Process duplicates and sanitize each value
-				    foreach ($form_data as $item) {
+				    foreach ($form_data as $itemkey => $itemvalue ) {
 				        // skip saving unnecessary text
 				    	if( in_array($itemkey, array('action','option_page','_wp_http_referer','_wpnonce','evcal_noncename','evo_current_lang','evo_translated_text'))) continue;
 

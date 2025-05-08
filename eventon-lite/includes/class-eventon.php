@@ -1,7 +1,7 @@
 <?php
 /**
  * EventON Lite Setup
- * @version 2.4.3
+ * @version 2.4.4
  * 
  */
 
@@ -11,7 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 class EventON {
 
 	// defines
-		public $version = '2.4.3';
+		public $version = '2.4.4';
 				
 		public $template_url;
 		public $print_scripts=false;

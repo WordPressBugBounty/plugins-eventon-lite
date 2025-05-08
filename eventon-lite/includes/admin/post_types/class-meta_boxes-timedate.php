@@ -484,26 +484,28 @@ $wp_date_format = $date_format;
 				if(!empty($ev_vals['repeat_intervals'])){
 
 					$DD = new DateTime( 'now', EVO()->calendar->timezone0);
-					$repeat_times = (unserialize($ev_vals['repeat_intervals'][0]));										
-					$date_format_string = $wp_date_format.' '.( $hr24? 'G:i':'h:ia');// datre format sting to display for repeats
-					
-					foreach($repeat_times as $__key => $rt){
-
-						if( $__key === 'rgi'|| !isset( $rt[0] )) continue;
+					$intervals = $EVENT->get_repeats();
+					if($intervals && sizeof($intervals)>0 ):									
+						$date_format_string = $wp_date_format.' '.( $hr24? 'G:i':'h:ia');// datre format sting to display for repeats
 						
-						$DD->setTimestamp((int)$rt[0]);
-						$start_unix = $DD->format('U');
-						$start_dt = $DD->format($date_format_string);
+						foreach( $intervals as $__key=>$rt):
 
-						$DD->setTimestamp((int)$rt[1]);
-						$end_unix = $DD->format('U');
-						$end_dt = $DD->format($date_format_string);
+							if( $__key === 'rgi'|| !isset( $rt[0] )) continue;
+							
+							$DD->setTimestamp((int)$rt[0]);
+							$start_unix = $DD->format('U');
+							$start_dt = $DD->format($date_format_string);
+
+							$DD->setTimestamp((int)$rt[1]);
+							$end_unix = $DD->format('U');
+							$end_dt = $DD->format($date_format_string);
 
 
-						echo '<li data-cnt="'.esc_attr($count).'" style="display:'.(( $count>3)?'none':'flex').'" class="'.($count==0?'initial':'').($count>3?' over':'').'">'. ($count==0? '<dd>'.esc_html__('Initial','eventon').'</dd>':'') . '<i>'.$count.'</i><span>'.esc_html__('from','eventon').'</span> '. esc_attr($start_dt) .' <span class="e">End</span> '. esc_attr($end_dt) .'<em alt="Delete">x</em>
-						<input type="hidden" name="repeat_intervals['.esc_attr($count).'][0]" value="'.esc_attr($start_unix).'"/><input type="hidden" name="repeat_intervals['.esc_attr($count).'][1]" value="'.esc_attr($end_unix).'"/></li>';
-						$count++;
-					}								
+							echo '<li data-cnt="'.esc_attr($count).'" style="display:'.(( $count>3)?'none':'flex').'" class="'.($count==0?'initial':'').($count>3?' over':'').'">'. ($count==0? '<dd>'.esc_html__('Initial','eventon').'</dd>':'') . '<i>'.$count.'</i><span>'.esc_html__('from','eventon').'</span> '. esc_attr($start_dt) .' <span class="e">End</span> '. esc_attr($end_dt) .'<em alt="Delete">x</em>
+							<input type="hidden" name="repeat_intervals['.esc_attr($count).'][0]" value="'.esc_attr($start_unix).'"/><input type="hidden" name="repeat_intervals['.esc_attr($count).'][1]" value="'.esc_attr($end_unix).'"/></li>';
+							$count++;
+						endforeach;	
+					endif;							
 				}
 				echo "</ul>";
 				
