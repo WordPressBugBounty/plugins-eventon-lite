@@ -1,7 +1,7 @@
 <?php 
 /**
  * Open AI Integration
- * @version 2.4.3
+ * @version 2.4.5
  */
 
 class EVO_OpenAI{
@@ -21,27 +21,26 @@ public function __construct(){
 		);
 		foreach ( $ajax_events as $ajax_event => $class ) {				
 			add_action( 'wp_ajax_'.  $ajax_event, array( $this, $class ) );
-			add_action( 'wp_ajax_nopriv_'.  $ajax_event, array( $this, $class ) );
+			add_action( 'wp_ajax_nopriv_'.  $ajax_event, array( $this, 'restrict_unauthenticated' ) );
 		}
 	}
 
-	public function nopriv(){
-		wp_send_json(['status'=>'nopriv','content'=> __('Login Needed')]);wp_die();
-	}
+	// Handle unauthenticated requests
+    public function restrict_unauthenticated() {
+        wp_send_json( array( 'status' => 'bad', 'msg' => __( 'Authentication required', 'eventon' )) );
+        wp_die();
+    }
 
 // ajax
 	public function enhance_content(){
 
-		// verification
-			if (empty($_REQUEST['nn']) || !wp_verify_nonce($_REQUEST['nn'], 'eventon_admin_nonce')) {
-		        wp_send_json_error(array( 'msg' => __('Nonce validation failed', 'eventon') ));
-		        return; 
-		    }
+		// validate
+		EVO()->helper->validate_request();
 
-		    if( !$this->is_ai_ready()){
-		    	wp_send_json_error(array( 'msg' => __('AI configuration is not ready for use.', 'eventon') ));
-		        return; 
-		    }
+	    if( !$this->is_ai_ready()){
+	    	wp_send_json_error(array( 'msg' => __('AI configuration is not ready for use.', 'eventon') ));
+	        return; 
+	    }
 
 		$help = new evo_helper();
 		$post_data = $help->sanitize_post();
@@ -82,7 +81,7 @@ public function __construct(){
 		}
 		
 
-		EVO_Debug( $prompt);
+		//EVO_Debug( $prompt);
 
 		$response = $this->call_openai_api($prompt, 300, 3); // Max tokens and 3 completions
 	    $enhanced_contents = [];
@@ -205,20 +204,13 @@ public function __construct(){
 
 	public function reset_usage(){
 
-		// verification
-			if (empty($_REQUEST['nn']) || !wp_verify_nonce($_REQUEST['nn'], 'eventon_admin_nonce')) {
-		        wp_send_json_error(array( 'msg' => __('Nonce validation failed', 'eventon') ));
-		        return; 
-		    }
-			if (current_user_can('manage_options')) {
-				wp_send_json_error( array('msg'=> __('You do not have permission to reset this data','eventon')) ); return;
-			}
-
-			if (get_transient('evoai_reset_cooldown')) {
-			    wp_send_json_error(array('msg' => __('Please wait before resetting again', 'eventon')));
-			    return;
-			}
-			set_transient('evoai_reset_cooldown', true, 60); // 60-second cooldown
+		// validate
+		EVO()->helper->validate_request();
+		if (get_transient('evoai_reset_cooldown')) {
+		    wp_send_json_error(array('msg' => __('Please wait before resetting again', 'eventon')));
+		    return;
+		}
+		set_transient('evoai_reset_cooldown', true, 60); // 60-second cooldown
 
 		$new_data = array(
 		    'prompt_tokens' => 0,
@@ -237,13 +229,8 @@ public function __construct(){
 	}
 
 	public function get_privacy_notice(){
-		//EVO_Debug( $_POST);
-		// verification
-			if (empty($_REQUEST['nn']) || !wp_verify_nonce($_REQUEST['nn'], 'eventon_admin_nonce')) {
-		        wp_send_json_error(array( 'msg' => __('Nonce validation failed', 'eventon') ));
-		        return; 
-		    }
-
+		// validate
+		EVO()->helper->validate_request();
 
 		ob_start();
 		?>

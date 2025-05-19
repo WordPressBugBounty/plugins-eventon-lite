@@ -2,7 +2,7 @@
 /** 
  * Helper functions to be used by eventon or its addons
  * front-end only 
- * @version 2.4
+ * @version 2.4.5
  */
 
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
@@ -52,6 +52,51 @@ class evo_helper{
 		
 
 	// sanitization
+		// @since 2.4.5
+		public function validate_request( 
+			$nonce_field = 'nn', 
+			$nonce_action = 'eventon_admin_nonce', 
+			$capability = 'edit_eventons', 
+			$require_admin = false, 
+			$require_auth = true, 
+			$output_type = 'json' , 
+			$use_admin_referer = false
+		) {
+		    $error_msg = '';
+
+		    // Check if in admin context if required
+		    if ( $require_admin && ! is_admin() ) {
+		        $error_msg = __( 'Only available in admin side.', 'eventon' );
+		    }
+		    // Check authentication if required
+		    elseif ( $require_auth && ! is_user_logged_in() ) {
+		        $error_msg = __( 'Authentication required', 'eventon' );
+		    }
+		    // Verify user permissions if capability is specified
+		    elseif ( $capability && ! current_user_can( $capability ) ) {
+		        EVO_Debug( 'Unauthorized access attempt to ' . $nonce_action );
+		        $error_msg = __( 'You do not have proper permission', 'eventon' );
+		    } 
+		    // admin referer check
+		    elseif ( $use_admin_referer ) {
+		        if ( ! check_admin_referer( $nonce_action, $nonce_field ) ) {
+		            $error_msg = __( 'Nonce or referrer validation failed', 'eventon' );
+		        }
+		    } 
+		    // Verify nonce
+		    elseif ( empty( $_REQUEST[$nonce_field] ) || ! wp_verify_nonce( wp_unslash( $_REQUEST[$nonce_field] ), $nonce_action ) ) {
+		        $error_msg = __( 'Nonce validation failed', 'eventon' );
+		    }
+
+		    // Handle output based on $output_type
+		    if ( $error_msg ) {
+		        if ( $output_type === 'json' ) {
+		            wp_send_json( array( 'status' => 'bad', 'msg' => $error_msg ) );
+		        } else {
+		            wp_die( $error_msg );
+		        }
+		    }
+		}
 		// @+ 4.0.3
 		public function sanitize_array($array){
 			return $this->recursive_sanitize_array_fields($array);

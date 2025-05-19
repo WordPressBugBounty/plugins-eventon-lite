@@ -116,7 +116,8 @@ jQuery(document).ready(function($){
 		// run ajax
 		var D = {
 			'action': 'eventon_get_latlng',
-			'address': add
+			'address': add,
+			'nn': evo_admin_ajax_handle.postnonce,
 		};
 		$.ajax({
 			beforeSend: function(){

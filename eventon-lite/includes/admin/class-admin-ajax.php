@@ -1,10 +1,9 @@
 <?php
 /**
  * Function ajax for backend
- * @version   2.4.3
+ * @version   2.4.5
  */
 class EVO_admin_ajax{
-	public $helper;
 	public $post_data;
 	
 	public function __construct(){
@@ -22,7 +21,7 @@ class EVO_admin_ajax{
 			'generate_custom_repeat_unix' =>'generate_custom_repeat_unix',
 
 			'admin_get_environment'		=>'admin_get_environment',
-			'admin_system_log'		=>'admin_system_log',
+			'admin_system_log'			=>'admin_system_log',
 			'admin_system_log_flush'		=>'admin_system_log_flush',
 
 			'get_secondary_settings'=> 'get_secondary_settings',
@@ -41,50 +40,51 @@ class EVO_admin_ajax{
 
 			$prepend = 'eventon_';
 			add_action( 'wp_ajax_'. $prepend . $ajax_event, array( $this, $class ) );
-			add_action( 'wp_ajax_nopriv_'. $prepend . $ajax_event, array( $this, $class ) );
+			add_action( 'wp_ajax_nopriv_' . $prepend . $ajax_event, array( $this, 'restrict_unauthenticated' ) );
 		}
 
 		add_action('wp_ajax_eventon-feature-event', array($this, 'eventon_feature_event'));
+		add_action('wp_ajax_nopriv_eventon-feature-event', array($this, 'restrict_unauthenticated'));
 
-		$this->helper = EVO()->helper;
-		$this->post_data = $this->helper->sanitize_array( $_POST );
+		$this->post_data = EVO()->helper->sanitize_array( $_POST );
 	}	
 
+	// Handle unauthenticated requests
+    public function restrict_unauthenticated() {
+        wp_send_json( array( 'status' => 'bad', 'msg' => __( 'Authentication required', 'eventon' )) );
+        wp_die();
+    }
+
 	// shortcode generator
-		function get_shortcode_generator(){
+		public function get_shortcode_generator(){
+			// Allow all roles, with nonce check, authorization check, read capability
+        	EVO()->helper->validate_request( 'nn', 'eventon_admin_nonce', 'read', false, true );
+
 			$sc = isset($this->post_data['sc']) ? stripslashes( $this->post_data['sc'] ): 'add_eventon';
 
 			$content = EVO()->shortcode_gen->get_content();	
 
-			echo json_encode(array(
+			wp_send_json(array(
 				'status'=>'good',
 				'content'=> $content,
-				'sc'=> $sc,
-				'type'=> isset($this->post_data['type']) ? $this->post_data['type']:'',
-				'other_id'=> isset($this->post_data['other_id']) ? $this->post_data['other_id']:'',
-			));exit;	
+				'sc' => sanitize_text_field( $sc ),
+	            'type' => isset( $this->post_data['type'] ) ? sanitize_text_field( $this->post_data['type'] ) : '',
+	            'other_id' => isset( $this->post_data['other_id'] ) ? sanitize_text_field( $this->post_data['other_id'] ) : '',
+			));wp_die();	
 		}
 
 	// generate custom repeat instance unix
 		public function generate_custom_repeat_unix(){
+			// Allow all roles, with nonce check, authorization check
+			EVO()->helper->validate_request( 'nn', 'eventon_admin_nonce', false, false, true );
 
 			$msg = '';
-
-			// verify nonce
-			if(empty( $_REQUEST['nn'] ) || !wp_verify_nonce( wp_unslash( $_REQUEST['nn'] ), 'eventon_admin_nonce')) {
-				$output['msg'] = __('Security Check Failed!','eventon');
-				wp_send_json($output); wp_die();
-			}
-
 			$PD = $this->post_data;
-
-			EVO_Debug($PD);
-
+			//EVO_Debug($PD);
 
 			// required data check
 			if( empty($PD['event_new_repeat_start_date_x']) || empty( $PD['event_new_repeat_end_date_x'])){
-				$output['msg'] = __('Missing required data!','eventon');
-				wp_send_json($output); wp_die();
+				wp_send_json(['msg'=> __('Missing required data!','eventon')]); wp_die();
 			}
 
 			// generate unix from passed data
@@ -136,26 +136,14 @@ class EVO_admin_ajax{
 	// get secondary lightbox settings
 		public function get_secondary_settings(){
 
-			// validate if user has permission
-			if( !current_user_can('edit_eventons') ){
-				wp_send_json(array(
-					'status'=>'bad','msg'=> __('You do not have proper permission to access this','eventon')
-				));	wp_die();
-			}
-
-			// nonce validation
-			if( empty($_POST['nn']) || !wp_verify_nonce( $_POST['nn'], 'eventon_admin_nonce' ) ){
-				wp_send_json(array(
-					'status'=>'bad','msg'=> __('Nonce validation failed','eventon')
-				));	wp_die();
-			}
-
-			$post_data = $this->helper->sanitize_array( $_POST);
+			// Validate request
+			EVO()->helper->validate_request();
+			
+			$post_data = EVO()->helper->sanitize_array( $_POST);
 			$settings_file_key = isset($post_data['setitngs_file_key']) ? $post_data['setitngs_file_key'] : '';
 			$allowed_files = array(
 			    'cmf_settings' => plugin_dir_path(__FILE__) . 'views/cmf_settings.php',
-			);
-			
+			);			
 
 			if (array_key_exists($settings_file_key, $allowed_files) && file_exists($allowed_files[$settings_file_key])) {
 			    ob_start();
@@ -175,21 +163,12 @@ class EVO_admin_ajax{
 			
 		}
 		public function save_secondary_settings(){
-			// validate if user has permission
-			if( !current_user_can('edit_eventons') ){
-				wp_send_json(array(
-					'status'=>'bad','msg'=> __('You do not have proper permission to perform this action','eventon')
-				));	wp_die();
-			}
 
-			// nonce validation
-			if( empty($_POST['evo_noncename']) || !wp_verify_nonce( $_POST['evo_noncename'], 'evo_save_secondary_settings' ) ){
-				wp_send_json(array(
-					'status'=>'bad','msg'=> __('Nonce validation failed','eventon')
-				));	wp_die();
-			}
+			// Validate request
+			EVO()->helper->validate_request('evo_noncename','evo_save_secondary_settings');
+			
 
-			$post_data = $this->helper->sanitize_array( $_POST);
+			$post_data = EVO()->helper->sanitize_array( $_POST);
 
 			// if html fields passed
 			$html_fields = false;
@@ -209,7 +188,7 @@ class EVO_admin_ajax{
 				
 				// html content
 				if( $html_fields &&  in_array($key, $html_fields )){
-					$val = $this->helper->sanitize_html( $_POST[ $key ] );
+					$val = EVO()->helper->sanitize_html( $_POST[ $key ] );
 				}
 
 				$EVENT->save_meta($key, $val);
@@ -223,15 +202,11 @@ class EVO_admin_ajax{
 	// virtual events
 		public function config_virtual_event(){
 
-			// validate if user has permission
-			if( !current_user_can('edit_eventons') ){
-				wp_send_json(array(
-					'status'=>'bad','msg'=> __('You do not have proper permission to access this','eventon')
-				));
-				wp_die();
-			}
+			// Validate request
+			EVO()->helper->validate_request();
+			
 
-			$post_data = $this->helper->sanitize_array( $_POST);
+			$post_data = EVO()->helper->sanitize_array( $_POST);
 
 			$EVENT = new EVO_Event( (int) $post_data['eid'] );
 
@@ -245,13 +220,14 @@ class EVO_admin_ajax{
 			wp_die();
 		}
 		public function select_virtual_moderator(){
+
+			// Validate request
+			EVO()->helper->validate_request();
 			
 			ob_start();
 
 			$eid = (int) $_POST['eid'];
-
-			$EVENT = new EVO_Event( $eid);
-			
+			$EVENT = new EVO_Event( $eid);			
 			$set_user_role = $EVENT->get_prop('_evo_user_role');
 			$set_mod = $EVENT->get_prop('_mod');
 
@@ -301,6 +277,9 @@ class EVO_admin_ajax{
 		}
 		public function get_virtual_users_select_options($role_slug, $set_user_id=''){
 			
+			// Validate request
+			EVO()->helper->validate_request();
+
 			$users = get_users( array( 
 				'role' => $role_slug,
 				'fields'=> array('ID','user_email', 'display_name') 
@@ -317,12 +296,8 @@ class EVO_admin_ajax{
 		}
 		public function get_virtual_users(){
 
-			// validate if user has permission
-			if( !current_user_can('edit_eventons') ){
-				wp_send_json(array(
-					'status'=>'bad','msg'=> __('You do not have proper permission to access this','eventon')
-				));	wp_die();
-			}
+			// Validate request
+			EVO()->helper->validate_request();
 
 			$user_role = sanitize_text_field( $_POST['_user_role']);
 
@@ -336,26 +311,15 @@ class EVO_admin_ajax{
 			
 		}
 		public function save_virtual_event_settings(){
-			// validate if user has permission
-			if( !current_user_can('edit_eventons') ){
-				wp_send_json(array(
-					'status'=>'bad','msg'=> __('You do not have proper permission to access this','eventon')
-				));	wp_die();
-			}
-			
-			// nonce validation
-			if( empty( $_POST['evo_noncename'] ) || !wp_verify_nonce( wp_unslash( $_POST['evo_noncename'] ), 'evo_save_virtual_event_settings' ) ){
-				wp_send_json(array(
-					'status'=>'bad','msg'=> __('Nonce validation failed','eventon')
-				));	wp_die();
-			}
 
-			$post_data = $this->helper->sanitize_array( $_POST);
+			// Validate request
+			EVO()->helper->validate_request('evo_noncename','evo_save_virtual_event_settings');
+			
+			$post_data = EVO()->helper->sanitize_array( $_POST);
 
 			$EVENT = new EVO_Event( $post_data['event_id']);
 
 			foreach($post_data as $key=>$val){
-
 				if( in_array($key, array( '_vir_url','_vir_after_content','_vir_pre_content','_vir_embed'))){
 					$val = $post_data[$key];
 				}
@@ -368,21 +332,12 @@ class EVO_admin_ajax{
 			)); wp_die();
 		}
 		public function save_virtual_mod_settings(){
-			// validate if user has permission
-			if( !current_user_can('edit_eventons') ){
-				wp_send_json(array(
-					'status'=>'bad','msg'=> __('You do not have proper permission to access this','eventon')
-				));	wp_die();
-			}			
 
-			// nonce validation
-			if( empty($_POST['evo_noncename']) || !wp_verify_nonce( wp_unslash ( $_POST['evo_noncename'] ), 'evo_save_virtual_mod_settings' ) ){
-				wp_send_json(array(
-					'status'=>'bad','msg'=> __('Nonce validation failed','eventon')
-				));	wp_die();
-			}		
+			// Validate request
+			EVO()->helper->validate_request('evo_noncename','evo_save_virtual_mod_settings');
+			
 
-			$post_data = $this->helper->sanitize_array( $_POST);	
+			$post_data = EVO()->helper->sanitize_array( $_POST);	
 
 			$EVENT = new EVO_Event( (int)$post_data['eid']);
 
@@ -396,22 +351,12 @@ class EVO_admin_ajax{
 		}
 		
 	// Related Events @2.3
-		function rel_event_list(){
+		public function rel_event_list(){
 
-			// Check User Caps.
-			if ( ! current_user_can( 'edit_eventons' ) ) {
-				wp_send_json_error( 'missing_capabilities' ); wp_die();
-			}
+			// Validate request
+			EVO()->helper->validate_request();		
 
-			// verify nonce
-			if(empty( $_REQUEST['nn'] ) || !wp_verify_nonce( wp_unslash( $_REQUEST['nn'] ), 'eventon_admin_nonce')) {
-				wp_send_json_error('Security Check Failed!','eventon');
-				 wp_die();
-			}
-
-			$post_data = $this->helper->sanitize_array( $_POST);
-
-
+			$post_data = EVO()->helper->sanitize_array( $_POST);
 			$event_id = (int)$post_data['eventid'];
 			$EVs = json_decode( stripslashes($post_data['EVs']), true );
 
@@ -507,6 +452,10 @@ class EVO_admin_ajax{
 
 	// Get Location Cordinates
 		public function get_latlng(){
+
+			// Validate request
+			EVO()->helper->validate_request('nn','eventon_admin_nonce', 'read', false ,true);		
+
 			$gmap_api = EVO()->cal->get_prop('evo_gmap_api_key', 'evcal_1');
 
 			if( !isset($_POST['address'])){
@@ -544,16 +493,11 @@ class EVO_admin_ajax{
 		}
 
 	// export eventon settings
-		function export_settings(){
-			// validate if user has permission
-			if( !current_user_can('edit_eventons') ){
-				wp_die( __('User not loggedin','eventon'));
-			}
+		public function export_settings(){
 
-			// verify nonce
-			if(empty( $_REQUEST['nonce'] ) || !wp_verify_nonce( wp_unslash( $_REQUEST['nonce'] ), 'evo_export_settings')) {
-				wp_die( __('Security Check Failed','eventon'));
-			} 
+			// Validate request
+			EVO()->helper->validate_request('nonce','evo_export_settings', 'edit_eventons', true ,true);		
+		
 
 			header('Content-type: text/plain');
 			header("Content-Disposition: attachment; filename=Evo_settings__". gmdate("d-m-y").".json");
@@ -571,26 +515,11 @@ class EVO_admin_ajax{
 
 	// import settings
 		public function get_import_settings(){
+			// Validate request
+			EVO()->helper->validate_request('nn','eventon_admin_nonce', 'edit_eventons', true ,true);		
+
 			$output = array('status'=>'bad','msg'=>'');
-
-			// verify nonce
-			if(empty( $_REQUEST['nn'] ) || !wp_verify_nonce( wp_unslash( $_REQUEST['nn'] ), 'eventon_admin_nonce')) {
-				$output['msg'] = __('Security Check Failed!','eventon');
-				wp_send_json($output); wp_die();
-			}
-
-			// check if admin and loggedin
-			if(!is_admin() && !is_user_logged_in()){
-				$output['msg'] = __('User not loggedin!','eventon');
-				wp_send_json($output); wp_die();
-			} 
-
-			// validate if user has permission
-			if( !current_user_can('edit_eventons') ){
-				$output['msg'] = __('Required permission missing!','eventon');
-				wp_send_json($output); wp_die();
-			}
-
+			
 			ob_start();
 
 			EVO()->elements->print_import_box_html(array(
@@ -608,30 +537,12 @@ class EVO_admin_ajax{
 			
 
 		}
-		function import_settings(){
-			$output = array('status'=>'bad','msg'=>'');
-			
-			// verify nonce
-				if(empty( $_POST['nonce'] ) || !wp_verify_nonce($_POST['nonce'], 'eventon_admin_nonce')){ 
-					$output['msg'] = __('Security Check Failed!','eventon');
-					wp_send_json($output); 
-					wp_die();
-				}
+		public function import_settings(){
+			// Validate request
+			EVO()->helper->validate_request('nonce','eventon_admin_nonce', 'edit_eventons', true ,true);		
 
-			// check if admin and loggedin
-				if(!is_admin() && !is_user_logged_in()){
-					$output['msg'] = __('User not loggedin!','eventon');
-					wp_send_json($output); wp_die();
-				} 
-
-			// admin permission
-				if( !current_user_can('edit_eventons')){
-					$output['msg'] = __('Required permission missing','eventon');
-
-					wp_send_json($output); wp_die();
-				}
-
-			$post_data = $this->helper->sanitize_array( $_POST);
+			$output = array('status'=>'bad','msg'=>'');			
+			$post_data = EVO()->helper->sanitize_array( $_POST);
 			$JSON_data = isset( $post_data['jsondata'] ) ? $post_data['jsondata'] : false;
 
 			// check if json array present
@@ -651,22 +562,14 @@ class EVO_admin_ajax{
 			}
 			
 			wp_send_json($output); wp_die();
-
 		}
 
 	// export events as CSV
-	// @update 4.3
-		function export_events(){
+		public function export_events(){
 
-			// check if admin and loggedin
-				if( !current_user_can('edit_eventons') ){
-					wp_die( __('User not loggedin','eventon'));
-				}
+			// Validate request
+			EVO()->helper->validate_request('nonce','eventon_download_events', 'edit_eventons', true ,true,'message');		
 
-			// verify nonce
-				if( empty( $_REQUEST['nonce'] ) || !wp_verify_nonce( wp_unslash( $_REQUEST['nonce'] ), 'eventon_download_events')) {
-					wp_die('Security Check Failed!');
-				}
 
 			$run_process_content = false;
 			
@@ -1023,30 +926,19 @@ class EVO_admin_ajax{
 	// saving general settings -- @added 4.8 @updated 4.8.1		
 		
 		// loadin new language
-		public function settings_load_new_lang(){
-
-		}
+		public function settings_load_new_lang(){}
 
 		// save language settings
 		public function settings_save(){
 
-			// Check nonce and referer
-		    if (!check_admin_referer('eventon_settings_save_nonce', 'evoajax')) {
-		        EVO_Debug('Invalid nonce or referer in settings_save: ' . print_r($_POST, true));
-		        wp_send_json_error(array('message' => 'Invalid nonce or referer'));
-		        wp_die();
-		    }
+			// Validate request
+			EVO()->helper->validate_request('evoajax','eventon_settings_save_nonce', 'edit_eventons', true ,true);		
 
-	        // check if admin and loggedin
-			if( !current_user_can('edit_eventons') ){
-				wp_send_json_error(array('message' => 'You do not have proper permission')); wp_die();
-			}
 
 	        // Decode JSON data and validate it
 		    $form_data = json_decode(stripslashes($_POST['formData']), true);		    
 		    if (json_last_error() !== JSON_ERROR_NONE) {
-		        wp_send_json_error(array('message' => 'Invalid JSON data'));
-		        wp_die();
+		        wp_send_json_error(array('message' => 'Invalid JSON data'));wp_die();
 		    }
 
 		    // get current tab
@@ -1150,7 +1042,7 @@ class EVO_admin_ajax{
 					}
 
 					// check isolatedly saved setting values and include them
-						foreach( array('evo_ecl','evowhs') as $_iso_field){
+						foreach( array('evowhs') as $_iso_field){
 							if( array_key_exists( $_iso_field, $saved_settings)){
 
 								$new_settings[ $_iso_field ] = $saved_settings[ $_iso_field ];
@@ -1204,7 +1096,6 @@ class EVO_admin_ajax{
 				endif;
 			
 			
-
 			$return_content = array(
 				//'debug'=> $form_data,
 				'debug2'=> $new_settings,
@@ -1216,16 +1107,13 @@ class EVO_admin_ajax{
 		}
 
 	// Feature an event from admin */
-		function eventon_feature_event() {
+		public function eventon_feature_event() {
 
-			if ( ! is_admin() ) wp_die( __( 'Only available in admin side.', 'eventon' ) );
-
-			if ( ! current_user_can('edit_eventons') ) wp_die( __( 'You do not have sufficient permissions to access this page.', 'eventon' ) );
-
-			if ( ! check_admin_referer('eventon-feature-event')) wp_die( __( 'You have taken too long. Please go back and retry.', 'eventon' ) );
+			// Validate request
+			EVO()->helper->validate_request('_wpnonce','eventon-feature-event', 'edit_eventons', true ,true,'message');		
+		
 
 			$post_id = isset( $_GET['eventID'] ) && (int) $_GET['eventID'] ? (int) $_GET['eventID'] : '';
-
 			if (!$post_id) wp_die( __( 'Event id is missing!', 'eventon' ) );
 
 			$post = get_post($post_id);
@@ -1246,7 +1134,10 @@ class EVO_admin_ajax{
 			exit;
 		}
 	// system log
-		function admin_system_log(){
+		public function admin_system_log(){
+			// Validate request
+			EVO()->helper->validate_request('nn','eventon_admin_nonce', 'edit_eventons', true ,true);	
+			
 			
 			$html = '';
 			ob_start();
@@ -1276,7 +1167,10 @@ class EVO_admin_ajax{
 			));
 			wp_die();
 		}
-		function admin_system_log_flush(){
+		public function admin_system_log_flush(){
+			// Validate request
+			EVO()->helper->validate_request('nn','eventon_admin_nonce', 'edit_eventons', true ,true);	
+
 			EVO_Error()->_flush_all_logs();
 
 			$html = EVO_Error()->_get_html_log_view();
@@ -1290,13 +1184,11 @@ class EVO_admin_ajax{
 		}
 
 	// environment @u 4.5.5
-		function admin_get_environment(){
+		public function admin_get_environment(){
 
-			// check if admin and loggedin
-				if( !current_user_can('edit_eventons') ){
-					wp_send_json_error(  __('User does not have permission','eventon') );
-					wp_die();
-				}
+			// Validate request
+			EVO()->helper->validate_request('nn','eventon_admin_nonce', 'edit_eventons', true ,true);	
+
 			
 			$data = array(); $html = ''; global $wpdb;
 

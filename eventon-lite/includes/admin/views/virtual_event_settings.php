@@ -1,7 +1,7 @@
 <?php
 /**
  * Virtual Event Settings 
- * @version 2.2.16
+ * @version 2.4.5
  */	
 
 
@@ -133,7 +133,7 @@ if( !$EVENT->is_virtual_data_ready()): ?>
 		);
 	?>
 	<label><?php esc_html_e('Select moderator for the virtual event','eventon')?></label>
-	<span class='evo_btn evolb_trigger' <?php echo $this->helper->array_to_html_data($btn_data);?> data-popc='print_lightbox' data-lb_cl_nm='sel_moderator' data-lb_sz='small' data-t='<?php esc_html_e('Select Moderator for Virtual Event','eventon');?>' data-eid='<?php echo esc_attr( $EVENT->ID );?>' style='margin-right: 10px'><?php $EVENT->get_prop('_mod') ? esc_html_e('Update Moderator','eventon') : esc_html_e('Select Moderator','eventon');?></span>
+	<span class='evo_btn evolb_trigger' <?php echo EVO()->helper->array_to_html_data($btn_data);?> data-popc='print_lightbox' data-lb_cl_nm='sel_moderator' data-lb_sz='small' data-t='<?php esc_html_e('Select Moderator for Virtual Event','eventon');?>' data-eid='<?php echo esc_attr( $EVENT->ID );?>' style='margin-right: 10px'><?php $EVENT->get_prop('_mod') ? esc_html_e('Update Moderator','eventon') : esc_html_e('Select Moderator','eventon');?></span>
 </p>
 
 

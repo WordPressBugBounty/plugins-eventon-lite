@@ -1,7 +1,7 @@
 <?php
 /**
  * EventON Lite Setup
- * @version 2.4.4
+ * @version 2.4.5
  * 
  */
 
@@ -11,7 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 class EventON {
 
 	// defines
-		public $version = '2.4.4';
+		public $version = '2.4.5';
 				
 		public $template_url;
 		public $print_scripts=false;
@@ -184,17 +184,10 @@ class EventON {
 
 		$this->evosv 			= new Evo_Cal_Schedule(); 
 		
-		new EVO_AJAX();
-
-
 		$GLOBALS['evo_shortcode_box'] = $this->shortcode_gen;
-		//$this->helper			= new evo_helper();
 
-		// Classes/actions loaded for the frontend and for ajax requests
-		if ( ! is_admin() || defined('DOING_AJAX') ) {
-			
-		}
-		if(is_admin()){
+		
+		if( $this->is_request('admin') ){
 			if( class_exists('evo_admin')) $this->evo_admin 	= new evo_admin();
 			if( class_exists('EVO_Taxonomies') ) $this->taxonomies	= new EVO_Taxonomies();	
 		}

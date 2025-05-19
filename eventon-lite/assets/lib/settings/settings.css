@@ -1,6 +1,6 @@
 /**
  * AJDE backender styles
- * @version 2.4
+ * @version 2.4.5
  */
 
 	
@@ -93,6 +93,12 @@
 		font-style:italic;
 		font-size:11px;
 		font-family:georgia
+	}
+	.toplevel_page_eventon .notice.notice-warning{
+		position: absolute;
+    z-index: 9;
+    margin-left: 300px;
+    margin-top: 10px;
 	}
 
 /* dark mode -- in work 4.6.5 */

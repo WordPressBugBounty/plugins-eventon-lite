@@ -6,7 +6,7 @@
  * @author 		AJDE
  * @category 	Core
  * @package 	EventON/Functions/AJAX
- * @version     2.4
+ * @version     2.4.5
  */
 
 class EVO_AJAX{
@@ -14,12 +14,12 @@ class EVO_AJAX{
 	 * Hook into ajax events
 	 */
 
-	public function __construct(){
+	public static function init(){
 
 		add_action( 'init', array( __CLASS__, 'define_ajax' ), 0 );
 		add_action( 'template_redirect', array( __CLASS__, 'do_evo_ajax' ), 0 );
 
-		$this->ajax_events();
+		self::ajax_events();
 	}	
 
 	// AJAX via endpoints @since 4.4
@@ -78,7 +78,7 @@ class EVO_AJAX{
 		}
 
 	// AJAX events
-		public function ajax_events(){
+		public static function ajax_events(){
 			$ajax_events = array(
 				'init_load'=>'init_load',						
 				'get_events'=>'main_ajax_call',			
@@ -92,26 +92,28 @@ class EVO_AJAX{
 			);
 			foreach ( $ajax_events as $ajax_event => $class ) {
 				$prepend = ( in_array($ajax_event, array('evo_dynamic_css','the_post_ajax_hook_3','the_post_ajax_hook_2')) )? '': 'eventon_';
-				add_action( 'wp_ajax_'. $prepend . $ajax_event, array( $this, $class ) );
-				add_action( 'wp_ajax_nopriv_'. $prepend . $ajax_event, array( $this, $class ) );
+				add_action( 'wp_ajax_'. $prepend . $ajax_event, array( __CLASS__, $class ) );
+				add_action( 'wp_ajax_nopriv_'. $prepend . $ajax_event, array( __CLASS__, 'restrict_unauthenticated' ) );
 
 				// EVO AJAX can be used for frontend ajax requests.
-				add_action( 'evo_ajax_' . $prepend . $ajax_event, array( $this , $class ) );
+				add_action( 'evo_ajax_' . $prepend . $ajax_event, array( __CLASS__ , $class ) );
 			}
 
 		}
 
+	// Handle unauthenticated requests
+    public function restrict_unauthenticated() {
+        wp_send_json( array( 'status' => 'bad', 'msg' => __( 'Authentication required', 'eventon' )) );
+        wp_die();
+    }
+
 	// Initial load
-		function init_load($return = false){			
-
-			$post_data = EVO()->helper->recursive_sanitize_array_fields( $_POST);
-
+		public static function init_load($return = false){			
+			
 			// nonce verification
-			if(empty( $_POST['nonce'] ) || !wp_verify_nonce( wp_unslash( $_POST['nonce'] ), 'eventon_nonce')) {
-				wp_send_json_error( 'bad_nonce' );
-				wp_die();
-			} 
-
+			EVO()->helper->validate_request( 'nonce', 'eventon_nonce', false , false, false );
+			
+			$post_data = EVO()->helper->recursive_sanitize_array_fields( $_POST);
 			// init load calendar events
 			$CALS = array();
 			
@@ -165,12 +167,10 @@ class EVO_AJAX{
 		}
 
 	// General ajax call - added 3.1
-		public function gen_trig_ajax(){
+		public static function gen_trig_ajax(){
 
-			// verify nonce
-			if(empty( $_POST['nn'] ) || !wp_verify_nonce( wp_unslash( $_POST['nn'] ), 'eventon_nonce')) {
-				wp_die( esc_html__( 'Action failed. Please refresh the page and retry.','eventon') ); 
-			}
+			// nonce verification
+			EVO()->helper->validate_request( 'nn', 'eventon_nonce', false, false, false );
 			
 			$PP = EVO()->helper->recursive_sanitize_array_fields( $_POST );
 
@@ -180,15 +180,12 @@ class EVO_AJAX{
 		}
 
 	// Primary function to load event data u2.2.12
-		function main_ajax_call(){
-
-			$postdata = EVO()->helper->sanitize_array( $_POST );
+		public static function main_ajax_call(){
 
 			// nonce verification
-			if(empty( $_POST['nonce'] ) || !wp_verify_nonce(wp_unslash( $_POST['nonce'] ), 'eventon_nonce')) {
-				wp_die( esc_html__( 'Action failed. Please refresh the page and retry.','eventon') ); 
-			}
+			EVO()->helper->validate_request( 'nonce', 'eventon_nonce', false, false, false );
 
+			$postdata = EVO()->helper->sanitize_array( $_POST );
 			$shortcode_args = $focused_month_num = $focused_year = '';
 			$status = 'GOOD';
 			
@@ -286,13 +283,11 @@ class EVO_AJAX{
 	
 
 	// Now Calendar
-		public function refresh_now_cal(){
+		public static function refresh_now_cal(){
 
 			// nonce verification
-			if(empty( $_POST['nonce'] ) || !wp_verify_nonce( wp_unslash( $_POST['nonce'] ), 'eventon_nonce')) {
-				wp_send_json_error( 'bad_nonce' );
-				wp_die();
-			}
+			EVO()->helper->validate_request( 'nonce', 'eventon_nonce', false, false, false );
+
 
 			$post_data = EVO()->helper->sanitize_array( $_POST );
 
@@ -320,18 +315,15 @@ class EVO_AJAX{
 	// refresh elements
 		public function refresh_elm(){
 			// nonce verification
-			if(empty( $_POST['nonce'] ) || !wp_verify_nonce( wp_unslash( $_POST['nonce'] ), 'eventon_nonce')) {
-				wp_send_json_error( 'bad_nonce' );
-				wp_die();
-			}
+			EVO()->helper->validate_request( 'nonce', 'eventon_nonce', false, false, false );
 
 			$post_data = EVO()->helper->recursive_sanitize_array_fields( $_POST );
 
-			wp_send_json($this->get_refresh_elm_data( $post_data )); 			
+			wp_send_json( self::get_refresh_elm_data( $post_data )); 			
 		}
 
 		//get ajax refresh element's data array
-		private function get_refresh_elm_data($PP, $type ='ajax'){
+		private static function get_refresh_elm_data($PP, $type ='ajax'){
 			$response = array();
 
 			if(isset($PP['evo_data']) && is_array($PP['evo_data']) ){
@@ -366,13 +358,11 @@ class EVO_AJAX{
 
 	// Load single event content
 	// @2.2.8
-		function load_event_content(){
+		public static function load_event_content(){
 
 			// nonce verification
-			if(empty( $_POST['nonce'] ) || !wp_verify_nonce( wp_unslash( $_POST['nonce'] ), 'eventon_nonce')) {
-				wp_send_json_error( 'bad_nonce' );
-				wp_die();
-			} 
+			EVO()->helper->validate_request( 'nonce', 'eventon_nonce', false, false, false );
+
 
 			$post_data = EVO()->helper->recursive_sanitize_array_fields( $_POST );
 
@@ -388,13 +378,10 @@ class EVO_AJAX{
 
 	// load single eventcard content
 	// @2.2.8
-		public function load_single_eventcard_content(){
+		public static function load_single_eventcard_content(){
 
 			// nonce verification
-			if(empty( $_POST['nn'] ) || !wp_verify_nonce( wp_unslash( $_POST['nn'] ), 'eventon_nonce')) {
-				wp_send_json_error( 'bad_nonce' );
-				wp_die();
-			} 
+			EVO()->helper->validate_request( 'nn', 'eventon_nonce', false, false, false );
 			
 
 			$post_data = EVO()->helper->recursive_sanitize_array_fields( $_POST );
@@ -433,16 +420,12 @@ class EVO_AJAX{
 
 	
 	// Search results for ajax search of events from search box u2.2.12
-	function search_evo_events(){
+	public static function search_evo_events(){
 
 		// nonce verification
-		if(empty( $_POST['nonce'] ) || !wp_verify_nonce( wp_unslash( $_POST['nonce'] ), 'eventon_nonce')) {
-			wp_send_json_error( 'bad_nonce' );
-			wp_die();
-		} 
+		EVO()->helper->validate_request( 'nonce', 'eventon_nonce', false, false, false );
 			
 		$post_data = EVO()->helper->recursive_sanitize_array_fields( $_POST );
-
 		$searchfor = isset($post_data['search']) ? $post_data['search'] :'';
 		$shortcode = isset($post_data['shortcode']) ? $post_data['shortcode']: array();
 
@@ -517,3 +500,7 @@ class EVO_AJAX{
 
 	}
 }
+
+
+
+EVO_AJAX::init();

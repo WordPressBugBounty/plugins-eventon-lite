@@ -1,15 +1,12 @@
 <?php
 /*
  * EventON Taxonomy Editor
- * @version 2.3
- * @fullversion 4.7.4
+ * @version 2.4.5
  */
 
 class EVO_Taxonomies_editor{
 
-public $helper;
-
-function editor_ajax_calls(){
+public function editor_ajax_calls(){
 	$ajax_events = array(
 		'get_event_tax_term_section'=>'get_event_tax_term_section',
 		'event_tax_list'		=>'tax_select_term',
@@ -19,24 +16,23 @@ function editor_ajax_calls(){
 	foreach ( $ajax_events as $ajax_event => $class ) {
 		$prepend = 'eventon_';
 		add_action( 'wp_ajax_'. $prepend . $ajax_event, array( $this, $class ) );
-		add_action( 'wp_ajax_nopriv_'. $prepend . $ajax_event, array( $this, $class ) );
+		add_action( 'wp_ajax_nopriv_'. $prepend . $ajax_event, array( $this, 'restrict_unauthenticated' ) );
 	}
-
-	$this->helper = EVO()->helper;
 }
 
+// Handle unauthenticated requests
+    public function restrict_unauthenticated() {
+        wp_send_json( array( 'status' => 'bad', 'msg' => __( 'Authentication required', 'eventon' )) );
+        wp_die();
+    }
+
 // AJAX
-	function get_event_tax_term_section(){	
+	public function get_event_tax_term_section(){
 
-		// validate if user has permission
-			if( !current_user_can('edit_eventons') ){
-				wp_send_json(array(
-					'status'=>'bad','msg'=> __('You do not have proper permission to access this','eventon')
-				));
-				wp_die();
-			}	
+		// validate
+		EVO()->helper->validate_request( 'nn', 'eventon_admin_nonce', true, true, true );	
 
-		$post_data = $this->helper->sanitize_array( $_POST);
+		$post_data = EVO()->helper->sanitize_array( $_POST);
 
 		wp_send_json(array(
 			'status'=>'good',
@@ -45,23 +41,12 @@ function editor_ajax_calls(){
 	}
 
 	// tax term list to select from
-	function tax_select_term(){
+	public function tax_select_term(){
 
-		// validate if user has permission
-			if( !current_user_can('edit_eventons') ){
-				wp_send_json(array(
-					'status'=>'bad','msg'=> __('You do not have proper permission to access this','eventon')
-				));	wp_die();
-			}
+		// validate
+		EVO()->helper->validate_request( 'nn', 'eventon_admin_nonce', true, true, true );	
 
-		// nonce validation
-			if( empty($_POST['nn']) || !wp_verify_nonce( wp_unslash( $_POST['nn'] ), 'eventon_admin_nonce' )){
-				wp_send_json(array(
-					'status'=>'bad','msg'=> __('Nonce validation failed','eventon')
-				)); wp_die();
-			}
-
-		$post_data = $this->helper->sanitize_array( $_POST);
+		$post_data = EVO()->helper->sanitize_array( $_POST);
 		$terms = get_terms(
 			array(
 				'taxonomy'	=> $post_data['tax'],
@@ -128,7 +113,7 @@ function editor_ajax_calls(){
 			?>
 
 			<p style='text-align:center; padding-top:10px;'>
-				<span class='evo_btn evo_submit_form' <?php echo $this->helper->array_to_html_data( $btn_data );?>><?php esc_html_e('Save Changes','eventon');?></span>
+				<span class='evo_btn evo_submit_form' <?php echo EVO()->helper->array_to_html_data( $btn_data );?>><?php esc_html_e('Save Changes','eventon');?></span>
 			</p>
 
 			<?php
@@ -145,25 +130,13 @@ function editor_ajax_calls(){
 	}
 
 	// save changes
-		function event_tax_save_changes(){
+		public function event_tax_save_changes(){
 
-			// validate if user has permission
-			if( !current_user_can('edit_eventons') ){
-				wp_send_json(array(
-					'status'=>'bad','msg'=> __('You do not have proper permission to access this','eventon')
-				));
-				wp_die();
-			}
+			// validate
+			EVO()->helper->validate_request( 'evo_noncename', 'evo_save_term_form', true, true, true );	
+			
 
-			// nonce validation
-			if( empty($_POST['evo_noncename']) || !wp_verify_nonce( wp_unslash( $_POST['evo_noncename'] ), 'evo_save_term_form' ) ){
-				wp_send_json(array(
-					'status'=>'bad','msg'=> __('Nonce validation failed','eventon')
-				));	wp_die();
-			}
-
-
-			$post_data = $this->helper->sanitize_array( $_POST);
+			$post_data = EVO()->helper->sanitize_array( $_POST);
 			$status = 'bad';
 			$content = '';
 			$tax = $post_data['tax'];
@@ -289,34 +262,31 @@ function editor_ajax_calls(){
 			)); wp_die();
 		}
 	// remove a taxonomy term
-		function event_tax_remove(){
+	public function event_tax_remove(){	
 
-			// validate if user has permission
-			if( !current_user_can('edit_eventons') ){
-				wp_send_json(array(
-					'status'=>'bad','msg'=> __('You do not have proper permission to access this','eventon')
-				));	wp_die();
-			}
+		// validate
+		EVO()->helper->validate_request( 'nn', 'eventon_admin_nonce', true, true, true );	
+		
 
-			$post_data = $this->helper->sanitize_array( $_POST);
-			$status = 'bad';
-			$content = '';
-			
-			if(!empty($post_data['term_id'])){
-				$event_id = (int)$post_data['event_id'];
-				wp_remove_object_terms( $event_id, (int)$post_data['term_id'], $post_data['tax'] , false);
-				$status = 'good';
-				$content = __('Changes successfully saved!','eventon');	
-			}else{
-				$content = __('Term ID was not passed!','eventon');	
-			}
+		$post_data = EVO()->helper->sanitize_array( $_POST);
+		$status = 'bad';
+		$content = '';
+		
+		if(!empty($post_data['term_id'])){
+			$event_id = (int)$post_data['event_id'];
+			wp_remove_object_terms( $event_id, (int)$post_data['term_id'], $post_data['tax'] , false);
+			$status = 'good';
+			$content = __('Changes successfully saved!','eventon');	
+		}else{
+			$content = __('Term ID was not passed!','eventon');	
+		}
 
-			wp_send_json(array(
-				'tax'=> $post_data['tax'],
-				'status'=>$status,
-				'msg'=>$content,
-				'htmldata'=> $this->get_meta_box_content($post_data['tax'] , $post_data['event_id'] )
-			)); wp_die();
+		wp_send_json(array(
+			'tax'=> $post_data['tax'],
+			'status'=>$status,
+			'msg'=>$content,
+			'htmldata'=> $this->get_meta_box_content($post_data['tax'] , $post_data['event_id'] )
+		)); wp_die();
 		}
 
 // META BOX CONTENT
@@ -378,8 +348,8 @@ function editor_ajax_calls(){
 				?>
 				<p class='evo_selected_tax_term evo_edittable_sel_val'>
 					<em><?php echo esc_attr( $term->name );?></em>
-					<i class='fa fa-pencil evolb_trigger' <?php echo $this->helper->array_to_html_data( $term_data );?> title='<?php echo esc_attr( $text_edit );?>' ></i> 
-					<i class='fa fa-times evo_trigger_ajax_run' <?php echo $this->helper->array_to_html_data( $term_data_del );?> title='<?php esc_html_e('Delete','eventon');?>'></i>
+					<i class='fa fa-pencil evolb_trigger' <?php echo EVO()->helper->array_to_html_data( $term_data );?> title='<?php echo esc_attr( $text_edit );?>' ></i> 
+					<i class='fa fa-times evo_trigger_ajax_run' <?php echo EVO()->helper->array_to_html_data( $term_data_del );?> title='<?php esc_html_e('Delete','eventon');?>'></i>
 				</p>
 				<?php
 			}
@@ -447,7 +417,7 @@ function editor_ajax_calls(){
 	private function get_tax_form( $post_data=''){
 		global $ajde;
 
-		$post_data = $this->helper->sanitize_array( $_POST);
+		$post_data = EVO()->helper->sanitize_array( $_POST);
 
 		$is_new = (isset($post_data['type']) && $post_data['type']=='new')? true: false;
 

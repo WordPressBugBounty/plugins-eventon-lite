@@ -95,8 +95,10 @@ class evo_admin {
 			include_once(  AJDE_EVCAL_PATH.'/includes/admin/post_types/class-meta_boxes.php' );
 			$this->metaboxes = new evo_event_metaboxes();
 
-		// Includes for admin
-			if(defined('DOING_AJAX')){	include_once( 'class-admin-ajax.php' );		}			
+		// Includes for admin AJAX
+			if ( ! $this->is_request('admin') || $this->is_request('ajax') ){
+				include_once( 'class-admin-ajax.php' );		
+			}	
 
 		// evneton settings only 
 			include_once(  AJDE_EVCAL_PATH.'/includes/admin/settings/class-settings.php' );
@@ -130,6 +132,19 @@ class evo_admin {
 		// when an addon is updated or installed - since 2.5
 			add_action('evo_addon_version_change', array($this, 'update_addon_styles'), 10);
 
+	}
+	
+	private function is_request( $type ) {
+		switch ( $type ) {
+			case 'admin':
+				return is_admin();
+			case 'ajax':
+				return defined( 'DOING_AJAX' );
+			case 'cron':
+				return defined( 'DOING_CRON' );
+			case 'frontend':
+				return ( ! is_admin() || defined( 'DOING_AJAX' ) ) && ! defined( 'DOING_CRON' ) && ! $this->is_rest_api_request();
+		}
 	}
 	
 // admin menus

@@ -1,7 +1,7 @@
 <?php
 /**
  * EventON Settings tab - Troubleshoot/support
- * @version 2.3
+ * @version 2.4.5
  * 
  */
 ?>
@@ -62,7 +62,7 @@
 					</form>
 				</div>",
 				'footer'=>"<div class='evopad15 evotac evomarb20'><p style=''><i>" . __('NOTE: Please feel free to type in your question and search our documentation library for related answers','eventon') . "</i></p>
-					<a href='https://www.youtube.com/playlist?list=PLj0uAR9EylGrROSEOpT6WuL_ZkRgEIhLq' class='evomart10 evo_admin_btn btn_prime' target='_blank'><i class='fa fa-youtube evomarr10'></i> " . __('EventON Video Tutorials','eventon') . "</a></div>",
+					<a href='https://www.youtube.com/playlist?list=PLj0uAR9EylGrROSEOpT6WuL_ZkRgEIhLq' class='evomart10 evo_admin_btn btn_prime' target='_blank'><i class='fa fa-play evomarr10'></i> " . __('EventON Video Tutorials','eventon') . "</a></div>",
 				'styles'=>'background-color:var(--evo_color_second);',
 			),
 			'box2' => array(
