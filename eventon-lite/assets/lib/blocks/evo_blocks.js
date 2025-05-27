@@ -115,11 +115,10 @@ wp.blocks.registerBlockType( 'eventon-blocks/evo-eventon-main', {
             ),
         ];
         //return el( 'p', { style: blockStyle }, 'Basic EventON Calendar' );
-    },
-    save: function( {attributes}  ) {
-        //console.log( attributes);
-        return el( 'p', {style: blockStyle}, attributes.shortcode );            
-    },
+    },   
+    save: function({ attributes }) {
+        return el('div', { className: 'wp-block-eventon-lite', style: blockStyle }, attributes.shortcode);
+    }
 } );
 
 

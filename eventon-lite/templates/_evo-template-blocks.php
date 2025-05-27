@@ -1,7 +1,7 @@
 <?php
 /** 
  * EventON Template Blocks
- * @version 2.2.16
+ * @version 2.4.6
  */
 
 class EVO_Temp_Blocks{
@@ -14,19 +14,25 @@ class EVO_Temp_Blocks{
  		if( empty($slug) ) $slug = 'single-ajde_events';
 
  		$path = EVO()->plugin_path() . '/templates/blocks/'. $slug.'.html';
-
  		$template_content = @file_get_contents( $path );
  		
  		if ($template_content === false) {
-	        // Handle the error if the file could not be read
+	        error_log("Could not read template file: " . $path);
 	        return new WP_Error('file_read_error', __('Could not read the template file.', 'eventon'));
+	    }
+
+	    // Validate template content to ensure it contains valid blocks
+	    $template_blocks = parse_blocks($template_content);
+	    if (empty($template_blocks)) {
+	        error_log("Invalid block content in template: " . $slug);
+	        return new WP_Error('invalid_block_content', __('Invalid block content in template.', 'eventon'));
 	    }
 
 		$template                 = new WP_Block_Template();
 		$template->id             = self::PLUGIN_SLUG . '//' . $slug;
 		$template->content        = self::inject_theme_attribute_in_content( $template_content );
 		$template->slug           = $slug;
-		$template->path           = EVO()->plugin_path() . '/templates/blocks/'. $slug.'.html';
+		$template->path           = $path;
 		$template->source         = 'custom';
 		$template->theme          = 'EventON';
 		$template->type           = 'wp_template';

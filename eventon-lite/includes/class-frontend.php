@@ -268,6 +268,7 @@ class evo_frontend {
 					),
 					'cal'=> array(
 						'lbs'=> EVO()->cal->get_prop('evo_ecard_lbs'),// lightbox scroll style
+						'search_openoninit'=> EVO()->cal->check_yn( 'EVOSR_showfield' ,'evcal_1'), // @added 2.4.6
 					)
 				))
 			);

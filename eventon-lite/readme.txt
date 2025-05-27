@@ -5,7 +5,7 @@ Author URI: http://ashanjay.com/
 Tags: calendar, event calendar, virtual events, events, event management
 Requires at least: 6.0
 Tested up to: 6.8.1
-Stable tag: 2.4.5
+Stable tag: 2.4.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -237,6 +237,14 @@ Yes, EventON Lite supports different timezones for each event. You can even disp
 For support with the Lite version, visit [support forum here](https://wordpress.org/support/plugin/eventon-lite/). For premium support or queries related to the Full version, please contact us through [our helpdesk](https://helpdesk.ashanjay.com).
 
 == Changelog ==
+= 2.4.6 (2025-5-27) =
+ADDED: Ability to edit existing custom repeats
+FIXED: lang value not properly set for new event data
+FIXED: validation failing for taxonomy editor
+FIXED: Edit event page console error on block
+FIXED: Calendar not loading for non loggedin users
+FIXED: custom repeat not saving
+
 = 2.4.5 (2025-5-19) =
 FIXED: event card settings not saving
 FIXED: Broken access control validations for admin functions

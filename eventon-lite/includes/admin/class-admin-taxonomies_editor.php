@@ -1,7 +1,7 @@
 <?php
 /*
  * EventON Taxonomy Editor
- * @version 2.4.5
+ * @version 2.4.6
  */
 
 class EVO_Taxonomies_editor{
@@ -16,7 +16,7 @@ public function editor_ajax_calls(){
 	foreach ( $ajax_events as $ajax_event => $class ) {
 		$prepend = 'eventon_';
 		add_action( 'wp_ajax_'. $prepend . $ajax_event, array( $this, $class ) );
-		add_action( 'wp_ajax_nopriv_'. $prepend . $ajax_event, array( $this, 'restrict_unauthenticated' ) );
+		add_action( 'wp_ajax_nopriv_'. $prepend . $ajax_event, array( $this, $class ) );
 	}
 }
 
@@ -30,7 +30,7 @@ public function editor_ajax_calls(){
 	public function get_event_tax_term_section(){
 
 		// validate
-		EVO()->helper->validate_request( 'nn', 'eventon_admin_nonce', true, true, true );	
+		EVO()->helper->validate_request( 'nn', 'eventon_admin_nonce', 'read', true, true );	
 
 		$post_data = EVO()->helper->sanitize_array( $_POST);
 
@@ -44,7 +44,7 @@ public function editor_ajax_calls(){
 	public function tax_select_term(){
 
 		// validate
-		EVO()->helper->validate_request( 'nn', 'eventon_admin_nonce', true, true, true );	
+		EVO()->helper->validate_request( 'nn', 'eventon_admin_nonce', 'read', true, true );	
 
 		$post_data = EVO()->helper->sanitize_array( $_POST);
 		$terms = get_terms(
@@ -133,7 +133,7 @@ public function editor_ajax_calls(){
 		public function event_tax_save_changes(){
 
 			// validate
-			EVO()->helper->validate_request( 'evo_noncename', 'evo_save_term_form', true, true, true );	
+			EVO()->helper->validate_request( 'evo_noncename', 'evo_save_term_form', 'read', true, true );	
 			
 
 			$post_data = EVO()->helper->sanitize_array( $_POST);
@@ -265,7 +265,7 @@ public function editor_ajax_calls(){
 	public function event_tax_remove(){	
 
 		// validate
-		EVO()->helper->validate_request( 'nn', 'eventon_admin_nonce', true, true, true );	
+		EVO()->helper->validate_request( 'nn', 'eventon_admin_nonce', 'read', true, true );	
 		
 
 		$post_data = EVO()->helper->sanitize_array( $_POST);

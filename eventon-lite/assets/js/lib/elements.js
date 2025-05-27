@@ -892,11 +892,9 @@ const BB = $('body');
 
 		init();
 	}
-	$('body').on('evo_eventedit_dom_loaded_evo_color',function(event, val){
-		$('body').find('.evo_color_selector').each(function(){
-			$(this).evo_colorpicker_init();	
-		});					
-	});
+	$('body').find('.evo_color_selector').each(function(){
+		$(this).evo_colorpicker_init();	
+	});	
 	
 // plus minus changer @updated 4.9
 	$('body').on('click','.evo_plusminus_change', function(event){

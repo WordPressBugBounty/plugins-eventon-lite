@@ -90,19 +90,26 @@ class EVO_AJAX{
 				'gen_trig_ajax'=>'gen_trig_ajax',
 
 			);
+			$restricted_actions = [];
+
 			foreach ( $ajax_events as $ajax_event => $class ) {
-				$prepend = ( in_array($ajax_event, array('evo_dynamic_css','the_post_ajax_hook_3','the_post_ajax_hook_2')) )? '': 'eventon_';
-				add_action( 'wp_ajax_'. $prepend . $ajax_event, array( __CLASS__, $class ) );
-				add_action( 'wp_ajax_nopriv_'. $prepend . $ajax_event, array( __CLASS__, 'restrict_unauthenticated' ) );
+				$prepend = ( in_array($ajax_event, array('the_ajax_hook','evo_dynamic_css','the_post_ajax_hook_3','the_post_ajax_hook_2')) )? '': 'eventon_';
+				add_action( 'wp_ajax_'. $prepend . $ajax_event, array( __CLASS__, $class ) );				
+
+				// for non loggedin user actions
+				if( in_array( $ajax_event, $restricted_actions)){
+					add_action( 'wp_ajax_nopriv_'. $prepend . $ajax_event, array( __CLASS__, 'restrict_unauthenticated' ) );
+				}else{
+					add_action( 'wp_ajax_nopriv_'. $prepend . $ajax_event, array( __CLASS__, $class ) );
+				}
 
 				// EVO AJAX can be used for frontend ajax requests.
 				add_action( 'evo_ajax_' . $prepend . $ajax_event, array( __CLASS__ , $class ) );
 			}
-
 		}
 
 	// Handle unauthenticated requests
-    public function restrict_unauthenticated() {
+    public static function restrict_unauthenticated() {
         wp_send_json( array( 'status' => 'bad', 'msg' => __( 'Authentication required', 'eventon' )) );
         wp_die();
     }
@@ -191,7 +198,7 @@ class EVO_AJAX{
 			
 
 			$SC = isset($postdata['shortcode']) ? $postdata['shortcode']: array();
-
+			if( isset( $SC['lang'])) evo_set_global_lang( sanitize_text_field( $SC['lang'] ) );
 			$ajaxtype = isset($postdata['ajaxtype'])? $postdata['ajaxtype']: '';
 
 			extract($SC);

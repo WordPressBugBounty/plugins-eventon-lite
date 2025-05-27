@@ -84,6 +84,7 @@
 				success:function(data){	
 					
 					if (opt.onSuccess || opt.success) {
+						// Call with onSuccess:function(data, OO, LB){} 
 		                (opt.onSuccess || opt.success).call(el, data, OO, LB);
 		            } else {
 		                el.evo_perform_ajax_success(OO, data, LB);

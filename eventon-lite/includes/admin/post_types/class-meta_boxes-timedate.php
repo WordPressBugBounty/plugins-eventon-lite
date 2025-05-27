@@ -469,6 +469,8 @@ $wp_date_format = $date_format;
 		
 		<!-- Custom repeat -->
 		<div class='repeat_information' style='display:<?php echo ( $EVENT->get_prop('evcal_rep_freq')=='custom')? 'block':'none';?>'>
+			<input class='_evo_time_format' type='hidden' name='_evo_time_format' value='<?php echo $used_timeFormat;?>'/>
+			<input class='_evo_date_format' type='hidden' name='_evo_date_format' value='<?php echo $wp_date_format;?>'/>
 			<p><?php esc_html_e('CUSTOM REPEAT TIMES','eventon');?><br/><i style='opacity:0.7'><?php esc_html_e('NOTE: Initial time is the original event time, while other times are repeat instances of the original event time.','eventon');?></i></p>										
 			<?php
 
@@ -501,8 +503,12 @@ $wp_date_format = $date_format;
 							$end_dt = $DD->format($date_format_string);
 
 
-							echo '<li data-cnt="'.esc_attr($count).'" style="display:'.(( $count>3)?'none':'flex').'" class="'.($count==0?'initial':'').($count>3?' over':'').'">'. ($count==0? '<dd>'.esc_html__('Initial','eventon').'</dd>':'') . '<i>'.$count.'</i><span>'.esc_html__('from','eventon').'</span> '. esc_attr($start_dt) .' <span class="e">End</span> '. esc_attr($end_dt) .'<em alt="Delete">x</em>
-							<input type="hidden" name="repeat_intervals['.esc_attr($count).'][0]" value="'.esc_attr($start_unix).'"/><input type="hidden" name="repeat_intervals['.esc_attr($count).'][1]" value="'.esc_attr($end_unix).'"/></li>';
+							echo '<li data-cnt="'.esc_attr($count).'" style="display:'.(( $count>3)?'none':'flex').'" class="'.($count==0?'initial':'').($count>3?' over':'').'">'. ($count==0? '<dd>'.esc_html__('Initial','eventon').'</dd>':'') . '<i>'.$count.'</i><span>'.esc_html__('from','eventon').'</span> '. esc_attr($start_dt) .' <span class="e">End</span> '. esc_attr($end_dt) .
+								'<span class="evodfxi evofxdrr evofxaic evoclwi evogap5 evofxjcfe">
+									<em class="evo_rep_edit evodfx evofxjcc evofxaic" alt="Edit"><i class="fa fa-pencil"></i></em>
+									<em class="evo_rep_del evodfx evofxjcc evofxaic" alt="Delete"><i class="fa fa-times"></i></em>
+								</span>'.
+							'<input type="hidden" name="repeat_intervals['.esc_attr($count).'][0]" value="'.esc_attr($start_unix).'"/><input type="hidden" name="repeat_intervals['.esc_attr($count).'][1]" value="'.esc_attr($end_unix).'"/></li>';
 							$count++;
 						endforeach;	
 					endif;							

@@ -1,7 +1,7 @@
 <?php
 /**
  * Function ajax for backend
- * @version   2.4.5
+ * @version   2.4.6
  */
 class EVO_admin_ajax{
 	public $post_data;
@@ -19,6 +19,7 @@ class EVO_admin_ajax{
 			'get_latlng'				=>'get_latlng',
 
 			'generate_custom_repeat_unix' =>'generate_custom_repeat_unix',
+			'edit_custom_repeat' =>'edit_custom_repeat',
 
 			'admin_get_environment'		=>'admin_get_environment',
 			'admin_system_log'			=>'admin_system_log',
@@ -36,11 +37,19 @@ class EVO_admin_ajax{
 			// save general settings
 			'general_settings_save'			=> 'settings_save', // 4.8
 		);
+
+		$restricted_actions = [];
 		foreach ( $ajax_events as $ajax_event => $class ) {
 
 			$prepend = 'eventon_';
 			add_action( 'wp_ajax_'. $prepend . $ajax_event, array( $this, $class ) );
-			add_action( 'wp_ajax_nopriv_' . $prepend . $ajax_event, array( $this, 'restrict_unauthenticated' ) );
+
+			// for non loggedin user actions
+			if( in_array( $ajax_event, $restricted_actions)){
+				add_action( 'wp_ajax_nopriv_'. $prepend . $ajax_event, array( $this, 'restrict_unauthenticated' ) );
+			}else{
+				add_action( 'wp_ajax_nopriv_'. $prepend . $ajax_event, array( $this, $class ) );
+			}
 		}
 
 		add_action('wp_ajax_eventon-feature-event', array($this, 'eventon_feature_event'));
@@ -94,6 +103,8 @@ class EVO_admin_ajax{
 
 
 			$new_index = (int)$PD['new_index'] +1;
+			// if editing interval
+			if( !empty($PD['edit_index'])) $new_index = (int)$PD['edit_index'];
 
 			// time strings
 			$start_time_string = $PD['_new_repeat_start_hour'].':'.$PD['_new_repeat_start_minute']. ( isset($PD['_new_repeat_start_ampm'])? $PD['_new_repeat_start_ampm']:'');
@@ -111,7 +122,7 @@ class EVO_admin_ajax{
 		        
 		    } else {
 		        error_log('Failed to parse interval: ' . print_r($PD, true));
-		        $output['msg'] = __('Failed to parse interval','eventon');
+ 		        $output['msg'] = __('Failed to parse interval','eventon');
 				wp_send_json($output); wp_die();
 		    }
 			
@@ -119,9 +130,13 @@ class EVO_admin_ajax{
 			$start_dt = $PD["event_new_repeat_start_date"] .' '. $start_time_string;
 			$end_dt = $PD["event_new_repeat_end_date"] .' '. $end_time_string;
 
-			$_html =  '<li data-cnt="'.$new_index.'" style="display:flex" class="'.($new_index==0?'initial':'').($new_index>3?' over':'').'">'. ($new_index==0? '<dd>'.__('Initial','eventon').'</dd>':'').'<i>'.$new_index.'</i><span>'.__('from','eventon').'</span> '. $start_dt .' <span class="e">End</span> '. $end_dt .'<em class="evo_rep_del" alt="Delete"><i class="fa fa-times"></i></em>
-						<input type="hidden" name="repeat_intervals['.$new_index.'][0]" value="'.$start_unix_val.'"/><input type="hidden" name="repeat_intervals['.$new_index.'][1]" value="'.$end_unix_val.'"/>'
-						.'</li>';
+			$_html =  '<li data-cnt="'.$new_index.'" style="display:flex" class="'.($new_index==0?'initial':'').($new_index>3?' over':'').'">'. ($new_index==0? '<dd>'.__('Initial','eventon').'</dd>':'').'<i>'.$new_index.'</i><span>'.__('from','eventon').'</span> '. $start_dt .' <span class="e">End</span> '. $end_dt .
+				'<span class="evodfxi evofxdrr evofxaic evoclwi evogap5 evofxjcfe">
+					<em class="evo_rep_edit evodfx evofxjcc evofxaic" alt="Edit"><i class="fa fa-pencil"></i></em>
+					<em class="evo_rep_del evodfx evofxjcc evofxaic" alt="Delete"><i class="fa fa-times"></i></em>
+				</span>'.
+				'<input type="hidden" name="repeat_intervals['.$new_index.'][0]" value="'.$start_unix_val.'"/><input type="hidden" name="repeat_intervals['.$new_index.'][1]" value="'.$end_unix_val.'"/>'
+				.'</li>';
 			$msg = __('Repeat Instance Added','eventon');
 			
 			wp_send_json(array(
@@ -130,6 +145,41 @@ class EVO_admin_ajax{
 				'msg'=> $msg
 			));
 			wp_die();
+
+		}
+
+		public function edit_custom_repeat(){
+			EVO()->helper->validate_request( 'nn', 'eventon_admin_nonce', false, false, true );
+			$PD = $this->post_data;
+
+			$_is_24h = (!empty($PD['_evo_time_format']) && $PD['_evo_time_format']=='24h')? true:false;
+			$date_format = !empty($PD['_evo_date_format']) ? $PD['_evo_date_format'] : 'Y/m/d';
+			$time_format = $_is_24h ? 'H:i' : 'g:ia';
+
+			$timezone = new DateTimeZone('UTC');
+			$index = key($PD['repeat_intervals']); // Get dynamic index
+		    $start_unix = $PD['repeat_intervals'][$index][0];
+		    $end_unix = $PD['repeat_intervals'][$index][1];
+
+		    $start_dt = new DateTime("@$start_unix", $timezone);
+		    $end_dt = new DateTime("@$end_unix", $timezone);
+
+		    $output = [
+		        'start_date' => $start_dt->format($date_format),
+		        'start_date_x' => $start_dt->format('Y/m/d'),
+		        'start_hour' => $start_dt->format($_is_24h ? 'H' : 'g'),
+		        'start_minute' => $start_dt->format('i'),
+		        'start_ampm' => $_is_24h ? '' : $start_dt->format('a'),
+		        'end_date' => $end_dt->format($date_format),
+		        'end_date_x' => $end_dt->format('Y/m/d'),
+		        'end_hour' => $end_dt->format($_is_24h ? 'H' : 'g'),
+		        'end_minute' => $end_dt->format('i'),
+		        'end_ampm' => $_is_24h ? '' : $end_dt->format('a')
+		    ];
+
+		    wp_send_json($output);
+		    wp_die();
+
 
 		}
 		

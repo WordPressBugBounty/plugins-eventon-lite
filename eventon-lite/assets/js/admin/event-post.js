@@ -497,6 +497,12 @@ jQuery(document).ready(function($){
 						const ul = container.find('.evo_custom_repeat_list');
 						ajax_data['new_index'] = ul.find('li:last').data('cnt');
 
+						// 24h
+						ajax_data['_evo_time_format'] = container.find('._evo_time_format').val();
+
+						// editing index
+						if( ul.hasClass('editing') ) ajax_data['edit_index'] = ul.find('li.editing').data('cnt');
+
 						el.evo_admin_get_ajax({
 							'adata':{
 								a:'eventon_generate_custom_repeat_unix',
@@ -504,7 +510,14 @@ jQuery(document).ready(function($){
 								show_snackbar:true,
 								loader_class:'evo_repeat_interval_new'
 							},
-							uid:'generate_custom_repeat_unix'
+							uid:'generate_custom_repeat_unix',
+							onSuccess: ( data, OO) => {
+								if( ul.hasClass('editing')){
+									ul.find('li.editing').replaceWith( data.content );
+								}else{
+									ul.append( data.content );
+								}								
+							}
 						});
 
 						return;
@@ -513,22 +526,54 @@ jQuery(document).ready(function($){
 						el.evo_snackbar({message: "All fields are required!"});
 					}
 				}
-			});
-
-			$('body').on('evo_ajax_success_generate_custom_repeat_unix',function(event, OO, data, el){
-
-				el = $(el);
-				const container = el.closest('.repeat_information');
+			})
+			// edit a custom repeat interval
+			.on('click','.evo_rep_edit',function(){
+				const $li = $(this).closest('li');
+				const container = $(this).closest('.repeat_information');
 				const box = container.find('.evo_repeat_interval_new.evo_edit_field_box');
-				const ul = container.find('.evo_custom_repeat_list');
 
-				ul.append( data.content );
-			});
+				var ajax_data = {};
+				$li.find('input').each(function(){
+					var name = $(this).attr('name');
+    				if (name) ajax_data[name] = $(this).val();
+				});
 
-		// delete a repeat interval
-			$('.evo_custom_repeat_list').on('click','li em',function(){
+				ajax_data['_evo_time_format'] = container.find('._evo_time_format').val();
+				ajax_data['_evo_date_format'] = container.find('._evo_date_format').val();
+
+				container.evo_admin_get_ajax({
+					adata :{
+						a:'eventon_edit_custom_repeat',
+						data:ajax_data,
+						show_snackbar:true,
+						loader_class:'evo_custom_repeat_list'
+					},
+					uid:'edit_custom_repeat_unix',
+					onBefore: (OO ) =>{
+						$li.addClass('editing');
+						$li.closest('ul').addClass('editing');
+					},
+					onSuccess: ( data, OO) => {
+						console.log(data);
+						$.each(['start', 'end'], function(i, type) {
+						    box.find(`input[name=event_new_repeat_${type}_date]`).val(data[`${type}_date`]);
+						    box.find(`input[name=event_new_repeat_${type}_date_x]`).val(data[`${type}_date_x`]);
+						    box.find(`select[name=_new_repeat_${type}_hour]`).val(data[`${type}_hour`]);
+						    box.find(`select[name=_new_repeat_${type}_minute]`).val(data[`${type}_minute`]);
+						    box.find(`select[name=_new_repeat_${type}_ampm]`).val(data[`${type}_ampm`]);
+						});
+
+						box.show();
+					}
+				});
+
+			})
+
+			// delete a repeat interval
+			.on('click','em.evo_rep_del',function(){
 				LI = $(this).closest('li');
-				LI.slideUp(function(){
+				LI.hide(function(){
 					LI.remove();
 				});
 			});
