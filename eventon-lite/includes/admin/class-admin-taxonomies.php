@@ -236,6 +236,11 @@ class EVO_Taxonomies extends EVO_Taxonomies_editor{
 						'name'=>esc_html__('Location State (Optional)','eventon'),
 						'var'=>'location_state'				
 					),
+					'location_zip'=>array(
+						'type'=>'text',
+						'name'=>__('Location Zip / Postal Code (Optional)','eventon'),
+						'var'=>'location_zip'				
+					),
 					'location_country'=>array(
 						'type'=>'text',
 						'name'=>esc_html__('Location Country (Optional)','eventon'),

@@ -1,7 +1,7 @@
 <?php
 /**
  * Event Meta box time and date fields
- * @version 2.4
+ * @version 2.4.7
  */
 							
 
@@ -470,7 +470,7 @@ $wp_date_format = $date_format;
 		<!-- Custom repeat -->
 		<div class='repeat_information' style='display:<?php echo ( $EVENT->get_prop('evcal_rep_freq')=='custom')? 'block':'none';?>'>
 			<input class='_evo_time_format' type='hidden' name='_evo_time_format' value='<?php echo $used_timeFormat;?>'/>
-			<input class='_evo_date_format' type='hidden' name='_evo_date_format' value='<?php echo $wp_date_format;?>'/>
+			<input class='_evo_date_format' type='hidden' name='_evo_date_format' value='Y/m/d'/>
 			<p><?php esc_html_e('CUSTOM REPEAT TIMES','eventon');?><br/><i style='opacity:0.7'><?php esc_html_e('NOTE: Initial time is the original event time, while other times are repeat instances of the original event time.','eventon');?></i></p>										
 			<?php
 
@@ -487,7 +487,7 @@ $wp_date_format = $date_format;
 
 					$DD = new DateTime( 'now', EVO()->calendar->timezone0);
 					$intervals = $EVENT->get_repeats();
-					if($intervals && sizeof($intervals)>0 ):									
+					if($intervals && is_array($intervals) && count( $intervals ) > 0 ):									
 						$date_format_string = $wp_date_format.' '.( $hr24? 'G:i':'h:ia');// datre format sting to display for repeats
 						
 						foreach( $intervals as $__key=>$rt):

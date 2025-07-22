@@ -1,6 +1,5 @@
 /** 
- * @version  2.3.3
- * @version 4.8.2
+ * @version  2.4.7
  */
 jQuery(document).ready(function($){
 
@@ -121,7 +120,8 @@ jQuery(document).ready(function($){
 	// Related events	@2.3
 		$('body')
 		// trigger configure related events
-		.on('click','.evo_configure_related_events',function(){
+		.on('click','.evo_configure_related_events',function(e){
+			e.preventDefault();
 			var el = $(this);
 			var box = el.closest('.evo_rel_events_box');
 			el.evo_lightbox_open({
@@ -145,13 +145,15 @@ jQuery(document).ready(function($){
 				LB.find('.evolb_content').html( data.content);					
 			}
 		})		
-		.on('click','span.rel_event', function(){
+		.on('click','span.rel_event', function(e){
+			e.preventDefault();
 			O = $(this);
 			O.toggleClass('select');
 		})
 
 		// save related event select
-		.on('click','.evo_save_rel_events', function(){
+		.on('click','.evo_save_rel_events', function(e){
+			e.preventDefault();
 			LB = $('body').find('.evo_related_events_lb');
 			EV = {};
 			HTML = '';

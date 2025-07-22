@@ -1120,7 +1120,7 @@ jQuery(document).ready(function($){
 
             	// update new values
 
-            	$('#evcal_2').find('input[name="'+data[0]+'"]').val(data[1]); // for vars
+            	$('#evcal_2').find('input[name="'+data[0]+'"]').val(data[1]).siblings('em').text( data[1] ); // for vars
             	$('#evcal_2').find('input[for="'+data[0]+'"]').val(data[1]); // for text strings
             	
             	msg_elm.html('Updating language values.');   

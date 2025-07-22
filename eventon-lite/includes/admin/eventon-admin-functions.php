@@ -7,7 +7,7 @@
  * @author 		AJDE
  * @category 	Admin
  * @package 	EventON/Admin
- * @version    	2.4.1
+ * @version    	2.4.7
  */
 
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
@@ -176,7 +176,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 			return eventon_get_unix_time($date_POST_values, $date_format, $time_format, $tz);
 	}
 
-// Sanitize CSS @version 2.4.1
+// Sanitize CSS @version 2.4.7
 	function eventon_sanitize_css($css) {
 	    // Check if input is empty or not a string
 	    if (empty($css) || !is_string($css)) {
@@ -208,7 +208,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
 	    // Preserve valid CSS characters, including quotes
 	    // Allow: alphanumeric, whitespace, and CSS-specific characters like {}:;,.#()"'-@*
-	    $css = preg_replace('/[^\w\s\d{}:;,.#()"\'\-@*!\/]/', '', $css);
+	    $css = preg_replace('/[^\w\s\d{}:;,.#()"\'\-@*!\/%]/', '', $css);
 
 	    // Ensure double quotes are not escaped unnecessarily
 	    $css = str_replace(array('\"', '&quot;'), '"', $css);

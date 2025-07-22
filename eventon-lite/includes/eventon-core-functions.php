@@ -418,12 +418,12 @@ require EVO_ABSPATH. 'includes/evo-conditional-functions.php';
 				
 				// date format
 				$_wp_date_format = (!empty($date_format))? $date_format: 
-					( (isset($postdata['_evo_date_format']))? $postdata['_evo_date_format']
+					( (isset($data['_evo_date_format']))? $data['_evo_date_format']
 						: get_option('date_format')
 					);
 				
 				$_is_24h = (!empty($time_format) && $time_format=='24h')? true:
-					( (isset($postdata['_evo_time_format']) && $postdata['_evo_time_format']=='24h')? 
+					( (isset($data['_evo_time_format']) && $data['_evo_time_format']=='24h')? 
 						true: false
 					); // get default site-wide date format
 					
@@ -450,7 +450,7 @@ require EVO_ABSPATH. 'includes/evo-conditional-functions.php';
 
 						if( !empty($data['evcal_st_ampm']) ){
 
-							$start_ampm = strtolower( $data['evcal_st_ampm'] );
+							$start_ampm = trim( strtolower( $data['evcal_st_ampm'] ) );
 
 							if( $start_ampm =='pm' && $time_hour != 12) $time_hour += 12; 
 							if( $start_ampm =='pm' && $time_hour == 12) $time_hour = 12; 
@@ -493,7 +493,7 @@ require EVO_ABSPATH. 'includes/evo-conditional-functions.php';
 
 						if( !empty($data['evcal_et_ampm']) ){
 
-							$end_ampm = strtolower( $data['evcal_et_ampm'] );
+							$end_ampm = trim( strtolower( $data['evcal_et_ampm'] ) );
 
 							if( $end_ampm =='pm' && $time_hour != 12) $time_hour += 12; 
 							if( $end_ampm =='pm' && $time_hour == 12) $time_hour = 12; 
@@ -1887,8 +1887,9 @@ require EVO_ABSPATH. 'includes/evo-conditional-functions.php';
 		    if(!$use_openstreet && !$gmap_api) return false;
 
 			// Clean up address (remove suite numbers which might confuse Nominatim)
-		    $address = preg_replace('/\bSuite\s+[A-Z0-9]\b/i', '', $address);
-		    $address = urlencode(str_replace(" ", "+", trim($address)));
+		     $address = preg_replace('/\bSuite\s+[A-Z0-9]\b/i', '', $address);
+			$address = urlencode($address); // Encode the entire address
+			$address = str_replace('%20', '+', $address); // Replace encoded spaces with +
 			
 			// Set up the URL based on API choice
 		    $url = $use_openstreet 

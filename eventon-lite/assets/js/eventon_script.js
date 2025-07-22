@@ -1263,7 +1263,10 @@ jQuery(document).ready(function($){
 			var SU = parseInt( SC.focus_start_date_range);				
 			var M = moment.unix(SU).utc();	
 
-			if( N.format('YYYY M') == M.format('YYYY M')){				
+			const rangeMonth = ( SC.fixed_month ) ? SC.fixed_month : M.format('M');
+			const rangeYear = ( SC.fixed_year ) ? SC.fixed_year : M.format('YYYY');
+
+			if( N.format('YYYY M') == rangeYear +' '+ rangeMonth){				
 				CAL.find('.evo-gototoday-btn').fadeOut();
 			}
 

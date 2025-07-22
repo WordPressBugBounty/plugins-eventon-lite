@@ -29,6 +29,7 @@ class EVO_Settings extends EVO_Settings_Designer{
 
 
 		$this->options_pre = 'evcal_options_';
+
 	}
 
 // Styles and scripts

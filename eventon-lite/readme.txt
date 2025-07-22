@@ -4,8 +4,8 @@ Plugin Name: EventON Lite
 Author URI: http://ashanjay.com/
 Tags: calendar, event calendar, virtual events, events, event management
 Requires at least: 6.0
-Tested up to: 6.8.1
-Stable tag: 2.4.6
+Tested up to: 6.8.2
+Stable tag: 2.4.7
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -236,7 +236,19 @@ Yes, EventON Lite supports different timezones for each event. You can even disp
 = How do I get support for EventON Lite? = 
 For support with the Lite version, visit [support forum here](https://wordpress.org/support/plugin/eventon-lite/). For premium support or queries related to the Full version, please contact us through [our helpdesk](https://helpdesk.ashanjay.com).
 
+= How can I report security bugs? =
+
+You can report security bugs through the Patchstack Vulnerability Disclosure Program. The Patchstack team helps validate, triage and handle any security vulnerabilities. [Report a security vulnerability.](https://patchstack.com/database/vdp/9e5fbbf9-f1d1-4765-83e5-76b7743a35be)
+
 == Changelog ==
+= 2.4.7 (2025-7-22) = 
+FIXED: duplicating repeat events not working
+FIXED: Import language via CSV to update on screen real-time
+FIXED: location lan lat generation not working properly
+FIXED: % sign not saving in custom css
+FIXED: eventon_get_unix_time()trim ampm value
+FIXED: related events not 
+
 = 2.4.6 (2025-5-27) =
 ADDED: Ability to edit existing custom repeats
 FIXED: lang value not properly set for new event data
