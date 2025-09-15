@@ -1,6 +1,6 @@
 /*
  * EventON Back end scripts for general backend of wordpress
- * @version 2.4.3
+ * @version 2.4.8
  */
 jQuery(document).ready(function($){	
 
@@ -406,6 +406,10 @@ jQuery(document).ready(function($){
 			LIGHTBOX.addClass('show');	
 			$('body').addClass('evo_overflow');
 			$('html').addClass('evo_overflow');
+
+			// trigger after lightbox close
+
+			$('body').trigger('evo_lightbox_opened',[ lb_class ]);
 		}
 
 		// @version 4.1

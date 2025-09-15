@@ -1,7 +1,7 @@
 <?php
 /**
  * Event Class for one event
- * @version 2.4.1
+ * @version 2.4.9
  */
 
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
@@ -300,7 +300,7 @@ class EVO_Event extends EVO_Data_Store{
 		// @+2.8 @u4.5.2
 		function is_event_in_date_range($S=0, $E=0, $start='' ,$end='' , $utc = false){
 			if(empty($start) && empty($end) ){
-				$start = $this->get_start_time();
+				$start = $this->get_start_time( $utc);
 				$end = $this->get_end_time( $utc );
 			}
 			return EVO()->calendar->shell->is_in_range( $S, $E, $start, $end);
@@ -862,8 +862,11 @@ class EVO_Event extends EVO_Data_Store{
 		}
 
 	// password protected events
-		function is_password_required(){
-			return $this->post_password;
+		public	function is_password_required(){
+			$need_pass = $this->post_password;
+			if( empty($need_pass)) $need_pass = post_password_required( $this->ID );
+
+			return $need_pass;
 		}
 
 	// Taxonomy @+2.8.1 @~2.8.5

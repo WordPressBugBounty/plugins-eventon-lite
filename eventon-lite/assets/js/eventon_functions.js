@@ -107,7 +107,7 @@
 
   			var OO = this.evo_process_ajax_params( opt );
 
-  			console.log(OO);
+  			//console.log(OO);
 
   			var _lbdata = OO.lbdata;
 			var _adata = OO.adata;	

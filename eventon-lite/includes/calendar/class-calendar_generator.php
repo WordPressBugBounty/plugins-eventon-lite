@@ -3,7 +3,7 @@
  * EVO_generator class.
  *
  * @class 		EVO_generator
- * @version		2.4
+ * @version		2.4.9
  * @package		EventON/Classes
  * @category	Class
  * @author 		AJDE
@@ -655,7 +655,8 @@ class EVO_generator extends EVO_Cal_Time{
 						'post_status'		=>'publish',
 						'posts_per_page'	=>-1 ,
 						'order'				=>'ASC',
-						'orderby' => 		'menu_order'
+						'orderby' => 		'menu_order',
+						'has_password'      => false,
 					);
 
 					if (!empty($scO->s)) $wp_arguments_['s'] = $scO->s;
@@ -794,6 +795,8 @@ class EVO_generator extends EVO_Cal_Time{
 					$_cal_visible_range = $this->helper->get_cal_visible_range_start();
 
 				$range_data = $this->cal_range_data;
+
+				//print_r($range_data);
 				
 				$count = 0;
 
@@ -909,10 +912,11 @@ class EVO_generator extends EVO_Cal_Time{
 						
 						// using UTC0 time
 						$_is_event_current = $EVENT->is_current_event( ($hide_past_by=='ee'?'end':'start'));
-
 						$_is_event_inrange = $EVENT->is_event_in_date_range( 
 							$range_data['start'],$range_data['end'],'','', true );
 						$_is_in_visible_range = $EVENT->is_in_visible_range( $_cal_visible_range );
+
+						
 												
 						// past event and range check
 							if( !$_is_in_visible_range ) continue;
@@ -969,6 +973,11 @@ class EVO_generator extends EVO_Cal_Time{
 			$this->is_eventcard_open= ($this->is_eventcard_hide_forcer) ? false:true;
 
 			$EVENT = new EVO_Event($event_id, '', $repeat_interval);
+
+			// check password status
+			if( $EVENT->is_password_required()){
+				return 'need_pass';
+			}
 
 			// set base start and end unix
 				$event_start_unix = $EVENT->get_start_time();
@@ -1994,7 +2003,8 @@ class EVO_generator extends EVO_Cal_Time{
 			$wp_args= array(
 				'posts_per_page'=>-1,
 				'post_type' => 'ajde_events',
-				'post_status'=>'any'			
+				'post_status'=>'any',
+				'has_password'      => false,	// exclude oassword protected events		
 			);
 			$wp_args = (isset($args['wp_args']))? array_merge($wp_args,$args['wp_args']): $wp_args;
 			

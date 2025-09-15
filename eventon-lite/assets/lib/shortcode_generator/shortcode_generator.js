@@ -1,6 +1,6 @@
 /**
  * Shortcode Generator
- * @version 4.8
+ * @version 2.4.8
  */
 jQuery(document).ready(function($){
 
@@ -32,7 +32,11 @@ jQuery(document).ready(function($){
 				'type': ('type' in data ? data.type : ''),
 				'other_id': ('other_id' in data ? data.other_id : ''),
 			});
+		})
+		.on('evo_lightbox_opened', function(e, lb_class){
+			open_sg_lightbox(  'add_eventon' ,'general');
 		});
+
 
 		$('body').on('click','.evo_sc_show_code_trig',function(){
 			$(this).siblings('.evoSC_shortcode_content').toggleClass('show');

@@ -2,7 +2,7 @@
 /**
  *
  *	EventON Now Calendar Content
- *	@version 2.4
+ *	@version 2.4.9
  */
 
 class Evo_Calendar_Now{
@@ -45,9 +45,11 @@ class Evo_Calendar_Now{
 
 		$plus = $delay? 1:0;
 
+		//echo $DD->format('U');
+
 		// in UTC0
 		$A['focus_start_date_range'] = $DD->format('U') + $plus;
-		$A['focus_end_date_range'] = $DD->format('U') + $plus ;
+		$A['focus_end_date_range'] = $DD->format('U') + $plus + 1;
 
 
 
@@ -100,79 +102,89 @@ class Evo_Calendar_Now{
 
 		</div>
 
-		<?php if( !$hide_next):?>
-		<div class='evo_eventon_now_next'>
+		<?php 
+
+		// Up next
+		if( !$hide_next):
+
+			ob_start();
+
+			$A = $this->A;
 			
-			<?php
+			// get events for next 12 months	
+			$A['focus_start_date_range'] = $DD->format('U');
+			$ahead_range = !empty($A['next_range']) ? (int)$A['next_range']: 12;
+			$DD->modify("+{$ahead_range} months");
+			$A['focus_end_date_range'] = $DD->format('U');
 
-			// up next
-				$A = $this->A;
+			$A = EVO()->calendar->process_arguments( $A);	
+			$event_list_array = EVO()->calendar->evo_get_wp_events_array( array( 'post__not_in'=> $now_event_ids) );
+
+
+			// if there are events in the next 12 months
+			if( count($event_list_array) > 0){
+
+				$help = EVO()->helper;
+
+				$next_event_start_unix = $event_list_array[0]['unix_start'];
+				$current_time = time();
 				
-				// get events for next 12 months	
-				$A['focus_start_date_range'] = $DD->format('U');
-				$DD->modify('+12 months');
-				$A['focus_end_date_range'] = $DD->format('U');
-
-				$A = EVO()->calendar->process_arguments( $A);	
-				$event_list_array = EVO()->calendar->evo_get_wp_events_array( array( 'post__not_in'=> $now_event_ids) );
-
-
-				// if there are events in the next 12 months
-				if( count($event_list_array) > 0){
-
-					$help = EVO()->helper;
-
-					$next_event_start_unix = $event_list_array[0]['unix_start'];
-					$current_time = time();
+				if( $next_event_start_unix > $current_time ){ // make sure event is in the future
+				
+					$next_events = array( $event_list_array[0]);
 					
-					if( $next_event_start_unix > $current_time ){ // make sure event is in the future
-					
-						$next_events = array( $event_list_array[0]);
-						
-						$event_data = EVO()->calendar->generate_event_data(
-							$next_events, 	
-							$A['focus_start_date_range']
-						);
+					$event_data = EVO()->calendar->generate_event_data(
+						$next_events, 	
+						$A['focus_start_date_range']
+					);
 
 
-						$gap = $next_event_start_unix - EVO()->calendar->current_time;
-						$nonce = wp_create_nonce('evo_calendar_now');
+					$gap = $next_event_start_unix - EVO()->calendar->current_time;
+					$nonce = wp_create_nonce('evo_calendar_now');
 
-						$data_attr = array(
-							'gap'=> $gap,
-							'endutc'=> $next_event_start_unix,
-							'now'=> EVO()->calendar->current_time,
-							't'=>'',
-							'd'=>evo_lang('Day'),
-							'ds'=>evo_lang('Days'),
-							'exp_act'=> 'runajax_refresh_now_cal',
-							'n'=> $nonce,
-						);
+					$data_attr = array(
+						'gap'=> $gap,
+						'endutc'=> $next_event_start_unix,
+						'now'=> EVO()->calendar->current_time,
+						't'=>'',
+						'd'=>evo_lang('Day'),
+						'ds'=>evo_lang('Days'),
+						'exp_act'=> 'runajax_refresh_now_cal',
+						'n'=> $nonce,
+					);
 
-						echo "<h3 class='evogap10 evofxaic'><em class='fsn' >". evo_lang('Coming up Next in') ."</em> <span class='evo_countdowner' ". $help->array_to_html_data($data_attr) ."></span></h3>";
+					echo "<h3 class='evogap10 evofxaic'><em class='fsn' >". evo_lang('Coming up Next in') ."</em> <span class='evo_countdowner' ". $help->array_to_html_data($data_attr) ."></span></h3>";
 
-						$header_args = array(
-							'external'=> true,
-							'_classes_calendar'=> '',
-							'initial_ajax_loading_html'=> false,
-							'date_header'=> false,
-						);
+					$header_args = array(
+						'external'=> true,
+						'_classes_calendar'=> '',
+						'initial_ajax_loading_html'=> false,
+						'date_header'=> false,
+					);
 
-						echo EVO()->calendar->body->get_calendar_header($header_args);		
+					echo EVO()->calendar->body->get_calendar_header($header_args);		
 
-						foreach( $event_data as $ED){
-							$now_event_ids[] = $ED['event_id'];
-							echo  $ED['content'];
-						}
-
-						echo EVO()->calendar->body->get_calendar_footer( true);
+					foreach( $event_data as $ED){
+						$now_event_ids[] = $ED['event_id'];
+						echo  $ED['content'];
 					}
 
+					echo EVO()->calendar->body->get_calendar_footer( true);
 				}
+
+			}
+
+			$next_content = ob_get_clean();
+
+		if( !empty($next_content)):
+		?>
+		<div class='evo_eventon_now_next'>			
+			<?php
+			echo $next_content;
 			?>
 		</div>
 		<?php endif;?>
-
+		<?php endif;?>
 		<?php
 		
 	}

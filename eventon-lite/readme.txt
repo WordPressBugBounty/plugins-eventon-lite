@@ -5,7 +5,7 @@ Author URI: http://ashanjay.com/
 Tags: calendar, event calendar, virtual events, events, event management
 Requires at least: 6.0
 Tested up to: 6.8.2
-Stable tag: 2.4.7
+Stable tag: 2.4.9
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -241,6 +241,17 @@ For support with the Lite version, visit [support forum here](https://wordpress.
 You can report security bugs through the Patchstack Vulnerability Disclosure Program. The Patchstack team helps validate, triage and handle any security vulnerabilities. [Report a security vulnerability.](https://patchstack.com/database/vdp/9e5fbbf9-f1d1-4765-83e5-76b7743a35be)
 
 == Changelog ==
+= 2.4.9 (2025-9-15) =
+ADDED: ability to set how far ahead to search for happening next event
+FIXED: live now events not showing current events in different timeones
+FIXED: csv export not working
+FIXED: cancelled events text color on event list
+
+= 2.4.8 (2025-8-15) =
+ADDED: password protected events pages with get_the_password_form()
+FIXED: Password protected events showing in calendar
+FIXED: shortcode generator not working from classic editor
+
 = 2.4.7 (2025-7-22) = 
 FIXED: duplicating repeat events not working
 FIXED: Import language via CSV to update on screen real-time

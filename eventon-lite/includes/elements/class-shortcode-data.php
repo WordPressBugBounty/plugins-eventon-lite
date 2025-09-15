@@ -356,6 +356,28 @@ class EVO_Shortcode_Data{
 							'guide'=>'This will hide the happening now events, but will show coming up next.',
 							'var'=>'hide_now',
 							'default'=>'no'
+						),
+						array(
+							'name'=>'Hide coming up next section',
+							'type'=>'YN',
+							'guide'=>'This will hide the coming up next section.',
+							'var'=>'hide_next',
+							'default'=>'no'
+						),array(
+							'name'=>'How many months ahead to search for next event',
+							'type'=>'select',
+							'guide'=> __('Set many months ahead you want to search for the next event'),
+							'var'=>'next_range',
+							'default'=>'12',
+							'options'=> [
+								'12'=>12,
+								'10'=> 10,
+								'8'=> 8,
+								'6'=> 6,
+								'3'=>3,
+								'2'=>2,
+								'1'=>1
+							]
 						)
 						
 					)

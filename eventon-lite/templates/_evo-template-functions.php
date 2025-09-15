@@ -1,7 +1,7 @@
 <?php
 /**
  *	EventON Template functions for template system
- *	@version 2.4
+ *	@version 2.4.8
  */
 
 defined( 'ABSPATH' ) || exit;
@@ -140,9 +140,15 @@ function evotemp_before_single_event_content(){
 	global $event;
 
 	// if password protected event
-	//if( $event->is_password_required() ) echo 'Password Protected event';
+	if( $event->is_password_required() ){
+		// Display password form
+		echo '<div class="evo_password_form">';
+        echo get_the_password_form();
+        echo '</div>';
+	} 
 
 	$event_id = get_the_ID();
+
 	$json = apply_filters('evo_event_json_data',array(), $event_id);
 
 	$_class_attr = array();
@@ -194,8 +200,6 @@ function evotemp_single_event_summary(){
 	$eventtop_style = EVO()->cal->get_prop('evosm_eventtop_style');
 	if(!$eventtop_style) $eventtop_style = 'immersive';
 
-
-
 	$single_events_args = apply_filters('eventon_single_event_page_data',array(
 		'etc_override'=>'no',
 		'eventtop_style'=> ($eventtop_style == 'color'? 2:0),
@@ -206,6 +210,11 @@ function evotemp_single_event_summary(){
 		if( EVO()->cal->check_yn('evosm_etc_override') ) $single_events_args['etc_override'] = 'yes';
 
 	$content =  EVO()->calendar->get_single_event_data( $event->ID, EVO()->lang, $event->ri, $single_events_args);		
+
+	// if event is password protected
+	if( $content == 'need_pass'){		
+        return;
+	}
 
 	// login only access
 	$thisevent_onlylogged_cansee = $event->check_yn('_onlyloggedin');

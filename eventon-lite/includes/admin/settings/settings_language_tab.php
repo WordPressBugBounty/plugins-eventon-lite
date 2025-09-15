@@ -2,7 +2,7 @@
 /**
  * Language Settings 
  *
- * @version		2.4
+ * @version		2.4.8
  * @package		EventON/settings
  * @category	Settings
  * @author 		AJDE
@@ -242,6 +242,7 @@ class evo_settings_lang extends EVO_Lang_Settings{
 					
 					array('label'=>'The Event Calendar','var'=>'1'),
 					array('label'=>'Collection of Events','var'=>'1'),
+					array('label'=>'Password Protected event','var'=>'1'),
 				array('type'=>'togend'),
 
 				array('type'=>'section',

@@ -101,7 +101,13 @@ class EVO_Shortcodes {
 
 				if( is_array($fields)){
 
-					$EVENT = new EVO_Event($event_id,'', $event_ri );					
+					$EVENT = new EVO_Event($event_id,'', $event_ri );	
+
+					// check password status
+					if( $EVENT->is_password_required()){
+						ob_get_clean();
+						return "<p class=''>". evo_lang('Password Protected event') . '</p>';
+					}				
 
 
 					foreach($fields as $ff){
@@ -206,6 +212,11 @@ class EVO_Shortcodes {
 					$args['repeat_interval'],
 					$args
 				);
+
+			// password protected event
+				if( $event == 'need_pass'){
+					return "<p class=''>". evo_lang('Password Protected event') . '!</p>';
+				}
 			
 			// other event box variables
 			$ev_excerpt = ($args['show_excerpt']=='yes')? "data-excerpt='1'":null;

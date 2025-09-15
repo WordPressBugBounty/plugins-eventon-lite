@@ -1,6 +1,6 @@
 /**
  * Primary Styles for EventON Calendar Front-end
- * @version 2.4
+ * @version 2.4.9
  */
 
 /* ROOT */
@@ -2936,10 +2936,6 @@
 		.ajde_evcal_calendar.cev.sev #evcal_list .sep_month_events .eventon_list_event,
 		.ajde_evcal_calendar.cev.sev #evcal_list .sep_month_events.no_event,
 		{border:none; }	
-		.ajde_evcal_calendar.cev.sev #evcal_list a.cancel_event >*,
-		.ajde_evcal_calendar.cev.sev #evcal_list a.cancel_event em,
-		.ajde_evcal_calendar.cev.sev #evcal_list a.cancel_event span
-		{color:#808080;}
 
 	/* bubble events */
 		.ajde_evcal_calendar.bub.cev.sev #evcal_list{overflow:visible;}
@@ -3762,6 +3758,27 @@
 		text-align: center;
 		margin-right: 5px;
 		line-height: 100%;
+	}
+
+/** Single Events Page @version 2.4.8 */
+	.evo_password_form {
+	    margin: 20px 0;
+	    text-align: center;
+	}
+	.evo_password_form input[type="password"] {
+	        padding: 8px 20px;
+	    width: 200px;
+	    border-radius: 20px;
+	}
+	.evo_password_form input[type="submit"] {
+	    padding: 8px 16px;
+	    background-color: var(--evo_color_prime);
+	    color: white;
+	    border: none;
+	    cursor: pointer;
+	    font-family: var(--evo_font_1);
+	    text-transform: uppercase;
+	    border-radius: 20px;
 	}
 
 /* More event images styles */

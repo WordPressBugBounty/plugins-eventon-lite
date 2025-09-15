@@ -1,7 +1,7 @@
 <?php
 /**
  * Function ajax for backend
- * @version   2.4.6
+ * @version   2.4.9
  */
 class EVO_admin_ajax{
 	public $post_data;
@@ -971,6 +971,12 @@ class EVO_admin_ajax{
 			endif;
 
 			wp_reset_postdata();
+		}
+
+		function html_process_content($content, $process = true){
+			//$content = iconv('UTF-8', 'Windows-1252', $content);
+			if( is_array( $content )) return $content;
+			return ($process)? htmlentities($content, ENT_QUOTES): $content;
 		}
 
 	// saving general settings -- @added 4.8 @updated 4.8.1		
