@@ -301,10 +301,10 @@
 			'css'=>'background-color:#$', 'var'=>'evo_color_lb_3',	'default'=>'cfcfcf'
 		),array(
 			'item'=>'.evo_lightboxes .evolbclose:before, .evo_lightboxes .evolbclose:after',
-			'css'=>'background-color:#$', 'var'=>'evo_color_lb_2',	'default'=>'666666'
+			'css'=>'background-color:#$', 'var'=>'evo_color_lb_2',	'default'=>'fffff'
 		),array(
 			'item'=>'.evo_lightboxes .evolbclose:hover:before, .evo_lightboxes .evolbclose:hover:after',
-			'css'=>'background-color:#$', 'var'=>'evo_color_lb_4',	'default'=>'666666'
+			'css'=>'background-color:#$', 'var'=>'evo_color_lb_4',	'default'=>'fffff'
 		)
 
 		// get directions section
@@ -599,13 +599,11 @@
 			array(
 				'item'=>'.evo_eventon_live_now_section h3','css'=>'color:#$', 'var'=>'evo_live1b',	'default'=>$evo_color_1
 			),array(
-				'item'=>'.evo_eventon_live_now_section .evo_eventon_now_next','css'=>'background-color:#$', 'var'=>'evo_live2',	'default'=>'ececec'
-			),array(
 				'item'=>'.evo_eventon_live_now_section .evo_eventon_now_next h3','css'=>'color:#$', 'var'=>'evo_live3',	'default'=>$evo_color_1
 			),array(
 				'item'=>'.evo_eventon_live_now_section .evo_eventon_now_next h3 .evo_countdowner','multicss'=>array(
-					array('css'=>'background-color:#$', 'var'=>'evo_live4b','default'=>$evo_color_2),
-					array('css'=>'color:#$', 'var'=>'evo_live4a','default'=>'ffffff')
+					array('css'=>'background-color:#$', 'var'=>'evo_live4b','default'=>'dcdcdc'),
+					array('css'=>'color:#$', 'var'=>'evo_live4a','default'=> $evo_color_1)
 				)	
 			),array(
 				'item'=>'.evo_eventon_live_now_section p.evo_eventon_no_events_now','multicss'=>array(

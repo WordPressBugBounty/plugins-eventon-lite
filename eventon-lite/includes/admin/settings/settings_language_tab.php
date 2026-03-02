@@ -2,7 +2,7 @@
 /**
  * Language Settings 
  *
- * @version		2.4.8
+ * @version		2.5
  * @package		EventON/settings
  * @category	Settings
  * @author 		AJDE
@@ -323,6 +323,8 @@ class evo_settings_lang extends EVO_Lang_Settings{
 						'name'=>'evcalL_getdir_title',
 						'legend'=>'Get directions section'
 					),
+					array('label'=>'Address copied to clipboard!'),
+					array('label'=>'Copy Destination Address!'),
 					array('label'=>'Time','name'=>'evcal_lang_time'),
 					array('label'=>'Future Event Times in this Repeating Event Series','name'=>'evcal_lang_repeats'),
 					array('label'=>'Color','name'=>'evcal_lang_scolor',),

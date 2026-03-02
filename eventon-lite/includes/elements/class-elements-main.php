@@ -1,7 +1,7 @@
 <?php
 /**
  * EventON General Calendar Elements
- * @version 2.4
+ * @version 2.5
  */
 
 class EVO_General_Elements extends EVO_Elm_Trigs{	
@@ -87,7 +87,7 @@ class EVO_General_Elements extends EVO_Elm_Trigs{
 		switch($type){
 			// notices
 			case 'notice':
-				echo "<p class='evo_elm_row evo_elm_notice ". esc_attr( $row_class )."' style='" . esc_attr( $row_style )."'>". esc_attr( $name ) ."</p>";
+				echo "<p class='evo_elm_row evo_elm_notice ". esc_attr( $row_class )."' style='" . esc_attr( $row_style )."'>". wp_kses_post( $name ) ."</p>";
 			break;
 			case 'static_field': // @since 4.7
 			case 'static':
@@ -689,6 +689,7 @@ class EVO_General_Elements extends EVO_Elm_Trigs{
 					$_extra .= $this->_process_trigger_data( $trig_data , $trig_type , 'data');
 					if( $trig_type == 'trig_lb' || empty($trig_type) ) $_attr_class .= ' evolb_trigger'; 
 					if( $trig_type == 'trig_ajax' ) $_attr_class .= ' evo_trigger_ajax_run'; 
+					if( $trig_type == 'trig_sp' ) $_attr_class .= ' evosp_trigger'; 
 				}
 
 				// precontent present
@@ -704,7 +705,7 @@ class EVO_General_Elements extends EVO_Elm_Trigs{
 				// after content as static button
 				if( !empty($field_after_content)){
 					$_attr_class .= ' inbtn';
-					$elm_start = "<div class='evo_elm_button {$_attr_class} {$row_class}' {$_extra}>";
+					$elm_start = "<div class='evo_elm_button {$_attr_class} {$row_class}' {$_extra} style='{$row_style}'>";
 					$elm_end = '</div>';
 				} 
 
@@ -726,6 +727,7 @@ class EVO_General_Elements extends EVO_Elm_Trigs{
 						$_extra .= $this->_process_trigger_data( $trig_data , $trig_type, 'data' );
 						if( $trig_type == 'trig_lb' || empty($trig_type) ) $_attr_class .= ' evolb_trigger'; 
 						if( $trig_type == 'trig_ajax' ) $_attr_class .= ' evo_trigger_ajax_run'; 
+						if( $trig_type == 'trig_sp' ) $_attr_class .= ' evosp_trigger'; 
 					}
 					
 
@@ -1501,6 +1503,10 @@ class EVO_General_Elements extends EVO_Elm_Trigs{
 		if( $name == 'live'){
 			return '<svg version="1.1" x="0px" y="0px" viewBox="0 0 73 53" enable-background="new 0 0 100 100" xmlns="http://www.w3.org/2000/svg"><g transform="matrix(1, 0, 0, 1, -13.792313, -23.832699)"><g><path  d="M75.505,25.432c-0.56-0.578-1.327-0.906-2.132-0.913c-0.008,0-0.015,0-0.022,0    c-0.796,0-1.56,0.316-2.123,0.88l-0.302,0.302c-1.156,1.158-1.171,3.029-0.033,4.206c5.274,5.451,8.18,12.63,8.18,20.214    c0,7.585-2.905,14.764-8.18,20.214c-1.141,1.178-1.124,3.054,0.037,4.211l0.303,0.302c0.562,0.561,1.324,0.875,2.118,0.875    c0.009,0,0.018,0,0.026,0c0.803-0.007,1.569-0.336,2.128-0.912C81.95,68.158,85.5,59.39,85.5,50.121    C85.5,40.853,81.95,32.085,75.505,25.432z"/><path d="M20.928,50.121c0-7.583,2.905-14.762,8.18-20.214c1.14-1.177,1.124-3.051-0.036-4.209l-0.303-0.302    c-0.563-0.562-1.325-0.877-2.12-0.877c-0.008,0-0.017,0-0.025,0c-0.804,0.007-1.571,0.335-2.13,0.913    C18.049,32.085,14.5,40.853,14.5,50.121c0,9.269,3.549,18.037,9.995,24.689c0.56,0.578,1.327,0.906,2.131,0.913    c0.008,0,0.016,0,0.024,0c0.795,0,1.559-0.315,2.121-0.879l0.303-0.303c1.158-1.158,1.174-3.03,0.035-4.207    C23.833,64.884,20.928,57.705,20.928,50.121z"/><path  d="M65.611,36.945c-0.561-0.579-1.33-0.907-2.136-0.913c-0.006,0-0.013,0-0.019,0    c-0.799,0-1.565,0.319-2.128,0.886l-0.147,0.148c-1.151,1.159-1.164,3.026-0.028,4.201c2.311,2.387,3.583,5.532,3.583,8.854    c0,3.323-1.272,6.468-3.582,8.854c-1.137,1.175-1.125,3.042,0.027,4.201l0.147,0.148c0.562,0.567,1.329,0.886,2.128,0.886    c0.006,0,0.013,0,0.019,0c0.806-0.005,1.575-0.334,2.136-0.912c3.44-3.551,5.335-8.23,5.335-13.177    C70.946,45.175,69.052,40.496,65.611,36.945z"/><path d="M38.812,37.06l-0.148-0.148c-0.562-0.563-1.326-0.879-2.121-0.879c-0.008,0-0.016,0-0.024,0    c-0.804,0.006-1.571,0.335-2.131,0.913c-3.439,3.55-5.333,8.229-5.333,13.176c0,4.947,1.894,9.627,5.334,13.177    c0.559,0.577,1.327,0.905,2.131,0.912c0.008,0,0.016,0,0.023,0c0.795,0,1.559-0.315,2.121-0.879l0.148-0.148    c1.158-1.158,1.173-3.03,0.035-4.208c-2.31-2.387-3.583-5.53-3.583-8.854c0-3.322,1.272-6.467,3.583-8.854    C39.986,40.09,39.971,38.217,38.812,37.06z"/></g><circle cx="50" cy="50.009" r="6.5"/> </g></svg>';
 		}
+
+		$svg_path = $this->svg->get_icon_path( $name );
+		if( !$svg_path ) return false;
+		return $svg_path;
 	}
 
 // Tool Tips updated 2.3

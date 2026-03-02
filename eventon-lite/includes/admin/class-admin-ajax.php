@@ -513,33 +513,35 @@ class EVO_admin_ajax{
 				'status'=>'bad','m'=> __('Address Missing','eventon'))); wp_die();
 			}
 
-			$address = sanitize_text_field($_POST['address']);
+			$address = sanitize_text_field($_POST['address']);			
+			$latlon_results = eventon_get_latlon_from_address( $address );
 			
-			$address = str_replace(" ", "+", $address);
-			$address = urlencode($address);
-			
-			$url = "https://maps.google.com/maps/api/geocode/json?address=$address&sensor=false&key=".$gmap_api;
 
-			$response = wp_remote_get($url);
-
-			$response = wp_remote_retrieve_body( $response );
-			if(!$response){ 
+			if( !$latlon_results ){
 				wp_send_json(array(
-				'status'=>'bad','m'=> __('Could not connect to google maps api','eventon'))); wp_die();
+				'status'=>'bad','m'=> __('Could not connect to map API','eventon'))); 
+				wp_die();
 			}
 
-			$RR = json_decode($response);
-
-			if( !empty( $RR->error_message)){
+			if( !is_array($latlon_results)){
 				wp_send_json(array(
-				'status'=>'bad','m'=> $RR->error_message )); wp_die();
+				'status'=>'bad','m'=> $latlon_results )); 
+				wp_die();
 			}
 
-		    wp_send_json(array(
+			if( !isset( $latlon_results['lat'] ) || !isset( $latlon_results['lng']) ){
+				wp_send_json(array(
+				'status'=>'bad','m'=> __('Could get results from map API','eventon'))); 
+				wp_die();
+			}
+
+
+			wp_send_json(array(
 				'status'=>'good',
-				'lat' => $RR->results[0]->geometry->location->lat,
-		        'lng' => $RR->results[0]->geometry->location->lng,
-			)); wp_die();
+				'lat' => $latlon_results['lat'],
+		        'lng' => $latlon_results['lng'],
+			)); 
+			wp_die();
 		}
 
 	// export eventon settings

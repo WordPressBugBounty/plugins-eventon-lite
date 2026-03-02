@@ -1,17 +1,13 @@
 <?php 
 /**
  * Add to calendar
- * @version 2.3
- * @fullversion 4.7.4
+ * @version 2.5
  */
 
 
 
 // ics link
-	$event_id = $EVENT->ID;  // Example event ID
-	$repeat_interval_index = $EVENT->ri;  // Example repeat interval index
-	$nonce = wp_create_nonce('export_event_nonce');
-	$__ics_url = home_url("/export-events/{$event_id}_{$repeat_interval_index}/?nonce={$nonce}");
+	$__ics_url = $EVENT->get_ics_link();
 
 
 

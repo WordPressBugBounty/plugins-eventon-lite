@@ -1,6 +1,6 @@
 /**
  * all event post types and taxonomy styles
- * @version 2.3.3
+ * @version 2.5
  */
 
 
@@ -561,10 +561,17 @@
 /* ui v3 */
 	.fcw{color:#fff}
 	#evo_mb, .eventon_mb{
-		background-color: #fff;
-		border: 1px solid var(--evo_border_c);
-		border-radius: 15px; overflow: hidden;
+		background-color: #fff;border: 1px solid var(--evo_border_c);
+	    border-radius: 15px;
 	}	
+	#evo_mb.eventon_mb.evo_main_settings {
+	    border: none;
+	}
+
+
+	#evo_mb .evo_event_main_settings_body {
+	    border: 1px solid var(--evo_border_c);
+	}
 	.evo_metabox .evo_metabox_action_buttons_area{
 		padding: 15px 25px;
 	    font: 13px 'open sans';
@@ -647,6 +654,34 @@
 	}	
 	#evo_mb label{margin-bottom: 10px;display: block;cursor: default;color: #5a5a5a;}
 	.evMB_end{	height:10px;width:100%;	}
+	.evo_event_settings_nav {
+	    width: 150px;
+	    min-width: 150px;
+	}
+
+/* collapsable button */
+	.evo_event_snav_close.ajde-collapse-menu span, 
+	.evo_event_snav_close.ajde-collapse-menu #collapse-button div:after{
+		color: var(--evo_color_1);
+	}
+	.evo_event_snav_close.ajde-collapse-menu:hover span, 
+	.evo_event_snav_close.ajde-collapse-menu:hover #collapse-button div:after{
+		color: var(--evo_color_prime);
+	}
+	.evo_event_settings_nav.mini{min-width: auto;width: auto;}
+	.evo_event_settings_nav.mini .evo_settings_section_trig span{display: none;}
+	#collapse-button.evo_event_snav_close .collapse-button-label{display: block;}
+	#collapse-button.evo_event_snav_close.close .collapse-button-label{display: none;}
+	#collapse-button.evo_event_snav_close .collapse-button-icon:after{
+		-ms-transform: rotate(0deg);
+		-webkit-transform: rotate(0deg);
+		transform: rotate(0deg);
+	}
+	#collapse-button.evo_event_snav_close.close .collapse-button-icon:after{
+		-ms-transform: rotate(180deg);
+		-webkit-transform: rotate(180deg);
+		transform: rotate(180deg);
+	}
 
 /* event status */
 	.event_status_settings textarea{width: 100%;}	

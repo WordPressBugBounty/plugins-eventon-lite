@@ -1887,7 +1887,7 @@ require EVO_ABSPATH. 'includes/evo-conditional-functions.php';
 		    if(!$use_openstreet && !$gmap_api) return false;
 
 			// Clean up address (remove suite numbers which might confuse Nominatim)
-		     $address = preg_replace('/\bSuite\s+[A-Z0-9]\b/i', '', $address);
+		    $address = preg_replace('/\bSuite\s+[A-Z0-9]\b/i', '', $address);
 			$address = urlencode($address); // Encode the entire address
 			$address = str_replace('%20', '+', $address); // Replace encoded spaces with +
 			
@@ -1896,6 +1896,18 @@ require EVO_ABSPATH. 'includes/evo-conditional-functions.php';
 		        ? "https://nominatim.openstreetmap.org/search?q={$address}&format=json&limit=1"
 		        : "https://maps.google.com/maps/api/geocode/json?address={$address}&sensor=false&key={$gmap_api}";
 
+
+		    // Make the request
+		    $response = wp_remote_get(
+		        $url,
+		        array(
+		            'headers' => array(
+		                'User-Agent' => "Lat Lon call from " . get_site_url()
+		            ),
+		            'timeout' => 15 // Add timeout to prevent hanging
+		        )
+		    );
+		    
 			// Check for WP_Error
 		    if (is_wp_error($response)) {
 		        EVO_Debug("WP Error: " . $response->get_error_message());

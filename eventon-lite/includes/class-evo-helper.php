@@ -211,11 +211,11 @@ class evo_helper{
 			$tzs = $matches[1];
 
 			$DD = new DateTime( 'now' );
+			$updated_zones = ['UTC' => '(GMT+00:00) Universal Time UTC'];
 
 			// if unix is passed adjust according to time present in unix
-			if( !empty( $unix ))	$DD->setTimestamp( $unix );
+			//if( !empty( $unix ))	$DD->setTimestamp( $unix );
 
-			$updated_zones = array();
 			foreach($tzs as $tz_string ){
 
 				if(	strpos($tz_string, 'UTC') !== false ) continue;
@@ -313,5 +313,43 @@ class evo_helper{
 			    $text = EVO()->calendar->helper->htmlspecialchars_decode($text);
 			    return $text;
 			}
+
+	// Humanly readable time
+	// @added 2.5
+		function get_human_time($time){
+
+			$output = '';
+			$minFix = $hourFix = $dayFix = 0;
+
+			$day = $time/(60*60*24); // in day
+			$dayFix = floor($day);
+			$dayPen = $day - $dayFix;
+			if($dayPen > 0)
+			{
+				$hour = $dayPen*(24); // in hour (1 day = 24 hour)
+				$hourFix = floor($hour);
+				$hourPen = $hour - $hourFix;
+				if($hourPen > 0)
+				{
+					$min = $hourPen*(60); // in hour (1 hour = 60 min)
+					$minFix = floor($min);
+					$minPen = $min - $minFix;
+					if($minPen > 0)
+					{
+						$sec = $minPen*(60); // in sec (1 min = 60 sec)
+						$secFix = floor($sec);
+					}
+				}
+			}
+			$str = "";
+			if($dayFix > 0)
+				$str.= $dayFix . " " . ( $dayFix > 1 ? evo_lang('Days') : evo_lang('Day') );
+			if($hourFix > 0)
+				$str.= ' '. $hourFix . ' '. ( $hourFix > 1 ? evo_lang('Hours') : evo_lang('Hour') );
+			if($minFix > 0)
+				$str.= ' '. $minFix . ' '. ( $minFix > 1 ? evo_lang('Minutes') : evo_lang('Minute') );
+			//if($secFix > 0)	$str.= $secFix." sec ";
+			return $str;
+		}
 
 }

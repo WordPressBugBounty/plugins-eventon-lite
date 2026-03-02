@@ -210,9 +210,22 @@ class evo_ajde_events{
 
 	// Custom Columns for event page
 		function eventon_custom_event_columns( $column , $post_id) {
-			global $post;
+			global $evo_event_cache, $post;
 
-			$EVENT = new EVO_Event( $post_id);
+			// Initialize the global cache if not set
+		    if (!isset($evo_event_cache)) {
+		        $evo_event_cache = array();
+		    }
+
+		    // Load or retrieve the EVO_Event object
+		    if (!isset($evo_event_cache[$post_id])) {
+		        $EVENT = new EVO_Event($post_id);
+		        //$EVENT->load_all_meta(); // Load meta once
+		        $evo_event_cache[$post_id] = $EVENT;
+		    } else {
+		        $EVENT = $evo_event_cache[$post_id];
+		    }
+		    
 			$EVENT->load_all_meta();
 
 			$pmv = $EVENT->get_data();
@@ -337,7 +350,10 @@ class evo_ajde_events{
 					echo '</div><!--.evoevent_item-->';
 					
 				break;
-				
+				case 'event_subtitle':
+					$subtitle = $EVENT->get_subtitle();
+					echo "<span class=''>". (!empty($subtitle)? $subtitle : '-') ."</span>";
+				break;
 				case "event_type" :		
 					if ( ! $terms = get_the_terms( $post->ID, $column ) ) {
 						echo '<span class="na">&ndash;</span>';

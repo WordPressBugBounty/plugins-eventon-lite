@@ -1,5 +1,6 @@
 /** 
- * @version  2.4.7
+ * Event Post script
+ * @version  2.5
  */
 jQuery(document).ready(function($){
 
@@ -16,7 +17,22 @@ jQuery(document).ready(function($){
 				P.siblings('.'+ V +'_extra').show();
 			}
 		});
-		
+	
+	//Handle Opening event setting sections @since 2.5
+		BB.on('click','.evo_settings_section_trig',function(){
+			const id = $(this).data('id');
+			$(this).addClass('evoclp').siblings().removeClass('evoclp');
+			$(this).closest('.evo_event_main_settings_in').find('.evomb_section').each(function(){
+				console.log($(this).attr('id'));
+				if( $(this).attr('id') == 'ev_add_func') return;
+				$(this).removeClass('evodfx').addClass('evodn');
+				if( $(this).hasClass( id )) $(this).removeClass('evodn').addClass('evodfx');
+			})
+		}).on('click','.evo_event_snav_close',function(){
+			const snav = $(this).closest('.evo_event_settings_nav');
+			$(this).toggleClass('close');
+            snav.toggleClass('mini', $(this).hasClass('close'));
+		});
 
 	// virtual event
 	// 4.0.3

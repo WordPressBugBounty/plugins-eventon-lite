@@ -21,7 +21,12 @@ class EVO_Cal_Filering{
 		if(isset($arg['hide_so']) && $arg['hide_so'] == 'yes') return $A;
 		if(isset($arg['filters']) && $arg['filters'] == 'no') return $A;
 
-		if(empty($this->cal->evopt1['evcal_filter_options'])) return $A;
+		$filter_option = EVO()->cal->get_prop('evcal_filter_options','evcal_1');
+
+		if(empty( $filter_option )) return $A;
+		if( count( array_filter( $filter_option )) === 0 ) return $A;
+
+		
 		$A['evo-filter-btn'] = '';
 		return $A;
 	}

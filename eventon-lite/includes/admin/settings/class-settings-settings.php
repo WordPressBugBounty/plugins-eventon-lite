@@ -1,7 +1,7 @@
 <?php
 /**
   * evo settings class
-  * @version 2.4.1
+  * @version 2.5
   */
 class evo_settings_settings{
 	
@@ -47,15 +47,6 @@ class evo_settings_settings{
 						'legend'=>__('This will disable html special character dencoding for all ics downloaded files for events','eventon')
 					),
 					
-					array('type'=>'sub_section_open','name'=>__('WP EventON Core Settings' ,'eventon')),					
-
-						array('id'=>'evo_content_filter','type'=>'dropdown','name'=>__('Select calendar event content filter type','eventon'),'legend'=>__('Select which method to use for processing event details and custom meta field data content for front-end.','eventon'), 'options'=>array( 
-							'evo'=>__('EventON Content Filter','eventon'),
-							'def'=>__('Default WordPress Filter','eventon'),
-							'none'=>__('No Filter','eventon')
-						)),
-						
-					array('type'=>'sub_section_close'),
 
 					array('type'=>'sub_section_open','name'=>__('Search Engine Structured Data' ,'eventon')),
 						array('id'=>'evo_schema','type'=>'yesno','name'=>__('Remove schema data from calendar','eventon'), 'legend'=>__('Schema microdata helps in google and other search engines find events in special event data format. With this option you can remove those microdata from showing up on front-end calendar.','eventon'),'afterstatement'=>'evo_schema'),
@@ -119,8 +110,8 @@ class evo_settings_settings{
 			))),
 			array(
 				'id'=>'evcal_005',
-				'name'=>__('Google Maps API Settings','eventon'),
-				'tab_name'=>__('Maps API','eventon'),
+				'name'=>__('Location & Maps Settings','eventon'),
+				'tab_name'=>__('Location','eventon'),
 				'icon'=>'map-marker',
 				'fields'=>array(
 					array('id'=>'evcal_cal_gmap_api',
@@ -171,11 +162,17 @@ class evo_settings_settings{
 						'type'=>'yesno',
 						'name'=>__('Enable generate google maps from address for all newly created events, by default','eventon'), 
 						'legend'=>__('When you are creating a new event the option to generate google map from address will be turned on by default.','eventon')),
+
+					array('id'=>'evo_openinapp','type'=>'yesno',
+						'name'=>__('Add open event location in maps button','eventon'), 
+						'legend'=>__('Add open event location in maps app or website, under event location information','eventon'),
+						'ver'=> '2.5',
+					),
+
 					array('id'=>'evo_geoOSM',
 						'type'=>'yesno',
 						'name'=>__('Use Openstreetmap API to get geolocation coordinates','eventon'), 
 						'legend'=>__('This will use openstreetmap.org API to fetch geolocation lat lon values instead of google maps API.','eventon'),
-						'ver'=> '4.7.2'
 					),
 					
 			)),
@@ -340,8 +337,11 @@ class evo_settings_settings{
 							'options'=> apply_filters('eventon_eventop_fields', $this->eventtop_settings()),
 					),
 					
-					array('id'=>'evcal_eventtop','type'=>'note','name'=>__('NOTE: Lot of these fields are NOT available in Tile layout. Reason: we dont want to potentially break the tile layout and over-crowd the clean design aspect of tile boxes.','eventon')),
+					array('id'=>'evcal_eventtop','type'=>'note','name'=>__('NOTE: Many of these fields are NOT available in Tile layout to avoid clutter and layout structure.','eventon')),
 
+					array('id'=>'evcal__note','type'=>'customcode','code'=>$this->get_extend_invite_code(
+						'Customize EventTop Data Layout in Full Version'
+					)),
 										
 					array('id'=>'evo_eventtop_progress_hide','type'=>'yesno','name'=>__('Hide live event progress bar with time remaining','eventon'),'legend'=>__('Enabling this will hide the live event progress bar on event top','eventon')),
 					array('id'=>'evo_hide_live','type'=>'yesno','name'=>__('Hide blinking "Live Now" icon from event top for current events','eventon'),'legend'=> __('This will hide the blinking live now icon, when events are live at current time.','eventon')),
@@ -375,14 +375,13 @@ class evo_settings_settings{
 					array('type'=>'sub_section_open','name'=>__('Featured Image','eventon')),
 						array('id'=>'evo_ftimg_height_sty','type'=>'dropdown','name'=>__('Feature image display style','eventon'), 'legend'=>'Select which display style you want to show the featured image on event card when event first load',
 							'options'=> array(
-								'direct'=>__('Direct Image','eventon'),
-								'minmized'=>__('Minimized height','eventon'),
-								'100per'=>__('100% Image height with stretch to fit','eventon'),
-								'full'=>__('100% Image height with propotionate to calendar width','eventon')
+								'def'=>__('Scaled cropped image to fit the full box','eventon'),
+								'fit'=>__('Fit entire image resized to min height','eventon'),
+								'full'=>__('Fit entire image, resized box height','eventon')
 						)),
-						array('id'=>'evo_ftimghover','type'=>'note','name'=>__('NOTE: Featured image display styles: Direct image style will show &lt;img/&gt; image as oppose to the image as background image of a &lt;div/&gt;','eventon')),
-						array('id'=>'evo_ftimghover','type'=>'yesno','name'=>__('Disable hover effect on featured image','eventon'),'legend'=>'Remove the hover moving animation effect from featured image on event. Hover effect is not available on Direct Image style'),
-						array('id'=>'evo_ftimgclick','type'=>'yesno','name'=>__('Disable zoom effect on click','eventon'),'legend'=>'Remove the moving animation effect from featured image on click event. Zoom effect is not available in Direct Image style'),
+						//array('id'=>'evo_ftimghover','type'=>'note','name'=>__('NOTE: Featured image display styles: Direct image style will show &lt;img/&gt; image as oppose to the image as background image of a &lt;div/&gt;','eventon')),
+						//array('id'=>'evo_ftimghover','type'=>'yesno','name'=>__('Disable hover effect on featured image','eventon'),'legend'=>'Remove the hover moving animation effect from featured image on event. Hover effect is not available on Direct Image style'),
+						//array('id'=>'evo_ftimgclick','type'=>'yesno','name'=>__('Disable zoom effect on click','eventon'),'legend'=>'Remove the moving animation effect from featured image on click event. Zoom effect is not available in Direct Image style'),
 
 						array('id'=>'evo_ftimgheight','type'=>'text','name'=>__('Minimal height for featured image (value in pixels)','eventon'), 'default'=>'eg. 400'),
 						array('id'=>'evo_ftim_mag','type'=>'yesno','name'=>__('Show magnifying glass over featured image','eventon'),'legend'=>'This will convert the mouse cursor to a magnifying glass when hover over featured image. <br/><br/><img src="'.AJDE_EVCAL_URL.'/assets/images/admin/cursor_mag.jpg"/><br/>This is not available for Direct Image style'),
@@ -529,6 +528,62 @@ class evo_settings_settings{
 					'fields'=> $this->single_events()
 				),
 
+				
+
+			// search
+				array(
+					'id'=>'eventon_search',
+					'name'=> __('Settings & Instructions for Event Search','eventon'),
+					'display'=>'none','icon'=>'search',
+					'tab_name'=> __('Search Events','eventon'),
+					'fields'=> apply_filters('evo_sr_setting_fields', array(
+						array('id'=>'evo_sr_001','type'=>'customcode',
+								'code'=>$this->content_search()
+						),
+						array('id'=>'evosr_default_search_on',
+							'type'=>'yesno',
+							'name'=>'Enable Search on all calendars by default',
+							'legend'=>'If you set this, search will be on calendars by default unless specify via shortcode search=no.'
+						),
+						array('id'=>'EVOSR_showfield',
+							'type'=>'yesno',
+							'name'=>'Show search text input field when calendar first load on page',
+							'legend'=>'This will show the search field when the page first load instead of having to click on search button'
+						),
+						
+						array('id'=>'EVOSR_default_search',
+							'type'=>'yesno',
+							'name'=>'Include events in default wordpress search results',
+							'legend'=>'This will include events in default wordpress search results, be aware you may have to add custom styles to match the search results from events to rest of your results. You may also have to add custom codes to get all event information to show in event search result'
+						),
+
+					))
+				),	
+
+				// advanced 
+				array(
+					'id'=>'evcal_001_advance',
+					'name'=>__('Advanced Settings','eventon'),
+					'tab_name'=>__('Advanced Settings','eventon'),
+					'icon'=>'laptop-code',
+					'fields'=> apply_filters('evo_settings_advanced', array(
+						array('type'=>'sub_section_open','name'=>__('WP EventON Core Settings' ,'eventon')),
+
+							array('id'=>'evo_content_filter','type'=>'dropdown','name'=>__('Select calendar event content filter type','eventon'),'legend'=>__('Select which method to use for processing event details and custom meta field data content for front-end.','eventon'), 'options'=>array( 
+								'evo'=>__('EventON Content Filter','eventon'),
+								'def'=>__('Default WordPress Filter','eventon'),
+								'none'=>__('No Filter','eventon')
+							)),
+
+							array('id'=>'evo_cache_events',
+								'type'=>'yesno',
+								'name'=>__('Cache calendar events list data','eventon'), 
+								'legend'=>__('This will cache the event data for calendar for upto 1 hour.','eventon')
+							),
+						array('type'=>'sub_section_close'),
+					))
+				),	
+
 				// third party
 				array(
 				'id'=>'evcal_003',
@@ -576,36 +631,6 @@ class evo_settings_settings{
 				))
 			),
 
-			// search
-				array(
-					'id'=>'eventon_search',
-					'name'=> __('Settings & Instructions for Event Search','eventon'),
-					'display'=>'none','icon'=>'search',
-					'tab_name'=> __('Search Events','eventon'),
-					'fields'=> apply_filters('evo_sr_setting_fields', array(
-						array('id'=>'evo_sr_001','type'=>'customcode',
-								'code'=>$this->content_search()
-						),
-						array('id'=>'evosr_default_search_on',
-							'type'=>'yesno',
-							'name'=>'Enable Search on all calendars by default',
-							'legend'=>'If you set this, search will be on calendars by default unless specify via shortcode search=no.'
-						),
-						array('id'=>'EVOSR_showfield',
-							'type'=>'yesno',
-							'name'=>'Show search text input field when calendar first load on page',
-							'legend'=>'This will show the search field when the page first load instead of having to click on search button'
-						),
-						
-						array('id'=>'EVOSR_default_search',
-							'type'=>'yesno',
-							'name'=>'Include events in default wordpress search results',
-							'legend'=>'This will include events in default wordpress search results, be aware you may have to add custom styles to match the search results from events to rest of your results. You may also have to add custom codes to get all event information to show in event search result'
-						),
-
-					))
-				),	
-
 				array(
 					'id'=>'evcal_013',
 					'name'=>__('Diagnose EventON Environment','eventon'),
@@ -636,23 +661,7 @@ class evo_settings_settings{
 					)
 				),
 
-				// advanced 
-				array(
-					'id'=>'evcal_001_advance',
-					'name'=>__('Advanced Settings','eventon'),
-					'tab_name'=>__('Advanced Settings','eventon'),
-					'icon'=>'laptop-code',
-					'fields'=> apply_filters('evo_settings_advanced', array(
-						
-						array('type'=>'sub_section_open','name'=>__('Event Cache Settings' ,'eventon')),		
-							array('id'=>'evo_cache_events',
-								'type'=>'yesno',
-								'name'=>__('Cache calendar events list data','eventon'), 
-								'legend'=>__('This will cache the event data for calendar for upto 1 hour.','eventon')
-							),
-						array('type'=>'sub_section_close'),
-					))
-				),		
+					
 			
 		)
 		);	
@@ -761,16 +770,14 @@ class evo_settings_settings{
 			), admin_url('admin-ajax.php'));
 
 			// ICS format
-			$exportICS_URL = add_query_arg(array(
-			    'action' => 'eventon_export_events_ics',
-			    'nonce'=>$nonce
-			), admin_url('admin-ajax.php'));
+			$nonce = wp_create_nonce('export_event_nonce');
+			$export_url_all = home_url("/export-events/all/?nonce={$nonce}");
 
 			ob_start(); ?>
 			<p><a href="<?php admin_url();?>options-permalink.php" class="evo_admin_btn btn_secondary"><?php esc_html_e('Reset Permalinks','eventon');?></a></p>
 			
 			<p><?php esc_html_e('Download all eventON events.','eventon');?></p>
-			<p><a class='evo_admin_btn btn_triad' href="<?php echo esc_url( $exportURL);?>"><?php esc_html_e('CSV Format','eventon');?></a>  <a class='evo_admin_btn btn_triad' href="<?php echo esc_url( $exportICS_URL);?>"><?php esc_html_e('ICS format','eventon');?></a></p>
+			<p><a class='evo_admin_btn btn_triad' href="<?php echo esc_url( $exportURL);?>"><?php esc_html_e('CSV Format','eventon');?></a>  <a class='evo_admin_btn btn_triad' href="<?php echo esc_url( $export_url_all);?>"><?php esc_html_e('ICS format','eventon');?></a></p>
 			<?php 
 			return  ob_get_clean();
 		}
@@ -861,7 +868,7 @@ class evo_settings_settings{
 		}
 
 	// HTML for eventcard designer
-		function eventcard_meta_fields(){
+		private function eventcard_meta_fields(){
 			ob_start();
 
 			$cal_help = new evo_cal_help();
@@ -1023,6 +1030,8 @@ class evo_settings_settings{
 
 			<?php
 
+			echo $this->get_extend_invite_code('Get Extra EventCard Layouts with Full Version');
+
 			return ob_get_clean();
 		}
 		
@@ -1106,9 +1115,49 @@ class evo_settings_settings{
 
 			// Note
 				$etc[] = array('id'=>'evo_note','type'=>'note',
-					'name'=>sprintf(__('Want more than 5 event categories? <br/><br/><a href="%s" target="_blank"class="evo_admin_btn btn_triad">Extend categories using pluggable functions</a>' ,'eventon'), 'http://www.myeventon.com/documentation/increase-event-type-count/') );
+					'name'=>sprintf(__('Want more than 5 event categories? <a href="%s" target="_blank"class="evo_trig_doc" data-get="increase-event-type-count">%s</a>' ,'eventon'), 
+						'https://docs.myeventon.com/documentations/increase-event-type-count/',
+						__('Extend categories using pluggable functions','eventon'),
+						) 
+				);
+
+			// MDT Intro
+				$etc[] = array('id'=>'evo_subheader','type'=>'subheader','name'=>__('EventCard Multi Data Types','eventon'));
+				$etc[] = array('id'=>'evo_note','type'=>'note',
+					'name'=>sprintf(__('Multi data types allow you to create multiple items of data that can be re-used in other events and update across all events by updating one multi data type item. <a href="%s" class="evo_trig_doc">%s</a>'
+					),
+						'https://docs.myeventon.com/documentations/various-creative-ways-to-use-multi-data-types/',
+						'Learn Various Ways to Use Multi Data Types'
+					)
+				);
+
+
+
+				$etc[] = array('id'=>'evcal__note','type'=>'customcode','code'=>$this->get_extend_invite_code(
+					'Unlock Multi Data Type Feature with EventON Full'
+				));
 
 			return $etc;
+		}
+
+		private function get_extend_invite_code( $description = ''){
+			ob_start();
+
+			$description = empty($description) ? __("Extend to EventON Full and uplock more features",'eventon') : $description;
+
+			EVO()->elements->get_element([
+				'type'				=>'detailed_button', '_echo'=> true,
+				'name'				=>__('EventON Full','eventon'),
+				'description'	=> $description,
+				'field_after_content'=> __("Learn More",'eventon'). "<i class='fa fa-arrow-right evomarl15'></i>",
+				'row_class'		=> 'evo_bordern evomarb5',
+				'field_class'	=>'evo_eventcard_designer',
+				'row_style'		=> '    background-color: #d9f4ff;',
+				'row_class'		=> 'evopad20i evobr10i',
+				'link'				=> 'https://myeventon.com/full',
+				'_blank'			=> true,
+			]);
+			return ob_get_clean();
 		}
 
 	// html for diagnosis content

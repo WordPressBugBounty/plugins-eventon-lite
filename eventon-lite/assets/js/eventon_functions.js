@@ -70,29 +70,43 @@
 
 			var el = this,
 		        OO = this.evo_process_ajax_params(opt),
-		        LB = OO.lbdata.class ? $('body').find('.evo_lightbox.' + OO.lbdata.class) : false,
-		        ajax_url = el.evo_get_ajax_url({a: OO.adata.a, e: OO.adata.end, type: OO.adata.ajax_type});
+		        LB = OO.lbdata.class ? $('body').find('.evo_lightbox.' + OO.lbdata.class) : false;
 
+		    var _lbdata = OO.lbdata;
+			var _adata = OO.adata;	
+			var _populate_id = OO._populate_id;	
+
+		    // Allow custom success callback to be passed in opt -- 4.9.2    		
+    		var customBefore = typeof opt.onBefore === 'function' ? opt.onBefore : null;   // New onBefore callback
+		    var customSuccess = typeof opt.onSuccess === 'function' ? opt.onSuccess : (typeof opt.success === 'function' ? opt.success : null); 
+		    	// Rename to onSuccess, keep backward compatibility with 'success'
+		    var customSuccess_Extra = typeof opt.successExtra === 'function' ? opt.successExtra : null; // this will run with default ajax
+		    var customComplete = typeof opt.onComplete === 'function' ? opt.onComplete : null; // New onComplete callback
+
+			var ajax_url = el.evo_get_ajax_url({a: _adata.a, e: _adata.end, type: _adata.ajax_type});
 
 	  		// Run AJAX
+	  		let ajaxResponse = '';
   			$.ajax({
 				beforeSend: function(){
-					if (opt.onBefore) opt.onBefore.call(el, OO, LB);
+					if (customBefore) {   customBefore.call(el, OO, LB); } // Call with onBefore:function(OO, LB){}
 					el.evo_perform_ajax_run_loader( OO, LB, 'start'  );
 				},
 				type: 'POST', url: ajax_url, data: OO.adata.data,	dataType:'json',
 				success:function(data){	
-					
-					if (opt.onSuccess || opt.success) {
-						// Call with onSuccess:function(data, OO, LB){} 
-		                (opt.onSuccess || opt.success).call(el, data, OO, LB);
+					ajaxResponse = data;
+					if (customSuccess) {
+		                customSuccess.call(el, OO, data, LB); 
+		                // call data with data.data
+		                // Trigger a custom event for onSuccess - 4.9.11
+		                $('body').trigger('evo_ajax_success_' + OO.uid,[ OO, data , el]);	
 		            } else {
 		                el.evo_perform_ajax_success(OO, data, LB);
 		                if (opt.successExtra) opt.successExtra.call(el, OO, data, LB);
 		            }					
 
 				},complete:function(){
-					if (opt.onComplete) opt.onComplete.call(el, OO, data, LB);
+					if (customComplete) {     customComplete.call(el, OO, ajaxResponse, LB);  } // Call with onSuccess:function( OO, data, LB){} 
 					el.evo_perform_ajax_run_loader( OO, LB, 'end'  );
 					
 				}
@@ -649,7 +663,7 @@
 			var _adata = OO.adata;
 			var _populate_id = OO._populate_id;
 
-			
+			console.log(OO);
 
 			// check if required values missing for lightbox
 			if( !('class' in _lbdata) || _lbdata.class == '' ) return;
@@ -1202,7 +1216,35 @@
 
 		}
 
+	// localize time @2.5
+		$.fn.evo_cal_localize_time = function(){			
+			this.find('.evo_loct_inprocess').each(function(e){	$(this).evo_localize_time();	});
+		}
+		$.fn.evo_localize_time = function( ){
+			
+			const eventcard = this.closest('.eventon_list_event');
+		    const hideEnd = eventcard.hasClass('no_et');
+		    const textLocal = evo_general_params.text.local_time;
 
+		    eventcard.find('.evo_mytime').each(function() {
+		    	const $el = $(this);
+		        const isEventCard = $el.hasClass('evocard');
+		        const { times, __f: fullFormat, __tf: timeOnlyFormat, tzo: utcOffset = 0 } = $el.data();
+		        const [start, end] = times.split('-').map(Number);
+
+		        const startMoment = moment.unix(start).utc().local();
+		        const endMoment = moment.unix(end).utc().local();
+		        const sameMonth = startMoment.format('YYYY/M') === endMoment.format('YYYY/M');
+		        const sameDay = sameMonth && startMoment.format('DD') === endMoment.format('DD');
+
+		        const startText = startMoment.format(fullFormat);
+		        const endText = endMoment.format(sameDay ? timeOnlyFormat : fullFormat);
+		        const html = `${startText}${hideEnd ? '' : ' - ' + endText}` + 
+		                     (isEventCard ? `<span class='evomarl5'>(${textLocal})</span>` : '');
+
+		        $el.replaceWith(`<span class='evo_newmytime'>${html}</span>`);
+		    });
+		}	
 
 	// DATE time functions @+2.8		
 		$.fn.evo_day_in_month = function(opt){
@@ -1247,6 +1289,57 @@
 					}				
 				}
 			}
+
+	// event image gallery LITE version 2.5
+		$.fn.eventon_process_main_ft_img = function(OO){
+			const IMG = this;
+			var img_sty = 'def';
+			if( IMG.hasClass('fit') ) img_sty = 'fit';
+			if( IMG.hasClass('full') ) img_sty = 'full';
+			
+			// Initialize box dimensions
+		    let box_width =  IMG.width();
+		    let box_height =  IMG.height();
+			
+			// Ensure valid box dimensions
+		    box_width = box_width > 0 ? box_width : 100; // Fallback to prevent errors
+		    box_height = box_height > 0 ? box_height : 100;
+			
+
+			 // Get image dimensions from data attributes
+		    const img_width = parseInt(IMG.data('w')) || 100; // Fallback to prevent division by zero
+		    const img_height = parseInt(IMG.data('h')) || 100;
+		    const img_ratio = img_height / img_width; // Image aspect ratio
+					
+			let new_width, new_height;
+			
+			// Handle 'fit' style 
+			if( IMG.hasClass('fit')){
+				// Scale to fit within box while maintaining aspect ratio
+		        new_width = box_height / img_ratio;
+				new_height = box_height;
+				if( new_width > box_width ){// width is wider than box
+
+					if( img_ratio <1 ){
+						new_width = box_width; new_height = img_ratio * new_width;
+					}else{
+						new_height = box_height; new_width = new_height / img_ratio;
+					}
+				} 	
+					
+				IMG.find('span').css({'width':new_width, 'height': new_height} );
+			}
+
+			// full style
+			if( IMG.hasClass('full')){
+				new_height = img_ratio * box_width;
+				new_width = box_width;
+				IMG.find('span').css({'width':new_width, 'height': new_height} );
+				IMG.css({'height': new_height} );
+			}
+
+			//console.log(box_width +' '+img_width+' '+new_width);
+		}
 
 		
 

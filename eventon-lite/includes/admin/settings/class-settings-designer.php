@@ -1,11 +1,16 @@
 <?php
 /**
  * EventON Various admin settings view designer
- * @version 2.4.3
+ * @version 2.5
  */
 
 class EVO_Settings_Designer{
-
+	private const TEXTDOMAIN = 'eventon';
+	private const NO_HR_TYPES = [
+        'begin_afterstatement', 'end_afterstatement',
+        'hiddensection_open', 'hiddensection_close',
+        'sub_section_open', 'sub_section_close'
+    ];
 	// Print Main Settings Form Content
 	public function print_ajde_customization_form($cutomization_pg_array, $data, $extra_tabs=''){
 		$this->print_main_settings($cutomization_pg_array, $data, $extra_tabs );
@@ -33,7 +38,7 @@ class EVO_Settings_Designer{
 				notice, image, icon, subheader, note, checkbox, text. textarea, font_size, font_style, border_radius, color, fontation, multicolor, radio, dropdown, checkboxes, yesno, begin_afterstatement, end_afterstatement, hiddensection_open, hiddensection_close, customcode
 			*/
 
-		foreach($cutomization_pg_array as $cpa=>$cpav){								
+		foreach($cutomization_pg_array as $cpa => $cpav){								
 			// left side tabs with different level colors
 			$ls_level_code = (isset($cpav['level']))? 'class="'.$cpav['level'].'"': null;
 			
@@ -42,12 +47,17 @@ class EVO_Settings_Designer{
 			if( $tab_type !='empty'){ // to not show the right side
 
 				
-				// RIGHT SIDE
-				$display_default = (!empty($cpav['display']) && $cpav['display']=='show')?'':'display:none';
-				//$display_default = 'display:none';
+				$icon = $cpav['icon'] ?? 'edit';
+	            $icon_html = "<i class='fa fa-$icon'></i>";
+	            $tab_icon = "<i class='fa fa-{$icon} evofz24 evomarr10'></i>";
 
-				$rightside.= "<div id='setting_".$cpav['id']."' data-setting='".$cpav['id']."' style='".$display_default."' class='nfer'>
-					<h3>".__($cpav['name'],$textdomain)."</h3>";
+				// RIGHT SIDE
+				$display = ($cpav['display'] ?? '') === 'show' ? '' : 'display:none';
+
+
+				$rightside.= "<div id='setting_".$cpav['id']."' data-setting='".$cpav['id']."' style='".$display."' class='nfer'>
+					<h3 class='evodfx evofxdrr evofxaic'>$tab_icon" . __($cpav['name'], 'eventon') . "</h3>
+					";
 
 					if(!empty($cpav['description']))
 						$rightside.= "<p class='tab_description'>".$cpav['description']."</p>";
@@ -61,11 +71,18 @@ class EVO_Settings_Designer{
 
 					if( !isset($field['type'])) continue;
 
+					$type = $field['type'];
+					$id = $field['id'] ?? '';
+        			$value = $data[$id] ?? ($field['default'] ?? '');
+        			$name = __($field['name'] ?? '', 'eventon');
+        			$legend_code = $this->get_legend($field);
+        			$skip_hr = in_array($type, self::NO_HR_TYPES, true) || !empty($field['afterstatement']);
+
 					// field value
 					$_value = ( !empty( $field['id']) && !empty($data[$field['id']]) && !is_array($data[$field['id']])) ? 
 							stripslashes( $data[$field['id']] ):null;
 
-					if($field['type']=='text' || $field['type']=='textarea'){
+					if($type=='text' || $type=='textarea'){
 						$FIELDVALUE = (!empty($data[ $field['id']]))? 
 							htmlspecialchars( stripslashes($data[ $field['id']]) ): 
 								null;
@@ -75,27 +92,8 @@ class EVO_Settings_Designer{
 							htmlspecialchars( $data[ $field['id']] );
 					}
 					
-					// LEGEND or tooltip
-						$tooltip_content = '';
-						if( !empty( $field['legend'] )) $tooltip_content = $field['legend'];
-						if( !empty( $field['tooltip'] )) $tooltip_content = $field['tooltip'];
-						
-						$legend_code = !empty( $tooltip_content ) ? EVO()->elements->tooltips( $tooltip_content , 'L', false ) : null;
-
-					// beta feature tag
-						if( !empty($field['beta'])) $legend_code .= "<span class='evonewtag beta evotooltipfree L' data-d='".__('This feature is still in beta stage','eventon') ."'>".__('Beta','eventon')."</span>";
-					
-					// new label
-						if (isset($field['ver'])) {
-						    $version = (isset($field['compare_ver']) && $field['ver'] === $field['compare_ver']) 
-						        ? $field['compare_ver'] : EVO()->version;
-						    if ($field['ver'] === $version) {
-						        $legend_code .= "<span class='new evonewtag evotooltipfree L' data-d='" . __('New in version', 'eventon') . " $version'>new</span>";
-						    }
-						}
-					
 					// switch statements	
-					switch ($field['type']){
+					switch ( $type ){
 
 						// default field to use EVO Elements
 						default:
@@ -105,10 +103,12 @@ class EVO_Settings_Designer{
 
 						// notices
 						case 'notice':
-							$rightside .= EVO()->elements->get_element(array(
-								'type'=>'notice','name'=> $field['name'] . $legend_code,
-								'row_class'=>'ajdes_notice',
-							));
+							$rightside .= EVO()->elements->get_element([
+			                    'type' => 'notice',
+			                    'name' => $name . $legend,
+			                    'row_class' => 'ajdes_notice'
+			                ]) ;
+							
 						break;
 						//IMAGE
 						case 'image':
@@ -193,33 +193,23 @@ class EVO_Settings_Designer{
 							$rightside.= "<p><input type='checkbox' name='".$field['id']."' value='yes' ".(($this_value=='yes')?'checked="/checked"/':'')."/> ".$field['name']."</p>";
 						break;
 						case 'text':
-							$placeholder = (!empty($field['default']) )? 'placeholder="'.$field['default'].'"':null;
+			               
+			                $val = htmlspecialchars($data[$id] ?? '', ENT_QUOTES);
+			                
+			                $rightside.= EVO()->elements->get_element([
+			                    'type' => 'text',
+			                    'id' => $id,
+			                    'name' => $name . $legend_code,
+			                    'value' => $val,
+			                    'default' => $field['default'] ?? '',
+			                    'tooltip' => $field['tooltip'] ?? '',
+			                    'tooltip_position' => 'L',
+			                    'hideable'=> ( !empty($field['hideable']) && !empty($data[$id]) ),
+			                    'placeholder'=> ( $field['default'] ?? '' ),
+			                ]);
 
-							$show_val = false; $hideable_text = '';
-							if(isset($field['hideable']) && $field['hideable'] && !empty($FIELDVALUE)){
-								$show_val = true;
-								$hideable_text = "<span class='evo_hideable_show' data-t='". __('Hide', $textdomain) ."'>". __('Show',$textdomain). "</span>";
-							}
-							
-							$rightside.= "<p>".__($field['name'],$textdomain).$legend_code. $hideable_text. "</p><p class='field_container'><span class='nfe_f_width'>";
+			            break;
 
-							if($show_val ){
-								$rightside.= "<input type='password' style='' name='".$field['id']."'";
-								$rightside.= 'value="'. $FIELDVALUE .'"';
-							}else{
-								$rightside.= "<input type='text' name='".$field['id']."'";
-								$rightside.= 'value="'. $FIELDVALUE .'"';
-							}
-							
-							$rightside.= $placeholder."/></span></p>";
-						break;
-						case 'password':
-							$default_value = (!empty($field['default']) )? 'placeholder="'.$field['default'].'"':null;
-							
-							$rightside.= "<p>".__($field['name'],$textdomain).$legend_code."</p><p><span class='nfe_f_width'><input type='password' name='".$field['id']."'";
-							$rightside.= 'value="'.$FIELDVALUE.'"';
-							$rightside.= $default_value."/></span></p>";
-						break;
 						case 'textarea':
 							
 							$_value = isset($data[$field['id']])? stripslashes( $data[$field['id']] ):null;
@@ -227,7 +217,7 @@ class EVO_Settings_Designer{
 							$rightside .= EVO()->elements->get_element(array(
 								'type'		=>'textarea',
 								'id'		=>$field['id'],
-								'name'		=> __($field['name'],$textdomain),
+								'name'		=> $name,
 								'tooltip'	=> $tooltip_content,
 								'tooltip_position'=> 'L',
 								'value'		=> $_value,
@@ -704,6 +694,25 @@ class EVO_Settings_Designer{
 		echo ob_get_clean();
 		
 	}
+
+	private function get_legend(array $field): string
+    {
+        $tooltip = $field['legend'] ?? $field['tooltip'] ?? '';
+        $html = $tooltip ? EVO()->elements->tooltips($tooltip, 'L', false) : '';
+
+        if (!empty($field['beta'])) {
+            $html .= "<span class='evonewtag beta evotooltipfree L' data-d='" . __('This feature is still in beta stage','eventon') . "'>" . __('Beta','eventon') . "</span>";
+        }
+
+        if (!empty($field['ver'])) {
+            $ver = $field['ver'] === ($field['compare_ver'] ?? EVO()->version) ? $field['ver'] : EVO()->version;
+            if ($field['ver'] === $ver) {
+                $html .= "<span class='new evonewtag evotooltipfree L' data-d='" . __('New in version', 'eventon') . " $ver'>new</span>";
+            }
+        }
+
+        return $html;
+    }
 
 
 	// supportive functions

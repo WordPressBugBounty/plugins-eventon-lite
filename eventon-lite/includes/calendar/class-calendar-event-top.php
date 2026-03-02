@@ -1,7 +1,7 @@
 <?php 
 /**
  * Event Top Content
- * @version 2.4
+ * @version 2.5
  */
 
 class EVO_Cal_Event_Structure_Top{
@@ -251,6 +251,11 @@ class EVO_Cal_Event_Structure_Top{
 
 							// manual timezone text
 							if( empty($object->_evo_tz)) $OT.= "<em class='evcal_local_time' data-s='{$event_start_unix}' data-e='{$event_end_unix}' data-tz='". $EVENT->get_prop('_evo_tz') ."'></em>";
+
+							// Duration
+							if( $EVENT->echeck_yn('show_dur') && $EVENT->duration > 0){
+								$OT.= "<span class='evo_time_dur'><i class='fa fa-hourglass-half evofz12i evomarr5'></i>". evo_lang('Duration') .' '.$this->help->get_human_time( $EVENT->duration ) ."</span>";
+							}
 						}
 						
 						

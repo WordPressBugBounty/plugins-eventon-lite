@@ -1,7 +1,7 @@
 <?php
 /**
  *	EventON Settings Main Object
- *	@version 2.4
+ *	@version 2.5
  */
 class EVO_Settings extends EVO_Settings_Designer{
 	
@@ -96,7 +96,15 @@ class EVO_Settings extends EVO_Settings_Designer{
 		?>
 		<div class="wrap ajde_settings <?php echo $this->focus_tab;?>" id='<?php echo $tab_id;?>'>
 			<div class='evo_settings_header'>
-				<h2 class='settings_m_header'><?php echo $title;?> (ver <?php echo $version;?>) 
+				<h2 class='settings_m_header'>
+					<div class="evodfx evofxdrr evogap10 evofxaic">
+						<svg id="evo_icon" viewBox="0 0 32 32" style='height: 30px;'><path d="<?php echo EVO()->elements->get_icon('evo_icon');?>"></path></svg>
+						<?php echo $title;?> (ver <?php echo $version;?>) 
+						<p class=''>							
+							<a class='evobgclg10 evoHbgcg5 evobr15 evopad5-10 evotdn' href='https://myeventon.com' target='_blank'><i class='fa fa-bolt evomarr5'></i>Upgrade to Full</a>
+						</p>
+						
+					</div>
 					<span class='evo_set_right'>
 						<?php
 						do_action('evo_admin_settings_header_right');
@@ -108,20 +116,6 @@ class EVO_Settings extends EVO_Settings_Designer{
 						<span class='evo_trig_form_save evo_admin_btn btn_blue'><?php _e('Save Changes','eventon');?></span>
 					</span>
 				</h2>
-				<div class='evo_settings_nav'>
-					<div class='evo_settings_nav_in'>
-					<h2 class='nav-tab-wrapper' id='meta_tabs'>
-						<?php					
-							foreach($tabs as $key=>$val){
-								
-								echo "<a href='{$tab_page}".$key."' class='{$key} nav-tab ".( ($this->page == $key)? 'nav-tab-active':null)." {$key}' ". 
-									( (!empty($tab_attr_field) && !empty($tab_attr_pre))? 
-										$tab_attr_field . "='{$tab_attr_pre}{$key}'":'') . ">".$val."</a>";
-							}			
-						?>		
-					</h2>
-				</div>
-				</div>
 			</div>
 		<?php
 

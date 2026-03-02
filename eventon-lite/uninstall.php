@@ -7,7 +7,7 @@
  * @author 		AJDE
  * @category 	Core
  * @package 	EventON lite/Uninstaller
- * @version     lite 1.0.3
+ * @version     2.5
  */
 if(defined( 'WP_UNINSTALL_PLUGIN' )){
 	$evo_opt = get_option('evcal_options_evcal_1');
@@ -44,6 +44,47 @@ if(defined( 'WP_UNINSTALL_PLUGIN' )){
 		// Delete orphan term meta
 		if ( ! empty( $wpdb->termmeta ) ) {
 			$wpdb->query( "DELETE tm FROM {$wpdb->termmeta} tm LEFT JOIN {$wpdb->term_taxonomy} tt ON tm.term_id = tt.term_id WHERE tt.term_id IS NULL;" );
+		}
+
+		// delete capabilities
+		// Get the list of capabilities that were added
+		$capabilities = eventon_get_core_capabilities(); 
+		if ( ! function_exists( 'eventon_get_core_capabilities' ) ) {
+		    $capabilities = array(
+		        'core' => array( 'manage_eventon' ),
+		        'eventon' => array(
+		            'publish_eventon',
+		            'publish_eventons',
+		            'edit_eventon',
+		            'edit_eventons',
+		            'edit_others_eventons',
+		            'edit_private_eventons',
+		            'edit_published_eventons',
+		            'read_eventons',
+		            'read_private_eventons',
+		            'delete_eventon',
+		            'delete_eventons',
+		            'delete_private_eventons',
+		            'delete_published_eventons',
+		            'delete_others_eventons',
+		            'assign_eventon_terms',
+		            'manage_eventon_terms',
+		            'edit_eventon_terms',
+		            'delete_eventon_terms',
+		            'upload_files'
+		        )
+		    );
+		}
+
+		// Get the administrator role object
+		$role = get_role( 'administrator' );
+
+		if ( $role ) {
+		    foreach ( $capabilities as $cap_group ) {
+		        foreach ( $cap_group as $cap ) {
+		            $role->remove_cap( $cap );
+		        }
+		    }
 		}
 
 		wp_cache_flush();

@@ -49,6 +49,22 @@ if(!empty($EventData['location_name']) || !empty($EventData['location_address'])
 				if( !empty($loc_phone) || !empty($loc_email)){
 					echo "<div class='evopadt5'><p class='evo_location_contact'>". (!empty($loc_phone) ? $loc_phone .' ' :'' ). (!empty($loc_email) ? "<a href='mailto:{$loc_email}'>$loc_email</a>" :'' ) ."</p></div>";
 				}
+
+				// open in maps button
+				if( EVO()->cal->check_yn('evo_openinapp','evcal_1')){
+					$encoded_address = rawurlencode($location_address);
+					?>
+					<a href="https://maps.apple.com/?q=<?php echo $encoded_address; ?>"
+					   target="_blank"
+					   rel="noopener"
+					   class="evo_openmap_trig evo_btn_arr evomart10i"
+					   data-d="<?php echo $encoded_address; ?>">
+					   <i class="fa fa-location-arrow evodfxi evofxaic" aria-hidden="true" style="    margin: 0 10px 0 0;"></i> 
+					   <?php evo_lang_e('Open in Maps');?>
+					   <i class='fa fa-chevron-right aria-hidden="true"'></i>
+					</a>
+   				 <?php 
+				}	
 			}
 			echo "</div>
 		

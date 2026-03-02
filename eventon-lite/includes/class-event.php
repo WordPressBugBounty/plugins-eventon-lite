@@ -1,7 +1,7 @@
 <?php
 /**
  * Event Class for one event
- * @version 2.4.9
+ * @version 2.5
  */
 
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
@@ -109,6 +109,28 @@ class EVO_Event extends EVO_Data_Store{
 
 		function get_ux_link(){
 			$exlink_option = $this->get_prop('_evcal_exlink_option');	
+		}
+
+		// @since 2.5
+		public function get_ics_link(){
+			$nonce = wp_create_nonce('export_event_nonce');
+			$slug = 'export-events';
+			$path_segment = $this->ID . '_' . $this->ri;
+
+			$structure = get_option( 'permalink_structure' );
+
+			// for plain permalink
+			if( !$structure){
+				$args = array(
+			        $slug      => 'single',
+			        'event_id'			 => $this->ID,
+			        'repeat_interval'	 => $this->ri,
+			        'nonce'                => $nonce,
+			    );
+
+			    return add_query_arg( $args, home_url( '/' ) );
+			}
+			return home_url("/". $slug . "/{$path_segment}/?nonce={$nonce}");
 		}
 
 	// title

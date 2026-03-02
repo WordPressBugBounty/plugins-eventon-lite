@@ -167,11 +167,17 @@ $wp_date_format = $date_format;
 				'label'=> __('Hide live progress bar', 'eventon'),
 				'tooltip'=> __('This will hide live event progress bar and time left from eventtop','eventon'), 
 				'id'=> '_edata[hide_progress]',
-				'value'=> $EVENT->get_eprop('hide_progress'),
-				'nesting_end'=>true,
+				'value'=> $EVENT->get_eprop('hide_progress'),				
 			),
 			
-			
+			array(
+                'type' => 'block_button',
+                'label' => __('Show Event Duration', 'eventon'),
+                'tooltip' => __('Show event duration along side event time on eventtop and eventcard.','eventon'), 
+                'id' => '_edata[show_dur]',
+                'value' => $EVENT->get_eprop('show_dur'),	
+                'nesting_end'=>true,			
+            ),
 			
 			array(
 				'type'=>'begin_afterstatement',

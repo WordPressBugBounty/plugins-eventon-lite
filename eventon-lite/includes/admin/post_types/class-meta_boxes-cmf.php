@@ -1,7 +1,7 @@
 <?php
 /**
  *	Event edit custom meta field data
- *	@version 2.3
+ *	@version 2.5
  */
 
 $metabox_array = array();

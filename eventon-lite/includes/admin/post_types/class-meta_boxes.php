@@ -5,7 +5,7 @@
  * @author 		AJDE
  * @category 	Admin
  * @package 	EventON/Admin/ajde_events
- * @version     2.4
+ * @version     2.5
  */
 
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
@@ -127,7 +127,7 @@ class evo_event_metaboxes{
 		}
 
 	// MAIN META BOX CONTENT
-		function ajde_evcal_show_box(){
+		public function ajde_evcal_show_box(){
 			global $eventon, $post;
 			
 			$evcal_opt1= get_option('evcal_options_evcal_1');
@@ -162,7 +162,7 @@ class evo_event_metaboxes{
 				),
 				array(
 					'id'=>'ev_otherdata',
-					'name'=>__('Other Event Data','eventon'),
+					'name'=>__('Other Data','eventon'),
 					'variation'=>'customfield',	
 					'hiddenVal'=>'',	
 					'iconURL'=>'fa-pencil',
@@ -179,13 +179,13 @@ class evo_event_metaboxes{
 				),
 				array(
 					'id'=>'ev_health',
-					'name'=>esc_html__('Health Guidelines','eventon'),	
+					'name'=>esc_html__('Health Guide','eventon'),	
 					'iconURL'=>'fa-heartbeat','variation'=>'customfield','iconPOS'=>'',
 					'type'=>'code','slug'=>'ev_health',
 				),
 				array(
 					'id'=>'ev_location',
-					'name'=>esc_html__('Location and Venue','eventon'),	
+					'name'=>esc_html__('Location','eventon'),	
 					'iconURL'=>'fa-map-marker','variation'=>'customfield','iconPOS'=>'',
 					'type'=>'code',
 					'slug'=>'ev_location',
@@ -200,16 +200,16 @@ class evo_event_metaboxes{
 					'slug'=>'ev_organizer'
 				),array(
 					'id'=>'ev_uint',
-					'name'=>esc_html__('User Interaction for event click','eventon'),	
+					'name'=>__('Event Click Interaction','eventon'),	
 					'hiddenVal'=>'',	
-					'iconURL'=>'fa-street-view','variation'=>'customfield','iconPOS'=>'',
+					'iconURL'=>'fa-chalkboard-user','variation'=>'customfield','iconPOS'=>'',
 					'type'=>'code',
 					'content'=>'',
 					'slug'=>'ev_uint',
 					'guide'=>esc_html__('This define how you want the events to expand following a click on the eventTop by a user','eventon')
 				),array(
 					'id'=>'ev_learnmore',
-					'name'=>esc_html__('Learn more about event link','eventon'),	
+					'name'=>esc_html__('Learn more','eventon'),	
 					'hiddenVal'=>'',	
 					'iconURL'=>'fa-random','variation'=>'customfield','iconPOS'=>'',
 					'type'=>'code',
@@ -227,7 +227,7 @@ class evo_event_metaboxes{
 					'guide'=>esc_html__('Show events that are releated to this event','eventon')
 				),array(
 					'id'=>'ev_seo',
-					'name'=>esc_html__('SEO Additions for Event','eventon'),	
+					'name'=>esc_html__('Extra SEO','eventon'),	
 					'hiddenVal'=>'',	
 					'iconURL'=>'fa-search','variation'=>'customfield','iconPOS'=>'',
 					'type'=>'code',
@@ -236,56 +236,42 @@ class evo_event_metaboxes{
 				)
 			));
 
-			
-		
-		// combine array with custom fields
-		// $metabox_array = (!empty($evMB_custom) && count($evMB_custom)>0)? array_merge($metabox_array , $evMB_custom): $metabox_array;
-		
-		$closedmeta = eventon_get_collapse_metaboxes($p_id);
-		
-		?>	
-			
-			<div id='evo_mb' class='eventon_mb'>
-				<input type='hidden' id='evo_collapse_meta_boxes' name='evo_collapse_meta_boxes' value=''/>
-			<?php
-				// initial values
-					$visibility_types = array('all'=>esc_html__('Everyone','eventon'),'admin'=> esc_html__('Admin Only','eventon'),'loggedin'=>esc_html__('Loggedin Users Only','eventon'));
+			$main = '';
+			$side_menu = '';
 
-				// FOREACH metabox item
-				foreach($metabox_array as $mBOX):
-					
-					// initials
-						$icon_style = (!empty($mBOX['iconURL']))?
-							'background-image:url('. esc_url( $mBOX['iconURL'] ) .')'
-							:'background-position:'. esc_attr( $mBOX['iconPOS'] );
-						$icon_class = (!empty($mBOX['iconPOS']))? 'evIcons':'evII';
-										
+			ob_start();
 
-						// visibility type ONLY for custom meta fields
-							$visibility_type = (!empty($mBOX['visibility_type']))? 
-								"<span class='visibility_type'>".esc_html__('Visibility Type:','eventon').' '. esc_attr( $visibility_types[$mBOX['visibility_type']] ) .'</span>': 
-								false;
-					
-						$closed = (!empty($closedmeta) && in_array($mBOX['id'], $closedmeta))? 'closed':null;
-			?>
-				<div class='evomb_section' id='<?php echo esc_attr( $mBOX['id'] );?>'>			
-					<div class='evomb_header'>
-						<?php // custom field with icons
-							if(!empty($mBOX['variation']) && $mBOX['variation']	=='customfield'):?>	
-							<span class='evomb_icon <?php echo esc_attr($icon_class);?>'><i class='fa <?php echo esc_attr($mBOX['iconURL']); ?>'></i></span>
-							
-						<?php else:	?>
-							<span class='evomb_icon <?php echo esc_attr($icon_class);?>' style='<?php echo esc_attr( $icon_style );?>'></span>
-						<?php endif; ?>
-						<p><?php echo esc_attr( $mBOX['name'] );?><?php echo (!empty($mBOX['hiddenVal']))?
-							'<span class="hiddenVal">'.esc_attr( $mBOX['hiddenVal'] ).'</span>':null;?><?php EVO()->elements->print_tooltips( isset($mBOX['guide']) ? $mBOX['guide'] :null );?><?php echo  $visibility_type;?></p>
-					</div>
-					<div class='evomb_body <?php echo esc_attr( $closed );?>' box_id='<?php echo esc_attr( $mBOX['id'] );?>'>
+			$main = "<div class='evo_event_main_settings_body evobr15 evofx_110'>";
+				$index = 1;
+			
+			$closedmeta = eventon_get_collapse_metaboxes($p_id);
+		
+			// initial values
+				$visibility_types = array('all'=>esc_html__('Everyone','eventon'),'admin'=> esc_html__('Admin Only','eventon'),'loggedin'=>esc_html__('Loggedin Users Only','eventon'));
+
+			// FOREACH metabox item
+			foreach($metabox_array as $mBOX):
+
+				$closed = '';
+
+				// construct side menu				
+				$side_menu .= "<a class='evo_settings_section_trig evoff_2 evocl1 evopad10 evoHcp evocurp ".($index == 1? 'evoclp':'') ."' data-id='{$mBOX['id']}'><i class='fa {$mBOX['iconURL']} evomarr10 evofz16i'></i><span>{$mBOX['name']}</span></a>";
+				
+				
+				?>
+				<div class='evomb_section <?php echo $mBOX['id'];?> evo_borderb evofxdrc <?php echo  $index == 1 ? 'evodfx':'evodn' ;?>' id='<?php echo $mBOX['id'];?>' style=''>			
 					<?php 
+					echo $this->event_metabox_parts_header( $mBOX , true );		
+					?>
+					<div class='evomb_body evofx_10a <?php echo $closed;?>' box_id='<?php echo $mBOX['id'];?>'>
+					<?php
+
+					$main .= ob_get_clean();
 
 					if(!empty($mBOX['content'])){
 						echo $mBOX['content'];
 					}else{
+						ob_start();
 						switch($mBOX['id']){
 
 							// VIRTUAL
@@ -380,14 +366,25 @@ class evo_event_metaboxes{
 								
 							break;
 						}
-						
-
+						$main .= ob_get_clean();
 					}
-					?>					
-					</div>
+					ob_start();
+					?>	
+					</div><!-- evomb_section -->			
 				</div>
-			<?php	endforeach;	?>
-					<div class='evomb_section additional_functionality' id='ev_add_func'>			
+			
+			<?php	
+			$index++;
+		
+
+			endforeach;	
+
+			$main .= ob_get_clean();
+			// Promo
+
+			ob_start();
+			?>
+					<div class='evomb_section additional_functionality evodfx evofxdrc' id='ev_add_func'>			
 						<div class='evomb_header'>
 							<span class="evomb_icon evII"><i class="fa fa-plug"></i></span>
 							<p><?php esc_html( esc_html_e('Expand EventON Lite','eventon') );?></p>
@@ -405,8 +402,28 @@ class evo_event_metaboxes{
 							</p>
 						</div>
 					</div>	
+			
+			<?php  
+
+			echo "</div>";
+
+			$main .= ob_get_clean();
+
+			$output = "
+			<div id='evo_mb' class='eventon_mb evo_main_settings'>
+			<div class='evo_event_main_settings_in snav evodfx evofxdrr'>
+				<div class='evo_event_settings_nav evodfx evofxdrc evofx_00a'>{$side_menu}
+					<div class='evo_event_snav_close ajde-collapse-menu' id='collapse-button'>
+						<span class='collapse-button-icon'></span>
+						<span class='collapse-button-label' style='font-size:12px;'>". __('Collapse Menu','eventon') ."</span>
+					</div>
+				</div>
+				{$main}
 			</div>
-		<?php  
+			</div>
+			";
+
+			echo $output;
 		}
 
 	// for custom meta boxes
@@ -699,8 +716,8 @@ class evo_event_metaboxes{
 		}
 
 	// Process metabox content
-	// @since 4.2.3
-		function process_content($array){
+	// @since 4.2.3 @updated 2.5
+		public function process_content($array){
 			$output = '';
 
 			$visibility_types = array(
@@ -709,7 +726,14 @@ class evo_event_metaboxes{
 				'loggedin'=>esc_html__('Loggedin Users Only','eventon')
 			);
 
+			$side_menu = '';
+			$is_main = !empty($load_type) && $load_type == 'main';
+			$is_main = isset( $_POST['from'] ) && $_POST['from'] == 'reloadbox' ? true: $is_main;
+
 			ob_start();
+
+			echo "<div class='evo_event_main_settings_body evobr15 evofx_110'>";
+			$index = 1;
 
 			foreach($array as $mBOX):
 
@@ -717,39 +741,101 @@ class evo_event_metaboxes{
 
 				$closed = isset($mBOX['close']) && $mBOX['close'] ? 'closed' : '';
 
-				// initials
-					$icon_style = (!empty($mBOX['iconURL']))?
-						'background-image:url('. esc_url( $mBOX['iconURL'] ).')'
-						:'background-position:'. esc_attr( $mBOX['iconPOS'] );
-					$icon_class = (!empty($mBOX['iconPOS']))? 'evIcons':'evII';
-					
-					
-					$hiddenVal = (!empty($mBOX['hiddenVal']))?
-						'<span class="hiddenVal">'. esc_attr( $mBOX['hiddenVal'] ).'</span>':null;
+				// construct side menu				
+				$side_menu .= "<a class='evo_settings_section_trig evoff_2 evocl1 evopad10 evoHcp evocurp ".($index == 1? 'evoclp':'') ."' data-id='{$mBOX['id']}'><i class='fa {$mBOX['iconURL']} evomarr10 evofz16i'></i><span>{$mBOX['name']}</span></a>";
 
-					// visibility type ONLY for custom meta fields
-						$visibility_type = (!empty($mBOX['visibility_type'])) ? 
-							"<span class='visibility_type'>". __('Visibility Type:','eventon').' '. esc_html( $visibility_types[$mBOX['visibility_type']] ) .'</span>': null;
-				
 				?>
-				<div class='evomb_section' id='<?php echo esc_attr($mBOX['id']);?>'>			
-					<div class='evomb_header <?php echo esc_attr( $closed );?>'>
-						<?php // custom field with icons
-							if(!empty($mBOX['variation']) && $mBOX['variation']	=='customfield'):?>	
-							<span class='evomb_icon <?php echo esc_attr( $icon_class );?>'><i class='fa <?php echo esc_attr( $mBOX['iconURL'] ); ?>'></i></span>
-							
-						<?php else:	?>
-							<span class='evomb_icon <?php echo esc_attr( $icon_class );?>' style='<?php echo esc_attr( $icon_style );?>'></span>
-						<?php endif; ?>
-						<p><?php echo esc_html( $mBOX['name'] );?><?php echo  $hiddenVal;?><?php EVO()->elements->print_tooltips( !empty($mBOX['guide']) ? $mBOX['guide'] : null );?><?php echo  $visibility_type;?></p>
+				<div class='evomb_section <?php echo $mBOX['id'];?> evo_borderb evofxdrc evoh100p <?php echo $is_main ? ( $index == 1 ? 'evodfx':'evodn' ) :'';?>' id='<?php echo $mBOX['id'];?>' style=''>			
+					<?php 
+					$this->event_metabox_parts_header( $mBOX , $is_main );		
+					?>
+					<div class='evomb_body evofx_10a <?php echo $closed;?>' box_id='<?php echo $mBOX['id'];?>'>
+						<?php	 echo $mBOX['content'];?>
 					</div>
-					<div class='evomb_body <?php echo esc_attr( $closed );?>' box_id='<?php echo esc_attr( $mBOX['id'] );?>'>
-						<?php	 echo ( $mBOX['content'] );?>
-					</div>
+
+					<?php // next item 
+					$next = $array[$i + 1] ?? null;
+					$prev = $array[$i - 1] ?? null;
+					if( $is_main):
+					?>
+						<div class='evomb_foot evodfx evofxdrr <?php echo $prev? 'evofxjcsb':'evofxjcfe';?> evopadb10 evopadr10 evopadl10'>
+							<?php if($prev):?>
+								<button class='evo_btn grey evoelmbtn evo_eventedit_next_trig evogap10 evoHKx-5' data-id='<?php echo $prev['id'];?>'><i class='fa fa-arrow-left evomarr10 evokid evotrans'></i><?php echo __('Previous:'). ' '. $prev['name'];?></button>
+							<?php endif;?>
+							<?php if( $next):?>
+								<button class='evo_btn grey evoelmbtn evo_eventedit_next_trig evogap10 evoHKx5' data-id='<?php echo $next['id'];?>'><?php echo __('Next:'). ' '. $next['name'];?><i class='fa fa-arrow-right evomarl10 evokid evotrans'></i></button>
+							<?php endif;?>
+						</div>
+					<?php endif;?>
 				</div>
-			<?php 
+				<?php 
+				
+			$index++;
 			endforeach;
 
+			echo "</div>";
+
+			$main_content = ob_get_clean();
+
+			if( !$is_main )	return $main_content;
+
+			$output = "
+			<div class='evo_event_main_settings_in ".( $is_main? 'snav':'') ." evodfx evofxdrr'>
+				<div class='evo_event_settings_nav evodfx evofxdrc evofx_00a'>{$side_menu}
+				<div class='evo_event_snav_close ajde-collapse-menu' id='collapse-button'>
+					<span class='collapse-button-icon'></span>
+					<span class='collapse-button-label' style='font-size:12px;'>". __('Collapse Menu','eventon') ."</span>
+				</div>
+				</div>
+				{$main_content}
+			</div>
+			";
+
+			return $output;
+		}
+
+		public function event_metabox_parts_header(  $data_array , $is_main = ''){
+
+			extract( array_merge(array(
+				'variation' => '',
+				'iconURL'=> '',
+				'guide'=> '',
+				'hiddenVal'=> '',
+				'visibility_type'=> '',
+				'iconPOS'=> '',
+				'close'=> '',
+				'name'=> '',
+			),$data_array));
+
+
+			$closed = !empty($close) && $close ? 'closed' : '';
+			$icon_class = (!empty($iconPOS))? 'evIcons':'evII';
+			$icon_style = (!empty($iconURL))?
+						'background-image:url('.$iconURL.')'
+						:'background-position:'.$iconPOS;
+			$hiddenVal = (!empty($hiddenVal))?	'<span class="hiddenVal">'.$hiddenVal.'</span>':null;
+			$guide = (!empty($guide))? 	EVO()->elements->tooltips($guide):null;
+
+			// visibility type ONLY for custom meta fields
+			$visibility_types = array('all'=>__('Everyone','eventon'),'admin'=>__('Admin Only','eventon'),'loggedin'=>__('Loggedin Users Only','eventon'));
+			$visibility_type = (!empty($visibility_type))? "<span class='visibility_type'>".__('Visibility Type:','eventon').' '.$visibility_types[$visibility_type] .'</span>': false;
+					
+			$name = !empty($name_full)? $name_full: $name;
+
+			ob_start();
+			?>
+			<div class='evomb_header evopad5 evoposr evoboxcb evodfx evofx_dr_r evofx_ai_c evogap10 <?php echo $closed;?> <?php echo $is_main? 'snav':'';?>'>
+				<?php // custom field with icons
+					if(!empty($variation) && $variation	=='customfield'):?>	
+					<span class='evomb_icon evofz18 <?php echo $icon_class;?>'><i class='fa <?php echo !empty($iconURL)? $iconURL: ''; ?>'></i></span>
+					
+				<?php else:	?>
+					<span class='evomb_icon evofz18 <?php echo $icon_class;?>' style='<?php echo $icon_style?>'></span>
+				<?php endif; ?>
+				<p class='evomb_header_label evomar0i'><?php echo !empty($name)? $name: '';?><?php echo $hiddenVal;?><?php echo $guide;?><?php echo $visibility_type;?></p>
+			</div>
+			<?php 
 			return ob_get_clean();
 		}
+
 }

@@ -1,6 +1,6 @@
 /**
  * EventON Elements CSS 
- * @version 2.4
+ * @version 2.5
  */
 
 :root{
@@ -10,11 +10,27 @@
     .evo_elm_row p.evo_field_container input,
     .evo_elm_row p.evo_field_container textarea{
         border-radius: 8px;
-        background-color: #e5e5e5; width:100%;
+        background-color: #f1f1f1;
+        width: 100%;
+        padding: 4px 15px;
+        font-size: 14px;
+        line-height: 1.6;
+        border: none;
+        box-shadow: 0px 0px 0px 1px var(--evocg10);
+        transition: all .2s ease;
+    }
+    .evo_elm_row p.evo_field_container input:focus,
+    .evo_elm_row p.evo_field_container textarea:focus,
+    .evo_elm_row select.evo_elm_dropdown:focus{
+        box-shadow: 0px 0px 0px 2px var(--evocg30);
     }
     .evo_elm_row p.evo_field_container input::placeholder,
     .evo_elm_row p.evo_field_container textarea::placeholder {
         color: #8e8e8e;
+    }
+    .evo_elm_row select.evo_elm_dropdown{
+        border: none;
+        box-shadow: 0px 0px 0px 1px var(--evocg10);
     }
     .evo_elm_afterstatement .evo_elm_row p.evo_field_container input,
     .evo_elm_afterstatement .evo_elm_row p.evo_field_container textarea{
@@ -22,7 +38,8 @@
     .evo_elm_row{display: block;width: 100%;box-sizing: border-box;}
     .evo_elm_row.evodfx{display: flex;}
     .evo_elm_row p.evo_field_label, .evo_elm_row p.evo_field_container{margin:0;}
-    .evo_elm_row p.evo_field_label{margin-bottom: 5px; padding-bottom: 0; font-size: 14px;position: relative;width:auto;}
+    .evo_elm_row p.evo_field_label{
+        margin-bottom: 5px; padding-bottom: 0; font-size: 14px;position: relative;width:auto;}
     .evo_elm_row p.evo_field_container{margin-bottom: 10px;padding:0;}
     .evo_nesting{
         display: flex; gap: 15px;

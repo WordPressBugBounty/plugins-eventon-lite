@@ -17,8 +17,8 @@ class evoadmin_set_appearance{
 
 		return apply_filters('eventon_appearance_add', 
 			array(
-				array('id'=>'evo_notice_1','type'=>'notice',
-					'name'=> sprintf(__('Once you make changes to appearance make sure to clear browser and website cache to see results. <br/>Can not find appearance? <a href="%s" target="_blank">See how you can add custom styles to change additional appearances</a>','eventon'),'http://www.myeventon.com/documentation/change-css-calendar/') 
+				array('id'=>'evo_notice_1','type'=>'notice',				
+					'name'=>sprintf(__('Once you make changes to appearance make sure to clear browser and website cache to see results. <br/>Can not find appearance? <a href="%s" target="_blank" class="evo_trig_doc">See how you can add custom styles to change additional appearances</a>','eventon'),'https://docs.myeventon.com/documentations/change-css-calendar/') 
 				)
 				
 				,array('id'=>'evoapp_code_1', 'type'=>'customcode','code'=>$this->appearance_theme_selector(), )
@@ -349,8 +349,8 @@ class evoadmin_set_appearance{
 					),
 					array('id'=>'fs_fonti5','type'=>'fontation','name'=>__('Lightbox Close Button Color','eventon'),
 						'variations'=>array(
-							array('id'=>'evo_color_lb_1', 'name'=>__('Background Color','eventon'), 'type'=>'color', 'default'=>'000000'),
-							array('id'=>'evo_color_lb_2', 'name'=>__('X Color','eventon'), 'type'=>'color', 'default'=>'666666'),
+							array('id'=>'evo_color_lb_1', 'name'=>__('Background Color','eventon'), 'type'=>'color', 'default'=> $evo_color_1),
+							array('id'=>'evo_color_lb_2', 'name'=>__('X Color','eventon'), 'type'=>'color', 'default'=>$evo_cl_w),
 							array('id'=>'evo_color_lb_3', 'name'=>__('Background Color - HOVER','eventon'), 'type'=>'color', 'default'=>'cfcfcf'),
 							array('id'=>'evo_color_lb_4', 'name'=>__('X Color - HOVER','eventon'), 'type'=>'color', 'default'=>'666666'),
 						)
@@ -369,8 +369,8 @@ class evoadmin_set_appearance{
 						array('id'=>'fs_fonti6','type'=>'fontation','name'=>__('Health Box','eventon'),
 						'variations'=>array(
 								array('id'=>'evo_health_1', 'name'=>__('Background Color','eventon'), 'type'=>'color', 'default'=>'ececec'),
-								array('id'=>'evo_health_2', 'name'=>__('Text Color','eventon'), 'type'=>'color', 'default'=>'8d8d8d'),
-								array('id'=>'evo_health_3', 'name'=>__('Icon Color','eventon'), 'type'=>'color', 'default'=>'8d8d8d'),
+								array('id'=>'evo_health_2', 'name'=>__('Text Color','eventon'), 'type'=>'color', 'default'=> $evo_color_1),
+								array('id'=>'evo_health_3', 'name'=>__('Icon Color','eventon'), 'type'=>'color', 'default'=> $evo_color_1),
 							)
 						),
 						array('id'=>'evo_health_4','type'=>'color','name'=>__('Other Health Guidelines Box Color','eventon'), 'default'=>'e8e8e8'),
@@ -383,12 +383,11 @@ class evoadmin_set_appearance{
 				array('id'=>'evcal_livenow','type'=>'hiddensection_open','name'=>__('Live Now Calendar View Styles','eventon'), 'display'=>'none'),
 
 					array('id'=>'evo_live1b','type'=>'color','name'=>__('Happening Now Section Title Text Color','eventon'),'default'=>$evo_color_1),
-					array('id'=>'evo_live2','type'=>'color','name'=>__('Coming Up Section Background Color','eventon'), 'default'=>'ececec'),
 					array('id'=>'evo_live3','type'=>'color','name'=>__('Coming Up Text Color','eventon'), 'default'=>$evo_color_1),			
 					array('id'=>'evo_live4','type'=>'fontation','name'=>__('Coming Up Counter','eventon'),
 						'variations'=>array(
-							array('id'=>'evo_live4a', 'name'=>__('Text Color','eventon'), 'type'=>'color', 'default'=>'ffffff'),
-							array('id'=>'evo_live4b', 'name'=>__('Background Color','eventon'), 'type'=>'color', 'default'=>$evo_color_2),
+							array('id'=>'evo_live4a', 'name'=>__('Text Color','eventon'), 'type'=>'color', 'default'=> $evo_color_1),
+							array('id'=>'evo_live4b', 'name'=>__('Background Color','eventon'), 'type'=>'color', 'default'=> 'dcdcdc'),
 						)
 					),	
 					array('id'=>'evo_live5','type'=>'fontation','name'=>__('No Current Events Section','eventon'),

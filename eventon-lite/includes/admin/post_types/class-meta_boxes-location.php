@@ -1,7 +1,7 @@
 <?php 
 /**
  * Event Edit Meta box Location
- * @version 2.4
+ * @version 2.5
  */
 
 ?>
@@ -60,7 +60,9 @@
 
 			// check google maps API key
 			if( !EVO()->cal->get_prop('evo_gmap_api_key','evcal_1')){
-				echo "<p class='evo_notice'>".__('Google Maps API key is required for maps to show on event. Please add them via ','eventon') ."<a href='". get_admin_url() .'admin.php?page=eventon#evcal_005'."'>".__('Settings','eventon'). "</a></p>";
+				echo "<div class='evomart10'>";
+				echo "<p class='evo_notice '>".__('Google Maps API key is required for maps to show on event. Please add them via ','eventon') ."<a href='". get_admin_url() .'admin.php?page=eventon#evcal_005'."'>".__('Settings','eventon'). "</a></p>";
+				echo "</div>";
 			}
 		?>									
 	</div>
