@@ -4,8 +4,8 @@ Plugin Name: EventON Lite
 Author URI: http://ashanjay.com/
 Tags: calendar, event calendar, virtual events, events, event management
 Requires at least: 6.0
-Tested up to: 6.9.1
-Stable tag: 2.5
+Tested up to: 6.9.4
+Stable tag: 2.5.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -249,6 +249,12 @@ For support with the Lite version, visit [support forum here](https://wordpress.
 You can report security bugs through the Patchstack Vulnerability Disclosure Program. The Patchstack team helps validate, triage and handle any security vulnerabilities. [Report a security vulnerability.](https://patchstack.com/database/vdp/9e5fbbf9-f1d1-4765-83e5-76b7743a35be)
 
 == Changelog ==
+= 2.5.1 (2026-3-18) =
+FIXED: event click external link not working
+FIXED: undefined image background error
+FIXED: XSS issue with eventon settings page tab values passed via url
+FIXED: Settings tooltip on collapsed menu icons
+
 = 2.5 (2025-3-2) = 
 ADDED: get direction to have event destination address with option to copy
 ADDED: option to open event map as expanded full page

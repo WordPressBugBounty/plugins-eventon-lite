@@ -42,7 +42,8 @@ class EVO_Settings_Designer{
 			// left side tabs with different level colors
 			$ls_level_code = (isset($cpav['level']))? 'class="'.$cpav['level'].'"': null;
 			
-			$leftside .= "<li ".$ls_level_code."><a class='".( ($count==1)?'focused':null)."' data-c_id='".$cpav['id']."' title='".$cpav['tab_name']."'><i class='fa fa-".( !empty($cpav['icon'])? $cpav['icon']:'edit')."'></i>".__($cpav['tab_name'],$textdomain)."</a></li>";								
+			$leftside .= "<li ".$ls_level_code."><a class='evosetting_nav_a ".( ($count==1)?'focused':null)."' data-d='{$cpav['tab_name']}' data-c_id='".$cpav['id']."' title='".$cpav['tab_name']."'><i class='fa fa-".( !empty($cpav['icon'])? $cpav['icon']:'edit')."'></i>".__($cpav['tab_name'],$textdomain)."</a></li>";
+
 			$tab_type = (isset($cpav['tab_type'] ) )? $cpav['tab_type']:'';
 			if( $tab_type !='empty'){ // to not show the right side
 

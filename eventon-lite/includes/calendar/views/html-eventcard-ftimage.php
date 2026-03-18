@@ -1,7 +1,7 @@
 <?php 
 /** 
  * EventON Event Featured Image
- * @version 2.5
+ * @version 2.5.1
  */ 
 
 
@@ -22,6 +22,7 @@ if( $object->main_image && is_array($object->main_image)){
 	$width = !empty($object->img[1])? $object->img[1]:'';
 
 	$new_width = 0;
+	$BGURL = '';
 
 	$img_hw_ratio = 1;
 	if( $main_image['full_w'] > 0) 

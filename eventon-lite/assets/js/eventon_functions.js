@@ -663,7 +663,7 @@
 			var _adata = OO.adata;
 			var _populate_id = OO._populate_id;
 
-			console.log(OO);
+			///console.log(OO);
 
 			// check if required values missing for lightbox
 			if( !('class' in _lbdata) || _lbdata.class == '' ) return;

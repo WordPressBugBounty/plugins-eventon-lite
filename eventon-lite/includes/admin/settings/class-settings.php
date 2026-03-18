@@ -1,7 +1,7 @@
 <?php
 /**
  *	EventON Settings Main Object
- *	@version 2.5
+ *	@version 2.5.1
  */
 class EVO_Settings extends EVO_Settings_Designer{
 	
@@ -11,9 +11,9 @@ class EVO_Settings extends EVO_Settings_Designer{
 	private $tab_props = false;
 
 	public function __construct(){
-		$this->page = (isset($_GET['page']) )? sanitize_text_field( $_GET['page'] ):false;
+		$this->page = (isset($_GET['page']) )? sanitize_key( $_GET['page'] ):false;
 		//$this->focus_tab = (isset($_GET['tab']) )? sanitize_text_field( urldecode($_GET['tab'])):'evcal_1';
-		$this->current_section = (isset($_GET['section']) )? sanitize_text_field( urldecode($_GET['section'])):'';
+		$this->current_section = (isset($_GET['section']) )? sanitize_key( urldecode($_GET['section'])):'';
 		$this->options_pre = 'evcal_options_';
 		
 

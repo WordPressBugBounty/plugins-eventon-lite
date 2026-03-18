@@ -163,17 +163,19 @@ jQuery(document).ready(function($){
 		});
 	// colpase menu
 		$('.ajde-collapse-menu').on('click', function(){
-			if($(this).hasClass('close')){
-				$(this).parent().removeClass('mini');
-				$(this).closest('.ajde_settings').removeClass('mini');
-				$('.evo_diag').removeClass('mini');
-				$(this).removeClass('close');
-			}else{
-				$(this).closest('.ajde_settings').addClass('mini');
-				$(this).parent().addClass('mini');
-				$('.evo_diag').addClass('mini');
-				$(this).addClass('close');
-			}
+
+			let closed = $(this).hasClass('close');
+			const nav = $(this).closest('.backender_left').find('.evosetting_nav_a');
+
+			closed = closed ? false: true;
+
+			$(this).parent().toggleClass('mini', closed);
+			$('.evo_diag').toggleClass('mini', closed);
+			$(this).closest('.ajde_settings').toggleClass('mini', closed);
+			$(this).toggleClass('close', closed);
+
+			nav.toggleClass('evotooltipfree R', closed);
+
 		});
 
 	// switching between tabs

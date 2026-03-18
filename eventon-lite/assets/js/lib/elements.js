@@ -575,9 +575,9 @@ const BB = $('body');
 		$(this).append('<em>' +tipContent +'</em>').addClass(classes[1]);
 	});
 
-// @updated 4.9
+// @updated 2.5.1
 // tooltips
-	$.fn.evo_elm_show_tooltip = function( passed_content, hide_time ){
+	$.fn.evo_elm_show_tooltip = function( passed_content, hide_time, targetElement ){
 		var el = this;
 
 		if( el.hasClass('show')) return;
@@ -588,7 +588,7 @@ const BB = $('body');
 	    if (!content) return;
 
 	    var tooltipbox = $('.evo_tooltip_box');
-	    var cor = getCoords(event.target); // Assuming getCoords() is defined elsewhere
+	    var cor = getCoords(targetElement || el[0]);
 	    tooltipbox.html(content).removeClass('show L evocenter'); // Reset classes
 
 		var box_height = tooltipbox.height();
@@ -603,7 +603,11 @@ const BB = $('body');
 	    } else if (el.hasClass('L')) {
 	        left = cor.left - box_width - 15; // Left-aligned tooltip
 	        tooltipbox.addClass('L');
-	    } else {
+	    } else if (el.hasClass('R')) {
+            top = top + ( el.height()  ) + 35;
+            left = cor.left + ( el.width() ) + 40; // Right side of the el
+            tooltipbox.addClass('R');
+        } else {
 	        left = cor.left + 5; // Default right-aligned
 	    }
 
@@ -617,13 +621,15 @@ const BB = $('body');
 	    }
 	}
 	$.fn.evo_elm_hide_tooltip = function(){
-		this.removeClass('show');
+		$('body').find('.evotooltipfree, .evotooltip').removeClass('show');
 		$('.evo_tooltip_box').removeClass('show L evocenter');
 	}	
 
 	$('body')
 		.on('mouseover','.ajdeToolTip, .colorselector, .evotooltip, .evotooltipfree',function(event){
 			event.stopPropagation();
+
+			$('.evotooltipfree.show').removeClass('show');
 
 			var relatedTarget = event.relatedTarget;
 			var target = $(event.target);

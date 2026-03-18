@@ -1,7 +1,7 @@
 <?php
 /**
   * evo settings class
-  * @version 2.5
+  * @version 2.5.1
   */
 class evo_settings_settings{
 	
@@ -25,7 +25,7 @@ class evo_settings_settings{
 				'name'=>__('General Calendar Settings','eventon'),
 				'display'=>'show',
 				'icon'=>'gears',
-				'tab_name'=>__('General Settings','eventon'),
+				'tab_name'=>__('General','eventon'),
 				'top'=>'4',
 				'fields'=> apply_filters('eventon_settings_general', array(
 					array('id'=>'evcal_cal_hide','type'=>'yesno','name'=>__('Hide Calendars from front-end','eventon'),),
@@ -286,7 +286,7 @@ class evo_settings_settings{
 				'id'=>'evcal_002sc',
 				'name'=>__('Calendar Scripting and styles','eventon'),
 				'tab_name'=>__('Scripts & Styling','eventon'),
-				'icon'=>'eye',
+				'icon'=>'file-code far',
 				'fields'=>$this->scripts()
 			),
 			array(

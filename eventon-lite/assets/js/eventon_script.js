@@ -367,8 +367,10 @@ jQuery(document).ready(function($){
 	                ux_val = cal_ux_val;
 	            }
 
+	            //console.log(ux_val);
+
 	            // ── UX behavior switch ──────────────────────────────────────────
-	            if (ux_val === '3' || ux_val === '3a') {
+	            if (ux_val === '3' || ux_val === '3a' || ux_val == 3 ) {
 	                // Lightbox mode
 	                const repeat_interval = parseInt($trig.closest('.eventon_list_event').data('ri')) || 0;
 
@@ -384,13 +386,14 @@ jQuery(document).ready(function($){
 	                SC.ajax_eventtop_show_content = true;
 	                if (etttc_class) SC.additional_class = etttc_class;
 
+
 	                // Open lightbox (your original function)
-	                eventon_open_event_lightbox(SC, $trig, $cal);
+	                this.open_lightbox(SC, $trig, $cal);
 
 	                return false;
 	            }
 
-	            else if (ux_val === '4') {
+	            else if (ux_val === '4' || ux_val == 4) {
 	                // Open single event page – same tab
 	                let url = $trig.attr('href');
 	                if (!url || url === undefined) {
@@ -413,8 +416,8 @@ jQuery(document).ready(function($){
 	                return false;
 	            }
 
-	            else if (ux_val === '2') {
-	                // External link
+	            else if (ux_val === '2' || ux_val == 2) {
+	            	 // External link
 	                if (is_from_single_event_box) {
 	                    e.preventDefault();
 	                    return false;
@@ -488,6 +491,93 @@ jQuery(document).ready(function($){
 
 	                return false;
 	            }
+	        },
+
+	        // open lightbox
+	        open_lightbox( SC_data, obj, CAL ){
+
+	        	var additional_classes = '';
+				if( obj.hasClass('cancel_event')) additional_classes +=  ' cancel_event';
+
+				additional_classes += ' ' + SC_data.additional_class;
+				additional_classes += ' ' + SC_data.calendar_type; // 4.6.6
+
+				var other_data = {
+					extra_classes: 'evo_lightbox_body eventon_list_event evo_pop_body evcal_eventcard event_'+SC_data.event_id +'_'+ SC_data.repeat_interval + additional_classes,
+					CAL:CAL,
+					obj: obj,
+					et_data: obj.find('.evoet_data').data(),// @4.5.5
+					SC: SC_data
+				};
+
+				// generate a random ID for this 
+					maximum = 99;
+					minimum = 10;
+					var randomnumber = Math.floor(Math.random() * (maximum - minimum + 1)) + minimum;
+					
+				// lightbox additional class
+					lbac = '';
+					if( evo_general_params.cal.lbs == 'sc1') lbac = 'within';
+					if( evo_general_params.cal.lbs == 'sc2') lbac = 'within ecSCR';
+
+				// AJAX via lightbox
+				if(SC_data.ux_val == '3a'){
+
+					var new_content = '';
+					new_content += '<div class="evo_cardlb" style="padding:10px 10px 0 10px">';
+					new_content += '<div style="margin-bottom:20px; width:100%; height:200px" class="evo_preloading"></div>';
+					const box = '<div style="display:flex;justify-content: space-between;margin-bottom:10px"><div style="width:40px;height:40px; margin-right:20px" class="evo_preloading"></div> <div style="flex:1 0 auto"> <div class="evo_preloading" style="width:70%; height:20px; margin-bottom:10px"></div><div class="evo_preloading" style="width:100%; height:80px; margin-bottom:10px"></div>  </div> </div>';
+					new_content += box + box + box;
+					new_content += '</div>';
+
+					
+					var data_arg = {};
+					data_arg['event_id'] = SC_data.event_id;
+					data_arg['ri'] = SC_data.repeat_interval;
+					data_arg['SC'] = SC_data;
+					data_arg['load_lbcontent'] = true;
+					data_arg['action'] = 'eventon_load_single_eventcard_content';
+					data_arg['uid'] = 'load_single_eventcard_content_3a';
+					if( CAL ) data_arg['calid'] = CAL.attr('id');
+
+					
+					//reset view to match
+						if( data_arg.SC.tile_style == '2') data_arg.SC.eventtop_style = '0';
+						data_arg.SC.tile_style = '0';
+						data_arg.SC.tile_bg = '0';
+						data_arg.SC.tiles = 'no';
+						
+					$('body').evo_lightbox_open({
+						uid:'evo_open_eventcard_lightbox',
+						//uid:'load_single_eventcard_content_3a',
+						lbc:'evo_eventcard_'+ randomnumber,lbac: lbac,
+						end:'client',
+						content: new_content,
+						ajax:'yes',
+						ajax_type: 'endpoint',
+						ajax_action: 'eventon_load_single_eventcard_content',
+						d: 	data_arg,
+						other_data: other_data
+					});
+					
+
+				}else{
+
+					var content = obj.closest('.eventon_list_event').find('.event_description').html();
+					var _content = $(content).not('.evcal_close');
+
+					clrW = obj.closest('.eventon_list_event').hasClass('clrW') ? 'clrW':'clrB';//4.6.2
+									
+					CAL.evo_lightbox_open({
+						uid:'evo_open_eventcard_lightbox',
+						lbc:'evo_eventcard_'+ randomnumber,lbac: lbac,
+						end:'client',
+						content: '<div class="evopop_top '+clrW+'">'+ obj.html() +'</div><div class="evopop_body">' + content +'</div>',
+						other_data: other_data
+					});
+
+					return;
+				}		
 	        },
 			// Processes event card interactions after slide down
 	        handle_slidedown_complete(e, event_id, obj, is_slide_down) {
@@ -1400,96 +1490,7 @@ jQuery(document).ready(function($){
 				$(this).find('.desc_trig').trigger('click');
 			})
 		
-	// process lightbox event card 2.2.13
-		// open event as lightbox
-		function eventon_open_event_lightbox( SC_data,obj, CAL){			
-			var additional_classes = '';
-
-			if( obj.hasClass('cancel_event')) additional_classes +=  ' cancel_event';
-
-			additional_classes += ' ' + SC_data.additional_class;
-			additional_classes += ' ' + SC_data.calendar_type; // 4.6.6
-
-			var other_data = {
-				extra_classes: 'evo_lightbox_body eventon_list_event evo_pop_body evcal_eventcard event_'+SC_data.event_id +'_'+ SC_data.repeat_interval + additional_classes,
-				CAL:CAL,
-				obj: obj,
-				et_data: obj.find('.evoet_data').data(),// @4.5.5
-				SC: SC_data
-			};
-
-			// generate a random ID for this 
-				maximum = 99;
-				minimum = 10;
-				var randomnumber = Math.floor(Math.random() * (maximum - minimum + 1)) + minimum;
-				
-			// lightbox additional class
-				lbac = '';
-				if( evo_general_params.cal.lbs == 'sc1') lbac = 'within';
-				if( evo_general_params.cal.lbs == 'sc2') lbac = 'within ecSCR';
-
-			// AJAX via lightbox
-			if(SC_data.ux_val == '3a'){
-
-				var new_content = '';
-				new_content += '<div class="evo_cardlb" style="padding:10px 10px 0 10px">';
-				new_content += '<div style="margin-bottom:20px; width:100%; height:200px" class="evo_preloading"></div>';
-				const box = '<div style="display:flex;justify-content: space-between;margin-bottom:10px"><div style="width:40px;height:40px; margin-right:20px" class="evo_preloading"></div> <div style="flex:1 0 auto"> <div class="evo_preloading" style="width:70%; height:20px; margin-bottom:10px"></div><div class="evo_preloading" style="width:100%; height:80px; margin-bottom:10px"></div>  </div> </div>';
-				new_content += box + box + box;
-				new_content += '</div>';
-
-				
-				var data_arg = {};
-				data_arg['event_id'] = SC_data.event_id;
-				data_arg['ri'] = SC_data.repeat_interval;
-				data_arg['SC'] = SC_data;
-				data_arg['load_lbcontent'] = true;
-				data_arg['action'] = 'eventon_load_single_eventcard_content';
-				data_arg['uid'] = 'load_single_eventcard_content_3a';
-				if( CAL ) data_arg['calid'] = CAL.attr('id');
-
-				
-				//reset view to match
-					if( data_arg.SC.tile_style == '2') data_arg.SC.eventtop_style = '0';
-					data_arg.SC.tile_style = '0';
-					data_arg.SC.tile_bg = '0';
-					data_arg.SC.tiles = 'no';
-					
-				$('body').evo_lightbox_open({
-					uid:'evo_open_eventcard_lightbox',
-					//uid:'load_single_eventcard_content_3a',
-					lbc:'evo_eventcard_'+ randomnumber,lbac: lbac,
-					end:'client',
-					content: new_content,
-					ajax:'yes',
-					ajax_type: 'endpoint',
-					ajax_action: 'eventon_load_single_eventcard_content',
-					d: 	data_arg,
-					other_data: other_data
-				});
-				
-
-			}else{
-
-				var content = obj.closest('.eventon_list_event').find('.event_description').html();
-				var _content = $(content).not('.evcal_close');
-
-				clrW = obj.closest('.eventon_list_event').hasClass('clrW') ? 'clrW':'clrB';//4.6.2
-								
-				CAL.evo_lightbox_open({
-					uid:'evo_open_eventcard_lightbox',
-					lbc:'evo_eventcard_'+ randomnumber,lbac: lbac,
-					end:'client',
-					content: '<div class="evopop_top '+clrW+'">'+ obj.html() +'</div><div class="evopop_body">' + content +'</div>',
-					other_data: other_data
-				});
-
-				return;
-			}		
-			
-		}
-
-		// run all map waiting map @4.6.1	
+	// run all map waiting map @4.6.1	
 		function _evo_run_eventcard_map_load(){
 			time = 600;
 

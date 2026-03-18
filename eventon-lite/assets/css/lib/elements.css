@@ -734,6 +734,8 @@
         left:calc(50% - 6px);
         border-color: #3a4652 transparent transparent transparent;
     }
+    .evo_elms .evo_tooltip_box.R{border-radius: 10px;}
+    .evo_elms .evo_tooltip_box.R:before{content:"";display: none;}
     .evo_elms .evo_tooltip_box.L{border-radius: 10px 10px 0px 10px;}
     .evo_elms .evo_tooltip_box.L:before{
         content: "";
