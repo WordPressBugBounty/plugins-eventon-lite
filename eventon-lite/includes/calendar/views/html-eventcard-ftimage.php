@@ -1,7 +1,7 @@
 <?php 
 /** 
  * EventON Event Featured Image
- * @version 2.5.1
+ * @version 2.5.2
  */ 
 
 
@@ -16,6 +16,7 @@ EVO()->cal->set_cur('evcal_1');
 // make sure image array object passed
 if( $object->main_image && is_array($object->main_image)){
 
+	$IMG = $BGURL = '';
 	$main_image = $object->main_image;
 
 	$height = !empty($object->img[2])? $object->img[2]:'';
