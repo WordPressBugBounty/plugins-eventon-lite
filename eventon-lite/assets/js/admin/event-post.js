@@ -529,7 +529,7 @@ jQuery(document).ready(function($){
 								loader_class:'evo_repeat_interval_new'
 							},
 							uid:'generate_custom_repeat_unix',
-							onSuccess: ( data, OO) => {
+							onSuccess: ( OO,data) => {
 								if( ul.hasClass('editing')){
 									ul.find('li.editing').replaceWith( data.content );
 								}else{

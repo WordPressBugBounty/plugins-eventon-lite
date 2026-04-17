@@ -744,6 +744,7 @@ jQuery(document).ready(function($){
 	        	const { B } = this.E;
 		    	B.find('.ajde_evcal_calendar').each( (index, calendar) => {
 
+
 		    		const $calendar = $(calendar);
 		    		const $SC = $calendar.evo_shortcode_data();
 
@@ -772,33 +773,34 @@ jQuery(document).ready(function($){
 			            }).on('mouseout.evoCal', '.eventon_list_event', (e) => {
 			                $(e.currentTarget).closest('.eventon_events_list').find('.evo_bub_box').remove();
 			            });
-
-			            // Jumper button toggle
-				        $calendar.on('click.evoCal', '.evo-jumper-btn', (e) => {
-				            const $this = $(e.currentTarget);
-				            $this.closest('.calendar_header').find('.evo_j_container').toggle();
-				            $this.toggleClass('vis');
-				        });
-
-				        // select a new time from jumper
-				        $calendar.on('click','.evo_j_dates a',function(){
-							var val = $(this).attr('data-val'),
-								type = $(this).parent().parent().attr('data-val'),
-								CAL = $calendar,
-								SC = CAL.evo_shortcode_data();
-
-							if(type=='m'){ // change month
-								CAL.evo_update_cal_sc({F:'fixed_month', V: val });
-							}else{
-								CAL.evo_update_cal_sc({F:'fixed_year', V: val });
-							}
-
-							run_cal_ajax( CAL.attr('id') ,'none','jumper');
-							
-							// hide month jumper if not set to leave expanded
-							if(SC.expj =='no')	container.delay(2000).slideUp();
-						});
 			        }
+
+		            // Jumper button toggle
+			        $calendar.on('click.evoCal', '.evo-jumper-btn', (e) => {
+			            const $this = $(e.currentTarget);
+			            $this.closest('.calendar_header').find('.evo_j_container').toggle();
+			            $this.toggleClass('vis');
+			        });
+
+			        // select a new time from jumper
+			        $calendar.on('click','.evo_j_dates a',function(){
+						var val = $(this).attr('data-val'),
+							type = $(this).parent().parent().attr('data-val'),
+							CAL = $calendar,
+							SC = CAL.evo_shortcode_data();
+
+						if(type=='m'){ // change month
+							CAL.evo_update_cal_sc({F:'fixed_month', V: val });
+						}else{
+							CAL.evo_update_cal_sc({F:'fixed_year', V: val });
+						}
+
+						run_cal_ajax( CAL.attr('id') ,'none','jumper');
+						
+						// hide month jumper if not set to leave expanded
+						if(SC.expj =='no')	container.delay(2000).slideUp();
+					});
+			        
 			    });
 	        },
 	        // Refreshes now calendar via AJAX

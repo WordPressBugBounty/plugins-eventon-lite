@@ -102,7 +102,8 @@ class EVO_admin_ajax{
 			$time_format = $_is_24h ? 'H:i':'g:ia';
 
 
-			$new_index = (int)$PD['new_index'] +1;
+			$new_index = !empty( $PD['new_index']) ? (int)$PD['new_index'] +1: 1;
+
 			// if editing interval
 			if( !empty($PD['edit_index'])) $new_index = (int)$PD['edit_index'];
 
@@ -130,13 +131,19 @@ class EVO_admin_ajax{
 			$start_dt = $PD["event_new_repeat_start_date"] .' '. $start_time_string;
 			$end_dt = $PD["event_new_repeat_end_date"] .' '. $end_time_string;
 
-			$_html =  '<li data-cnt="'.$new_index.'" style="display:flex" class="'.($new_index==0?'initial':'').($new_index>3?' over':'').'">'. ($new_index==0? '<dd>'.__('Initial','eventon').'</dd>':'').'<i>'.$new_index.'</i><span>'.__('from','eventon').'</span> '. $start_dt .' <span class="e">End</span> '. $end_dt .
-				'<span class="evodfxi evofxdrr evofxaic evoclwi evogap5 evofxjcfe">
-					<em class="evo_rep_edit evodfx evofxjcc evofxaic" alt="Edit"><i class="fa fa-pencil"></i></em>
-					<em class="evo_rep_del evodfx evofxjcc evofxaic" alt="Delete"><i class="fa fa-times"></i></em>
+			$_html =  '<li data-cnt="'.$new_index.'" style="display:flex" class="'.($new_index==0?'initial':'').($new_index>3?' over':'').'  evogap10 evomar0 evopad10 evodfx evofxjcsb evofxaic">
+				<i class="evo_crep_num evofsn evoop7" style="    font-family: monospace;">'.$new_index.'</i>
+				<div class="evodfx evofxdrr evogap20 evofx_1 evoff_x">
+					<span class="">'. $start_dt .'</span>
+					<span class="">'. $end_dt .	'</span>
+				</div>			
+				<span class="evo_crep_action evodfxi evofxdrr evofxaic evoclwi evogap5 evofxjcfe">
+					'. ($new_index==0? '<dd class="evofz12">'.__('Initial','eventon').'</dd>':''). '
+					<em class="evo_rep_edit evodfx evofxjcc evofxaic evotrans evobr5" alt="Edit"><i class="fa fa-pencil"></i></em>
+					<em class="evo_rep_del evodfx evofxjcc evofxaic evotrans evobr5" alt="Delete"><i class="fa fa-times"></i></em>
 				</span>'.
 				'<input type="hidden" name="repeat_intervals['.$new_index.'][0]" value="'.$start_unix_val.'"/><input type="hidden" name="repeat_intervals['.$new_index.'][1]" value="'.$end_unix_val.'"/>'
-				.'</li>';
+						.'</li>';
 			$msg = __('Repeat Instance Added','eventon');
 			
 			wp_send_json(array(

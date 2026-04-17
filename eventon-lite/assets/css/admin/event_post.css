@@ -294,19 +294,13 @@
 	.evo_custom_repeat_list li.new{
 		border-left:3px solid #E0B17C;
 	}
+	.evo_crep_num{min-width: 20px;}
+	.evo_crep_action{min-width: 110px;}
 	.evo_custom_repeat_list li.editing{    background-color: #333;}
-	.evo_custom_repeat_list li span.e{padding-left: 10px;}
-	.evo_custom_repeat_list li span{
-		text-transform: uppercase;
-		color: #bdbdbd;
-		display: inline-block;
-		width: 55px;
-	}
 	.evo_custom_repeat_list li em{
 		font-style: normal;
 	    text-transform: uppercase;
 	    cursor: pointer;
-	    border-radius: 50%;
 	    width: 20px;
 	    text-align: center;
 	    box-sizing: border-box;

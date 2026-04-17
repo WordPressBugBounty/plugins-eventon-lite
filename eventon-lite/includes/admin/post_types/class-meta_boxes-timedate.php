@@ -509,12 +509,20 @@ $wp_date_format = $date_format;
 							$end_dt = $DD->format($date_format_string);
 
 
-							echo '<li data-cnt="'.esc_attr($count).'" style="display:'.(( $count>3)?'none':'flex').'" class="'.($count==0?'initial':'').($count>3?' over':'').'">'. ($count==0? '<dd>'.esc_html__('Initial','eventon').'</dd>':'') . '<i>'.$count.'</i><span>'.esc_html__('from','eventon').'</span> '. esc_attr($start_dt) .' <span class="e">End</span> '. esc_attr($end_dt) .
-								'<span class="evodfxi evofxdrr evofxaic evoclwi evogap5 evofxjcfe">
-									<em class="evo_rep_edit evodfx evofxjcc evofxaic" alt="Edit"><i class="fa fa-pencil"></i></em>
-									<em class="evo_rep_del evodfx evofxjcc evofxaic" alt="Delete"><i class="fa fa-times"></i></em>
+							echo '<li data-cnt="'.$count.'" style="display:'.(( $count>3)?'none':'flex').'" class="'.($count==0?'initial':'').($count>3?' over':'').' evogap10 evomar0 evopad10 evodfx evofxjcsb evofxaic">'. 
+								'<i class="evo_crep_num evofsn evoop7" style="    font-family: monospace;">'.$count.'</i>
+								<div class="evodfx evofxdrr evogap20 evofx_1 evoff_x">
+									<span class="">'. $start_dt .'</span>
+									<span class="">'. $end_dt .	'</span>
+								</div>
+								<span class="evo_crep_action evodfxi evofxdrr evofxaic evoclwi evogap5 evofxjcfe">
+									'.($count==0? '<dd class="evofz12">'.__('Initial','eventon').'</dd>':'').'
+									<em class="evo_rep_edit evodfx evofxjcc evofxaic evotrans evobr5" alt="Edit"><i class="fa fa-pencil"></i></em>
+									<em class="evo_rep_del evodfx evofxjcc evofxaic evotrans evobr5" alt="Delete"><i class="fa fa-times"></i></em>
 								</span>'.
-							'<input type="hidden" name="repeat_intervals['.esc_attr($count).'][0]" value="'.esc_attr($start_unix).'"/><input type="hidden" name="repeat_intervals['.esc_attr($count).'][1]" value="'.esc_attr($end_unix).'"/></li>';
+							'<input type="hidden" name="repeat_intervals['.$count.'][0]" value="'.$start_unix.'"/><input type="hidden" name="repeat_intervals['.$count.'][1]" value="'.$end_unix.'"/>'
+							.'</li>';
+							
 							$count++;
 						endforeach;	
 					endif;							
