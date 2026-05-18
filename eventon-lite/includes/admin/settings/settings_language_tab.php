@@ -323,6 +323,7 @@ class evo_settings_lang extends EVO_Lang_Settings{
 						'name'=>'evcalL_getdir_title',
 						'legend'=>'Get directions section'
 					),
+					array('label'=>'Get Directions'),
 					array('label'=>'Address copied to clipboard!'),
 					array('label'=>'Copy Destination Address!'),
 					array('label'=>'Time','name'=>'evcal_lang_time'),

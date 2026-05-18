@@ -354,14 +354,18 @@ class EVO_Cal_Event_Structure_Top{
 
 					endif;
 
+
 					// custom fields on eventtop @2.3					
 					if( !empty( $object->cmf_data ) && count( $object->cmf_data )> 0 ){
 						foreach( $object->cmf_data  as $cmf_x => $cmf_data ){
+
 							$cmfO = (object) $cmf_data;
 							if( empty( $cmfO->login_needed_message )){
 
 								
-								if($is_array_eventtop_fields && in_array('cmd'.$cmf_x ,$eventtop_fields) && !empty($object->tags) ):
+								if($is_array_eventtop_fields && in_array('cmd'.$cmf_x ,$eventtop_fields) ):
+
+
 
 									$OT.="<span class='evo_event_cmf level_4'>";
 
