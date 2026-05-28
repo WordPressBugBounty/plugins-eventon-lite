@@ -73,7 +73,7 @@ class EVO_Template_Loader {
 
 			// if single event page is only for loggedin users
 				if( EVO()->cal->check_yn('evosm_loggedin','evcal_1') && !is_user_logged_in()){
-					wp_redirect( evo_login_url() );
+					wp_safe_redirect( evo_login_url() );
 				}
 
 			// if single event template is disabled
@@ -194,24 +194,38 @@ class EVO_Template_Loader {
 // Render Block Templates
 	function add_evo_block_templates($query_result, $query, $template_type){
 
-		$post_type      = isset( $query['post_type'] ) ? $query['post_type'] : '';
-		$slugs          = isset( $query['slug__in'] ) ? $query['slug__in'] : array();
+		$slugs = isset($query['slug__in']) ? $query['slug__in'] : array();
+		//EVO_Debug($slugs);
 
+	    foreach ($slugs as $slug) {
+	    	//EVO_Debug($slug);
 
-		foreach($slugs as $slug){
-			if( !in_array($slug, array(
-				'single-ajde_events',
-				'taxonomy-event_type',
-				'taxonomy-event_organizer',
-				'taxonomy-event_location'
-			))) continue;
-			
-			$query_result[] = $this->template_blocks->get_single_event_template( $slug );			
-		}
+	    	$template_slug_to_load = strpos($slug, 'taxonomy-event_type') === 0 ? 'taxonomy-event_type': $slug;
 
-		$query_result = $this->template_blocks->remove_theme_templates_with_custom_alternative($query_result);
-		
-		return $query_result;
+	        // Check if this template is allowed
+	        $allowed = apply_filters( 'evo_block_templates', array(
+	            'single-ajde_events',
+	            'archive-ajde_events',
+	            'taxonomy-event_type',
+	            'taxonomy-event_organizer',
+	            'taxonomy-event_location'
+	        ), $slug );
+
+	        if ( ! in_array( $template_slug_to_load, $allowed ) ) {
+	            continue;
+	        }
+
+	        $template = $this->template_blocks->get_single_event_template($template_slug_to_load);
+	        
+	        $template->slug = $slug;                    // Important: Use original slug
+        	$template->id   = 'eventon//' . $slug;     // Also update ID to match
+
+	        //EVO_Debug($template);
+	        $query_result[] = $template;
+	    }
+
+	    $query_result = $this->template_blocks->remove_theme_templates_with_custom_alternative($query_result);
+	    return $query_result;
 	}
 
 

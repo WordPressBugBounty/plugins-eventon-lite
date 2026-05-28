@@ -3,11 +3,11 @@
  * Plugin Name: EventON Lite
  * Plugin URI: http://www.myeventon.com/lite
  * Description: A beautifully crafted minimal calendar experience - Lite Version
- * Version: 2.5.4
+ * Version: 2.5.5
  * Author: Ashan Jay
  * Author URI: http://www.ashanjay.com
- * Requires at least: 6.0
- * Tested up to: 6.9.4
+ * Requires at least: 6.5
+ * Tested up to: 7.0
  * 
  * Text Domain: eventon
  * Domain Path: /lang/languages/

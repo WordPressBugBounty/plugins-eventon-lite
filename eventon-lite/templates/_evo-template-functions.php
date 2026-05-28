@@ -91,7 +91,7 @@ function evotemp_before_header(){
 				$vir_url = $EVENT->get_vir_url();
 				
 				if($vir_url){
-					wp_redirect( $vir_url ); exit;
+					wp_safe_redirect( $vir_url ); exit;
 				} 
 			}
 		}

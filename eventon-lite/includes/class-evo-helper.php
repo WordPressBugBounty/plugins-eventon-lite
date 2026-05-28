@@ -207,7 +207,7 @@ class evo_helper{
 			// using WP timezones
 			$html = $this->__get_evo_timezone_choices('UTC');
 
-			preg_match_all('/<option value="([^"]+)">/', $html, $matches);
+			preg_match_all('/<option value="([^"]+)"[^>]*>/', $html, $matches);
 			$tzs = $matches[1];
 
 			$DD = new DateTime( 'now' );

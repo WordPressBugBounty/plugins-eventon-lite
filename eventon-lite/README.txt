@@ -4,8 +4,8 @@ Plugin Name: EventON Lite
 Author URI: http://ashanjay.com/
 Tags: calendar, event calendar, virtual events, events, event management
 Requires at least: 6.0
-Tested up to: 6.9.4
-Stable tag: 2.5.4
+Tested up to: 7.0
+Stable tag: 2.5.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -249,6 +249,10 @@ For support with the Lite version, visit [support forum here](https://wordpress.
 You can report security bugs through the Patchstack Vulnerability Disclosure Program. The Patchstack team helps validate, triage and handle any security vulnerabilities. [Report a security vulnerability.](https://patchstack.com/database/vdp/9e5fbbf9-f1d1-4765-83e5-76b7743a35be)
 
 == Changelog ==
+= 2.5.5 (2026-5-28) = 
+FIXED: timezone dropdown not working
+FIXED: Event type x templates not loading
+
 = 2.5.4 (2026-5-18) = 
 FIXED: get direction translation text
 FIXED: custom meta not showing in eventtop unless event tags are enabled

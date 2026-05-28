@@ -37,7 +37,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 				do_action('evo_after_duplicate_event', $EVENT, $post);
 
 				// Redirect to the edit screen for the new draft page
-				wp_redirect( admin_url( 'post.php?action=edit&post=' . $new_id ) );
+				wp_safe_redirect( admin_url( 'post.php?action=edit&post=' . $new_id ) );
 				exit;
 			}else{
 				wp_die( esc_html(__( 'Event creation failed, could not create duplicate event:', 'eventon' )) . ' ' . esc_attr( $id) );

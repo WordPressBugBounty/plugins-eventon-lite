@@ -132,6 +132,11 @@ public function editor_ajax_calls(){
 	// save changes
 		public function event_tax_save_changes(){
 
+			// permission to save
+			if ( ! current_user_can('edit_eventon') && ! current_user_can('manage_eventon') ) {  
+		        wp_send_json_error( array( 'msg' => __('You do not have permission to perform this action.', 'eventon') ) );
+		    }
+
 			// validate
 			EVO()->helper->validate_request( 'evo_noncename', 'evo_save_term_form', 'read', true, true );	
 			
@@ -209,8 +214,11 @@ public function editor_ajax_calls(){
 
 							// specific to location tax
 							if($value['var']=='location_address'){
+
+								$address = sanitize_text_field( $post_data['location_address'] );
+
 								if(isset($post_data['location_address']))
-									$latlon = eventon_get_latlon_from_address($post_data['location_address']);
+									$latlon = eventon_get_latlon_from_address( $address );
 
 								// longitude
 								$term_meta['location_lon'] = isset($term_meta['location_lon']) ? $term_meta['location_lon']:
@@ -220,7 +228,8 @@ public function editor_ajax_calls(){
 								$term_meta['location_lat'] = isset($term_meta['location_lat']) ? $term_meta['location_lat']:
 									(!empty($latlon['lat'])? floatval($latlon['lat']): null);
 
-								$term_meta['location_address' ] = (isset($post_data[ 'location_address' ]))? $post_data[ 'location_address' ]:null;
+								$term_meta['location_address' ] = (isset($post_data[ 'location_address' ]))? 
+									$address :null;
 
 								continue;
 							}
