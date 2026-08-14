@@ -126,7 +126,7 @@ class EVO_Event_Virtual{
 					<p class='evo_vir_access_title'><span style='display:block'>".  esc_html( evo_lang('You are the moderator of this event. Access the live stream') ) ."</span></p>					
 					<p class='evo_vir_access_actions'><span class='evo_vir_access_actions_in'>";
 					if( $EVENT->virtual_url() && !empty( $EVENT->virtual_url() ) )
-						echo "<a target='_blank' href='". esc_url( $EVENT->virtual_url() ) ."' class='evcal_btn'>". esc_html( evo_lang('Join the Event Now') ) ."</a>";					
+						echo "<a target='_blank' rel='noopener noreferrer' href='". esc_url( $EVENT->virtual_url() ) ."' class='evcal_btn'>". esc_html( evo_lang('Join the Event Now') ) ."</a>";					
 				
 				if($virtual_pass = $EVENT->get_virtual_pass() )
 					echo "<span class='evo_vir_pass'>". esc_html( evo_lang('Password') ). ' <b>' . esc_html( $virtual_pass ) ."</b></span>";
@@ -250,7 +250,7 @@ class EVO_Event_Virtual{
 						<p class='evo_vir_access_title'><span>". esc_html( evo_lang('Join the live stream') ) ."</span></p>					
 						<p class='evo_vir_access_actions'>
 						<span class='evo_vir_access_actions_in'>";
-						if($EVENT->virtual_url()) echo "<a target='_blank' href='". esc_url( $EVENT->virtual_url() ) ."' class='evcal_btn'>". esc_html( evo_lang('Join the Event Now') ) ."</a>";					
+						if($EVENT->virtual_url()) echo "<a target='_blank' rel='noopener noreferrer' href='". esc_url( $EVENT->virtual_url() ) ."' class='evcal_btn'>". esc_html( evo_lang('Join the Event Now') ) ."</a>";					
 					
 					if($virtual_pass)
 						echo "<span class='evo_vir_pass'>". esc_html( evo_lang('Password') ). ' <b>' . esc_html( $virtual_pass ) ."</b></span>";

@@ -65,7 +65,7 @@ class evo_ajde_events{
 			
 			$columns["evo_featured"] = '<span class="evo_posttable evo_posttable_featured ajdeToolTip L" data-label=" '. esc_html__( 'Featured', 'eventon' ) .'" data-d="'. esc_html__( 'Featured', 'eventon' ) .'"></span>';
 			
-			$columns["repeat"] = '<span class="evo_posttable evo_posttable_repeat ajdeToolTip L" data-label=" '. esc_html__( 'Event Repeat', 'eventon' ) .'" data-d="'. esc_html__( 'Event Repeat', 'eventon' ) .'"></span>';
+			
 			//$columns["date"] = esc_html__( 'Date', 'eventon' );
 
 			$columns = apply_filters('evo_event_columns', $columns);	
@@ -262,18 +262,25 @@ class evo_ajde_events{
 
 					echo '<div class="evo_item_details">';
 					
-					
-					echo "<span style='display:block'>";
+					// Event Quick Tags
+					echo "<div style='' class='evodfx evofx_ww evogap5 evomarb5'>";
 					// event status
 					$status = $EVENT->get_event_status();
 					if( $status && $status != 'scheduled') 
 						echo "<span class='evo_item_status ". esc_attr( $status )."'>". esc_html( $EVENT->get_event_status_l18n( $status ) ) ."</span>";
 
 					// virtual event
-					if($EVENT->is_virtual())
+					if($EVENT->is_virtual()){
 						echo "<span class='evo_item_status vir'>". esc_attr( evo_lang( 'Virtual Event' ) )."</span>";
+					}
 
-					echo "</span>";
+					// event repeat status
+						if( $EVENT->is_repeating_event()){
+							$repeat_freq = $EVENT->get_prop('evcal_rep_freq' );
+							echo '<span class="evo_eventedit_row_rep '. esc_attr( $repeat_freq ).' evotooltip free evocenter" data-d="'. __('Repeating Type','eventon').'"><i class="fa fa-repeat evomarr5"></i>'.esc_html( __($repeat_freq, 'eventon') ).'</span>';
+						}
+
+					echo "</div>";
 					
 					// event name
 					if($can_edit_post){
@@ -449,19 +456,6 @@ class evo_ajde_events{
 					//echo get_post_meta($post->ID, '_featured', true);		
 				break;
 				
-				case 'repeat':
-					
-					$repeat = get_post_meta($post->ID, 'evcal_repeat',true);		
-					
-					if(!empty($repeat) && $repeat=='yes'){
-						$repeat_freq = get_post_meta($post->ID, 'evcal_rep_freq',true);
-						$output_repeat = '<span class="evo_eventedit_row_rep '. esc_attr($repeat_freq ).'">'. esc_attr( $repeat_freq ) .'</span>';
-					}else{
-						$output_repeat = '<span class="na">&ndash;</span>';
-					}
-					
-					echo wp_kses_post( $output_repeat );
-				break;
 				case 'event_lang':
 					
 					$lang = get_post_meta($post->ID, '_evo_lang',true);	

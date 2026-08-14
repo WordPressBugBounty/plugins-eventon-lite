@@ -194,13 +194,13 @@ class EVO_Welcome_Page {
 		?>
 			<p class="eventon-actions" style='margin:0'>		
 				
-				<a class="evo_admin_btn btn_prime" href="http://www.myeventon.com/documentation/" target='_blank'><?php esc_html_e( 'Documentation', 'eventon' ); ?></a>
+				<a class="evo_admin_btn btn_prime" href="http://www.myeventon.com/documentation/" target='_blank' rel="noopener noreferrer"><?php esc_html_e( 'Documentation', 'eventon' ); ?></a>
 				
-				<a class="evo_admin_btn btn_prime" href="http://www.myeventon.com/support/" target='_blank'><?php esc_html_e( 'Support', 'eventon' ); ?></a>
+				<a class="evo_admin_btn btn_prime" href="http://www.myeventon.com/support/" target='_blank' rel="noopener noreferrer"><?php esc_html_e( 'Support', 'eventon' ); ?></a>
 
-				<a class="evo_admin_btn btn_prime" href="http://www.myeventon.com/news/" target='_blank'><?php esc_html_e( 'News', 'eventon' ); ?></a>
+				<a class="evo_admin_btn btn_prime" href="http://www.myeventon.com/news/" target='_blank' rel="noopener noreferrer"><?php esc_html_e( 'News', 'eventon' ); ?></a>
 				<a class="evo_admin_btn btn_prime" href="<?php echo esc_url( admin_url( add_query_arg( array( 'page' => 'evo-changelog' ), 'index.php' ) ) ); ?>" ><?php esc_html_e( 'Changelog', 'eventon' ); ?></a>
-				<a href="http://www.twitter.com/myeventon" target='_blank' class="evo_admin_btn btn_prime"><?php esc_html_e( 'Follow on Twitter', 'eventon' ); ?></a>				
+				<a href="http://www.twitter.com/myeventon" target='_blank' rel="noopener noreferrer" class="evo_admin_btn btn_prime"><?php esc_html_e( 'Follow on Twitter', 'eventon' ); ?></a>				
 			</p>
 			<?php /*
 			<h2 class="nav-tab-wrapper">
@@ -250,8 +250,8 @@ class EVO_Welcome_Page {
 					<div class="get_started_in">
 						<h2>
 							<a class='evo_admin_btn btn_prime' href='<?php echo esc_url( admin_url('index.php?page=evo-getting-started'));?>'>Get started</a>
-							<a class='evo_admin_btn btn_prime' href='https://docs.myeventon.com' target='_blank'>Docs</a>
-							<a class='evo_admin_btn btn_prime' href='https://www.youtube.com/playlist?list=PLj0uAR9EylGrROSEOpT6WuL_ZkRgEIhLq' target='_blank'>Videos</a>
+							<a class='evo_admin_btn btn_prime' href='https://docs.myeventon.com' target='_blank' rel="noopener noreferrer">Docs</a>
+							<a class='evo_admin_btn btn_prime' href='https://www.youtube.com/playlist?list=PLj0uAR9EylGrROSEOpT6WuL_ZkRgEIhLq' target='_blank' rel="noopener noreferrer">Videos</a>
 							<a class='evo_admin_btn btn_prime' href='<?php echo esc_url( admin_url('index.php?page=evo-changelog'));?>'>Changelog</a>
 						</h2>
 					</div>
@@ -259,7 +259,7 @@ class EVO_Welcome_Page {
 				</div>
 
 				<div class='evow_credits'>
-					<p style='font-size:14px; margin:0; padding-bottom:3px;opacity: 0.8;text-transform: uppercase;'><a href='http://www.ashanjay.com' target='_blank'>A Product of AshanJay Designs LLC</a></p>
+					<p style='font-size:14px; margin:0; padding-bottom:3px;opacity: 0.8;text-transform: uppercase;'><a href='http://www.ashanjay.com' target='_blank' rel="noopener noreferrer">A Product of AshanJay Designs LLC</a></p>
 				</div>
 			</div>
 		<?php
@@ -339,7 +339,7 @@ class EVO_Welcome_Page {
 					'http://www.myeventon.com/addons/rsvp-events/');?></p>
 
 					<h4><?php esc_html_e( 'Visit the Addons Store', 'eventon' );?></h4>
-					<p><?php esc_html_e( '<a href="http://www.myeventon.com/addons/" target="_blank">The Addon store</a> has a list of all available addons for EventON that you can purchase.', 'eventon' );?></p>
+					<p><?php esc_html_e( '<a href="http://www.myeventon.com/addons/" target="_blank" rel="noopener noreferrer">The Addon store</a> has a list of all available addons for EventON that you can purchase.', 'eventon' );?></p>
 
 				</div>
 			</div>

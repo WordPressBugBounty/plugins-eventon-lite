@@ -4,16 +4,18 @@ Plugin Name: EventON Lite
 Author URI: http://ashanjay.com/
 Tags: calendar, event calendar, virtual events, events, event management
 Requires at least: 6.0
-Tested up to: 7.0
-Stable tag: 2.5.5
+Tested up to: 7.0.4
+Stable tag: 2.5.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Create beautiful, responsive event calendars with unlimited events, repeating schedules, virtual support, and a sleek minimal design!
+Beautiful, responsive event calendar for WordPress. Unlimited events, repeating schedules, virtual events, maps, filters & AI tools. Clean design, SEO-ready, no bloat.
 
 == Description ==
 
-**[EventON Lite](https://myeventon.com/lite)** is the **[#1 best selling Event Calendar plugin on Codecanyon](https://myeventon.com)** (with 63k+ paid installations around the world since 2011). It delivers a clean, modern, and fully responsive calendar that looks professional out of the box — perfect for blogs, businesses, communities, schools, churches, or anyone sharing events.
+**[EventON Lite](https://myeventon.com/lite)** is the free version of the **[#1 best-selling Event Calendar plugin on Codecanyon](https://myeventon.com)** (63,000+ paid installations worldwide since 2011). 
+
+Create a professional, fast, and beautiful event calendar in minutes — no coding required. Perfect for blogs, businesses, churches, schools, communities, and anyone who wants to showcase events without clutter or bloat.
 
 https://youtu.be/DQewHs7XWJE
 
@@ -30,83 +32,74 @@ Ready to take your event calendar to next level and unlock advanced features lik
 
 Experience EventON Full version before you buy at **[EventON Full Demo](https://demo.myeventon.com/)** and **[EventON Addons Demo](https://addons.myeventon.com/)**.
 
+== Why people love EventON Lite ==
+
+- Clean, modern, fully responsive design that looks great out of the box
+- Unlimited events, colors, and categories
+- Powerful repeating schedules (daily, weekly, monthly, yearly + custom)
+- Virtual events support
+- Google Maps + event organizers
+- Search, filter, and sort events easily
+- SEO-ready with Event Schema & JSON-LD
+- Interactive Shortcode Generator + Gutenberg block
+- OpenAI integration to help write event titles, descriptions, and social posts
+- Lightweight and focused — no unnecessary features
 
 == Key Features ==
 
-Over the years we have added many amazing features to EventON.
+<strong>Calendar Experience</strong>
+- Multiple views: Month, Schedule, Tile, Live Now
+- Gradient event colors and custom icons (Font Awesome)
+- Month jumper, load more events, and limit number of events shown
+- Responsive on every device
+- Open events as lightbox, slide-down, new page, or external link
+- Show only featured events or hide past/cancelled events
 
-* Unlimited events, colors and categories
-* Event location (with Google map) and event organizers
-* Set featured image for events
-* Single, Multiple day, and All-day events
-* Month- and year-long events
-* Virtual Events
-* Event Categories (5+ Event types & Tags)
-* Event Custom meta data
-* Event Attendance modes
-* Repeating events (Daily, Weekly, Monthly, Yearly & Custom)
-* Event time as visitor's local time
-* Add to Google Cal and iCal 
-* Feature and prioritize events
-* Sort & Filter events
-* Event Search
-* Related Events
-* Live Now Calendar View
-* Schedule View
-* Various Tile Views
-* Gradient Event Colors
-* Interactive Calendar Generator (Shortcode Generator)
-* Responsive for any device
-* Event Schema and JSON-LD for event SEO
-* Basic paypal payments support
-* OpenAI Integration for Event title, subtitle, description and X post
+<strong>Event Creation Power</strong>
+- Unlimited events with featured images
+- Single-day, multi-day, all-day, month-long, and year-long events
+- Repeating events (daily, weekly, monthly, yearly, custom)
+- Virtual events with attendance modes
+- Event location + Google Maps + Directions
+- Event organizers
+- Custom meta fields
+- Event categories (multiple event types + tags)
+- Feature and prioritize important events
+- Different timezones per event + “view in visitor’s local time”
+- Add to Google Calendar & iCal
 
+<strong>Discovery & Engagement</strong>
+- Event search
+- Sort & filter by category, type, and more
+- Related events
+- Single event box you can place anywhere
+- Widgets for sidebars
+- Location & Organizer archive pages
+
+<strong>Ease of Use & Design</strong>
+- Interactive Shortcode Generator (works in Classic Editor and Blocks)
+- EventCard Designer with multiple layouts
+- Quick edit & bulk edit
+- Built-in language translations
+- Custom CSS support
+- Download all events as CSV or ICS
+
+<strong>Technical & SEO</strong>
+- Event Schema and JSON-LD markup for better search visibility
+- Basic PayPal payments support
+- OpenAI integration for titles, subtitles, descriptions, and X (Twitter) posts
+- Accessible future repeat instances
+- Members-only calendar option
 
 == Ideal for ==
 
-- Event listings & community calendars
-- Workshops, webinars, meetups, or recurring classes
-- Church services, school activities, or local happenings
-- Blogs/sites wanting a beautiful free calendar without bloat
+- Community calendars and local event listings
+- Workshops, webinars, meetups, and recurring classes
+- Church services and school activities
+- Blogs and websites that want a beautiful free calendar without bloat
+- Nonprofits, clubs, and small businesses
 
 See it live: **[EventON Lite Demo](https://demolite.myeventon.com/)** !
-
-
-== Other Features ==
-
-* Various event interaction types: Do nothing, Slide down, Open a link, Open as lightbox, Open single event page
-* Jump months on calendar using Month jumper
-* Set different timezones for events
-* Set custom icons (by fontawesome)
-* Accessibile future repeat instances of event
-* Location & Organizer archive page
-* Various Widgets for sidebar
-* Learn more link for events
-* Ability to hide event end time
-* Support for various event status & attendance modes
-* Single event box anywhere you want on your website
-* Interactive Eventcard Designer with various layout
-* Quick edit and Bulk edit vital event data
-* Limit number of events on calendar
-* Load more events on calendar as you go
-* Show events from fixed month/year
-* Move month/year long events to top of the calendar
-* Show only featured events in the calendar
-* Hide featured events from calendar
-* Open eventcards on page load or as accordion style
-* Show month navigation at the bottom of the calendar
-* Hide all cancelled events
-* Hide past events by start or end time
-* Calendar filter as a dropdown list or multiple checkboxes
-* Various eventtop data to create desired event calendar styles
-* Make the calendar only visible to loggedin users with shortcode members_only='yes'
-* Hide multiple occurance of events in event list months
-* Show only parts of events on single event box
-* Download all events as CSV or ICS
-* Various Google map styles and custom zoom level
-* Build-in easy language translations
-* Add custom CSS styles
-* Output just raw event data values using shortcode for any event (v2.2)
 
 == EventON Documentation & Support ==
 
@@ -249,6 +242,14 @@ For support with the Lite version, visit [support forum here](https://wordpress.
 You can report security bugs through the Patchstack Vulnerability Disclosure Program. The Patchstack team helps validate, triage and handle any security vulnerabilities. [Report a security vulnerability.](https://patchstack.com/database/vdp/9e5fbbf9-f1d1-4765-83e5-76b7743a35be)
 
 == Changelog ==
+= 2.5.6 (2026-8-14) = 
+FIXED: target blank links to have proper rel attributes
+FIXED: date of 3 characters on custom date not working
+FIXED: virtual event link redirecting to admin page
+UPDATED: calendar header month year separate HTML elements
+UPDATED: event edit page repeating type column moved to event name
+UPDATED: get directions to use tranportation modes
+
 = 2.5.5 (2026-5-28) = 
 FIXED: timezone dropdown not working
 FIXED: Event type x templates not loading

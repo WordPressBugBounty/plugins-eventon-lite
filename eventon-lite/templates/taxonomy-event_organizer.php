@@ -34,10 +34,11 @@
 
 	// organizer link
 		$organizer_link_target = (!empty($term_meta['_evocal_org_exlink_target']) && $term_meta['_evocal_org_exlink_target'] == 'yes')? '_blank':'';
+		$rel = $organizer_link_target == '_blank' ? 'rel="noopener noreferrer"': '';
 
 		$organizer_term_link = !empty($term_meta['evcal_org_exlink']) ? evo_format_link($term_meta['evcal_org_exlink']): false;
 
-		$organizer_term_name = $organizer_term_link ? '<a target="'.$organizer_link_target.'" href="'. $organizer_term_link .'">' . $term->name . '</a>' : $term->name; 
+		$organizer_term_name = $organizer_term_link ? '<a target="'.$organizer_link_target.'" href="'. $organizer_term_link .'" '. $rel.'>' . $term->name . '</a>' : $term->name; 
 
 ?>
 
@@ -98,7 +99,7 @@
 							?>			
 
 							<?php if( $organizer_term_link):?>
-								<p class='mar0 pad0'><a class='evo_btn evcal_btn' href='<?php echo esc_url( $organizer_term_link );?>' target='<?php echo esc_attr( $organizer_link_target );?>'><?php evo_lang_e('Learn More');?></a></p>
+								<p class='mar0 pad0'><a class='evo_btn evcal_btn' href='<?php echo esc_url( $organizer_term_link );?>' target='<?php echo esc_attr( $organizer_link_target );?>' <?php echo $rel;?>><?php evo_lang_e('Learn More');?></a></p>
 							<?php endif;?>
 
 						</div>

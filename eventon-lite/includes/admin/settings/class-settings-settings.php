@@ -157,6 +157,12 @@ class evo_settings_settings{
 					array('id'=>'evo_gmap_iconurl','type'=>'text','name'=>__('Custom map marker icon complete http url','eventon'),
 						'legend'=> __('Type a complete http:// url for a PNG image that can be used instead of the default red google map markers.','eventon'),'default'=>'eg. http://www.site.com/image.png'
 					),
+					array('id'=>'evo_map_dir_field',
+						'type'=>'yesno',
+						'name'=>__('Add type your address to get directions field','eventon'), 
+						'legend'=>__('Add input fields for visitor to type their address and get direction.','eventon'),
+						'ver'=> '2.5.6',
+					),
 
 					array('id'=>'evo_gen_map',
 						'type'=>'yesno',
@@ -225,8 +231,13 @@ class evo_settings_settings{
 							array('id'=>'evo_timeF','type'=>'begin_afterstatement'),
 							array('id'=>'evo_timeF_v','type'=>'text','name'=>__('Date Format','eventon'), 'default'=>'F j (l)'),
 							array('id'=>'evo_timeF_tf','type'=>'text','name'=>__('Time Format','eventon'), 'default'=> EVO()->calendar->time_format ),
-							array('id'=>'evcal_api_mu_note','type'=>'note',
-								'name'=>__('Refer to guide for acceptable date/time format values: php <a href="https://www.php.net/manual/en/datetime.format.php" target="_blank">date()</a> Use \ to add special characters eg. \a\t H:i','eventon')),
+							array('id'=>'evcal_api_mu_note','type'=>'note',								
+								'name' => sprintf(
+						        /* translators: %s: link to the PHP date() documentation */
+						        __( 'Refer to guide for acceptable date/time format values: php %s. Use \\ to add special characters eg. \\a\\t H:i', 'eventon' ),
+						        '<a href="https://www.php.net/manual/en/datetime.format.php" target="_blank">date()</a>'
+						    ),
+							),
 							array('id'=>'evo_timeF','type'=>'end_afterstatement'),
 
 						array('id'=>'evo_show_localtime','type'=>'yesno',
@@ -487,7 +498,7 @@ class evo_settings_settings{
 						'name'=>__('Stop using eventON single event template for single event pages','eventon'),
 						'legend'=>'If you dont want eventON single events template been used for individual event pages you can enable this option to stop using single event template altogether and fall back to default theme template'),
 						array('id'=>'evcal__note','type'=>'note',
-							'name'=> sprintf(__('<a href="%s" target="_blank"class="evo_admin_btn btn_triad">Learn How to customize events archive page</a></br>' ,'eventon'), 'http://www.myeventon.com/documentation/how-to-customize-events-archive-page/') 
+							'name'=> sprintf(__('<a href="%s" target="_blank" rel="noopener noreferrer" class="evo_admin_btn btn_triad">Learn How to customize events archive page</a></br>' ,'eventon'), 'http://www.myeventon.com/documentation/how-to-customize-events-archive-page/') 
 						),
 
 
@@ -1115,7 +1126,7 @@ class evo_settings_settings{
 
 			// Note
 				$etc[] = array('id'=>'evo_note','type'=>'note',
-					'name'=>sprintf(__('Want more than 5 event categories? <a href="%s" target="_blank"class="evo_trig_doc" data-get="increase-event-type-count">%s</a>' ,'eventon'), 
+					'name'=>sprintf(__('Want more than 5 event categories? <a href="%s" target="_blank" rel="noopener noreferrer" class="evo_trig_doc" data-get="increase-event-type-count">%s</a>' ,'eventon'), 
 						'https://docs.myeventon.com/documentations/increase-event-type-count/',
 						__('Extend categories using pluggable functions','eventon'),
 						) 

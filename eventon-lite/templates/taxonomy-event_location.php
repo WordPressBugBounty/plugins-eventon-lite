@@ -50,11 +50,12 @@
 		
 	// location link
 		$location_link_target = (!empty($term_meta['evcal_location_link_target']) && $term_meta['evcal_location_link_target'] == 'yes')? '_blank':'';
+		$rel = $location_link_target == '_blank' ? 'rel="noopener noreferrer"': '';
 
 		$location_term_link = !empty($term_meta['evcal_location_link']) ? evo_format_link($term_meta['evcal_location_link']) : false;
 
 		$location_term_name = $location_term_link ? 
-			'<a target="'.$location_link_target.'" href="'. $location_term_link .'">' .  $term->name . '</a>':
+			'<a target="'.$location_link_target.'" '. $rel.' href="'. $location_term_link .'">' .  $term->name . '</a>':
 			 $term->name;
 
 
@@ -91,7 +92,7 @@
 							</div>
 
 							<?php if( $location_term_link):?>
-								<p class='mar0 pad0'><a class='evo_btn evcal_btn' href='<?php echo esc_url($location_term_link);?>' target='<?php echo esc_attr($location_link_target);?>'><?php esc_attr(evo_lang_e('Learn More'));?></a></p>
+								<p class='mar0 pad0'><a class='evo_btn evcal_btn' href='<?php echo esc_url($location_term_link);?>' target='<?php echo esc_attr($location_link_target);?>' <?php echo $rel;?>><?php esc_attr(evo_lang_e('Learn More'));?></a></p>
 							<?php endif;?>
 						</div>
 

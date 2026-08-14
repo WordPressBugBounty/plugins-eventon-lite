@@ -680,7 +680,7 @@ class EVO_General_Elements extends EVO_Elm_Trigs{
 			break;
 			// @2.3
 			case 'detailed_button':
-				$_target = $_blank ? 'target="_blank"' : null;
+				$_target = $_blank ? 'target="_blank" rel="noopener noreferrer"' : null;
 
 				$_extra = $_attr_class = '';
 

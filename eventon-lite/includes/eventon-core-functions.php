@@ -1452,15 +1452,13 @@ require EVO_ABSPATH. 'includes/evo-conditional-functions.php';
 			foreach($str as $st){
 				switch($st){
 					case 'm':
-						$new_str.= eventon_return_timely_names_('month_num_to_name',$month_number, 'full', $lang);
-
-						
+						$new_str.= "<span class='evo_header_mo'>". eventon_return_timely_names_('month_num_to_name',$month_number, 'full', $lang) . "</span>";		
 					break;
 					case 'Y':
-						$new_str.= $year_number;
+						$new_str.= "<span class='evo_header_yr'>". $year_number . "</span>";
 					break;
 					case 'y':
-						$new_str.= substr($year_number, -2);
+						$new_str.= "<span class='evo_header_yr'>". substr($year_number, -2) . "</span>";
 					break;
 					default:
 						$new_str.= $st;

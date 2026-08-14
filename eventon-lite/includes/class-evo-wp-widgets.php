@@ -68,7 +68,7 @@ class EvcalWidget extends WP_Widget{
 						'id'=> esc_attr( $this->get_field_name('ev_cal_id') ),
 						'value'=> esc_attr( $ev_cal_id ),
 						'name'=> esc_html('Widget ID','eventon'),
-						'tooltip'=> esc_html('Set a custom ID for widget calendar to separate it from other eventON calendar widgets. Specially if you have more than one eventON calendar widgets. <a href="http://www.myeventon.com/documentation/shortcode-guide/" target="_blank">What should be the ID</a> DO NOT leave blank space.','eventon'),
+						'tooltip'=> esc_html('Set a custom ID for widget calendar to separate it from other eventON calendar widgets. Specially if you have more than one eventON calendar widgets. <a href="http://www.myeventon.com/documentation/shortcode-guide/" target="_blank" rel="noopener noreferrer">What should be the ID</a> DO NOT leave blank space.','eventon'),
 						'tooltip_position'=>'L'
 					),
 					array(
@@ -598,7 +598,7 @@ class EvcalWidget extends WP_Widget{
 					));
 					?>	
 				</div>
-				<p style='opacity:0.6'><i><?php esc_html_e('If you are not able to achieve what you desire, try','eventon')?> <a href='http://www.myeventon.com/documentation/use-eventon-shortcode-executor-widget/' target='_blank'><?php esc_html_e('EventON Shortcode Executor Widget','eventon');?></a></i></p>	
+				<p style='opacity:0.6'><i><?php esc_html_e('If you are not able to achieve what you desire, try','eventon')?> <a href='http://www.myeventon.com/documentation/use-eventon-shortcode-executor-widget/' target='_blank' rel="noopener noreferrer"><?php esc_html_e('EventON Shortcode Executor Widget','eventon');?></a></i></p>	
 			</div>
 			<?php
 		}

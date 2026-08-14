@@ -372,7 +372,7 @@ class EVO_Cal_Event_Structure_Top{
 									// button type
 									if( $cmfO->type == 'button' && !empty( $cmfO->valueL ) ){
 
-										$_target = (!empty($cmfO->_target) && $cmfO->_target=='yes')? 'target="_blank"':null;
+										$_target = (!empty($cmfO->_target) && $cmfO->_target=='yes')? 'target="_blank" rel="noopener noreferrer"':null;
 
 										$OT .="<span href='". esc_url( $cmfO->valueL ) ."' {$_target} class='evcal_btn evo_cusmeta_btn'>". esc_html( $cmfO->value ) ."</span>";
 									// All other types

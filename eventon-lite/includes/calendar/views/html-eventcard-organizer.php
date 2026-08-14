@@ -14,7 +14,7 @@ $EO = $event_organizer;
 $img_src = (!empty($event_organizer->organizer_img_id)? 
 	wp_get_attachment_image_src($event_organizer->organizer_img_id,'medium'): null);
 
-$newdinwow = (!empty($event_organizer->organizer_link_target) && $event_organizer->organizer_link_target=='yes')? 'target="_blank"':'';
+$newdinwow = (!empty($event_organizer->organizer_link_target) && $event_organizer->organizer_link_target=='yes')? 'target="_blank" rel="noopener noreferrer"':'';
 
 // Organizer link
 	$org_link = '';
@@ -86,7 +86,7 @@ $OT.= "<div class='evo_metarow_organizer evorow evcal_evdata_row evcal_evrow_sm 
 
 					if( $key == 'twitter') $key = 'x-'. $key;
 						
-					$org_social .= "<a target='_blank' href='". $url . "'><i class='fa fa-{$key}'></i></a>";
+					$org_social .= "<a target='_blank' rel='noopener noreferrer' href='". $url . "'><i class='fa fa-{$key}'></i></a>";
 				}
 				if( !empty($org_social)) 
 					$org_data .= "<div class='evo_card_organizer_social'>" .$org_social ."</div>";

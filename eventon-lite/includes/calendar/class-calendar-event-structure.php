@@ -264,7 +264,7 @@ class EVO_Cal_Event_Structure extends EVO_Cal_Event_Structure_Top{
 					case "learnmore":
 						// learn more link with pluggability
 						$learnmore_link = !empty($EVENT->get_prop('evcal_lmlink'))? apply_filters('evo_learnmore_link', $EVENT->get_prop('evcal_lmlink'), $object): false;
-						$learnmore_target = ($EVENT->get_prop('evcal_lmlink_target')  && $EVENT->get_prop('evcal_lmlink_target')=='yes')? 'target="_blank"':null;
+						$learnmore_target = ($EVENT->get_prop('evcal_lmlink_target')  && $EVENT->get_prop('evcal_lmlink_target')=='yes')? 'target="_blank" rel="noopener noreferrer"':null;
 
 						if(!$learnmore_link) break;
 						

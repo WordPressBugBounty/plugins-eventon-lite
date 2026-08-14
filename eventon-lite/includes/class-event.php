@@ -1,7 +1,7 @@
 <?php
 /**
  * Event Class for one event
- * @version 2.5
+ * @version 2.5.6
  */
 
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
@@ -633,7 +633,7 @@ class EVO_Event extends EVO_Data_Store{
 					case 'M':
 						$DT3[ $kk ] = eventon_return_timely_names_('month_num_to_name',$DT2['n']);	break;
 					case 'D':
-						$DT3[ $kk ] = eventon_return_timely_names_('day_num_to_name',$DT2['N']);	break;
+						$DT3[ $kk ] = eventon_return_timely_names_('day_num_to_name',$DT2['N'], 'three');	break;
 					case 'a':
 						$DT3[ $kk ] = eventon_return_timely_names_('ampm',$DT2['a']);	break;
 					case 'A':

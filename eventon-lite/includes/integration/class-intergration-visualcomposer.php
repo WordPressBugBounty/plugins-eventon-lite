@@ -36,7 +36,9 @@ class evo_vc_intergration{
 	         	array(
 	            	"type" => "evonotes",
 	            	"holder" => "div",'param_name'=>'evonotes',
-	            	"content" => __( "To use the full range of eventON supported shortcode options, use eventON <a href='http://www.myeventon.com/documentation/shortcode-generator/' target='_blank'>Shortcode Generator</a> to generator an eventON shortcode string and then place that inside a <b>Text Block</b> within Visual Composer. Options available in this Visual Composer element for eventON are only common used options.", "eventon" ),
+	            	"content" => sprintf(__( "To use the full range of eventON supported shortcode options, use eventON  to generator an eventON shortcode string and then place that inside a <b>Text Block</b> within Visual Composer. Options available in this Visual Composer element for eventON are only common used options.", "eventon" ),
+	            		"<a href='http://www.myeventon.com/documentation/shortcode-generator/ target='_blank'>Shortcode Generator</a>"
+	            	),
 	         	),array(
 	            	"type" => "evoyesno",
 	            	"param_name" => "show_et_ft_img",

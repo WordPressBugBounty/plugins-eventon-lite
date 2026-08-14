@@ -582,7 +582,7 @@
 		color: #1f1f1f;
 		position: absolute;
 		right: 15px;
-		top: 13px;
+		top: 17px;
 		font: 400 16px/1 dashicons;
 		-webkit-font-smoothing: antialiased;
   		-moz-osx-font-smoothing: grayscale;
@@ -601,7 +601,7 @@
 	.evomb_icon.evII{background-position:top center;}
 	.evomb_icon.evII i{color: var(--evo_color_1);font-size: 18px;}
 	.evomb_header p{
-		padding-left:40px; 
+		padding-left:30px; 
 		margin:0;
 		padding-top:3px;
 		color:var(--evo_color_1);
@@ -615,7 +615,7 @@
 	}
 	.evomb_body{
 		color: var(--evo_color_1);
-	    padding: 15px;
+	    padding: 0 15px 15px;
 	    font: 13px var(--evo_main_font);
 	}
 	.evomb_body .yesno_leg_line label{color:#808080;}

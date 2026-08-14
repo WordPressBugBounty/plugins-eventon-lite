@@ -146,51 +146,51 @@ class evo_cal_help {
 					'key'=>'eventonsm_fbs',
 					'counter' =>1,
 					'favicon' => 'likecounter.png',
-					'url' => '<a class=" evo_ss" target="_blank" onclick="'.$fb_js.'"
+					'url' => '<a class=" evo_ss" target="_blank" rel="noopener noreferrer" onclick="'.$fb_js.'"
 						href="//www.facebook.com/sharer.php?u=PERMALINK" title="'.evo_lang('Share on facebook').'"><i class="fa fab fa-facebook"></i></a>',
 				),
 				'Twitter'    => array(
 					'key'=>'eventonsm_tw',
 					'counter' =>1,
 					'favicon' => 'twitter.png',
-					'url' => '<a class="tw evo_ss" onclick="'.$tw_js.'" href="//twitter.com/intent/tweet?text=TITLECOUNT&#32;-&#32;&url=PERMALINK" title="'.evo_lang('Share on Twitter').'" rel="nofollow" target="_blank" data-url="PERMALINK"><i class="fa fab fa-x-twitter"></i></a>',
+					'url' => '<a class="tw evo_ss" onclick="'.$tw_js.'" href="//twitter.com/intent/tweet?text=TITLECOUNT&#32;-&#32;&url=PERMALINK" title="'.evo_lang('Share on Twitter').'" rel="nofollow" target="_blank" rel="noopener noreferrer" data-url="PERMALINK"><i class="fa fab fa-x-twitter"></i></a>',
 				),
 				'LinkedIn'=> array(
 					'key'=>'eventonsm_ln',
 					'counter'=>1,'favicon' => 'linkedin.png',
-					'url' => '<a class="li evo_ss" href="//www.linkedin.com/shareArticle?mini=true&url=PERMALINK&title=TITLE&summary=SUMMARY" target="_blank" title="'.evo_lang('Share on Linkedin').'"><i class="fa fab fa-linkedin"></i></a>',
+					'url' => '<a class="li evo_ss" href="//www.linkedin.com/shareArticle?mini=true&url=PERMALINK&title=TITLE&summary=SUMMARY" target="_blank" rel="noopener noreferrer" title="'.evo_lang('Share on Linkedin').'"><i class="fa fab fa-linkedin"></i></a>',
 				),						
 				'Pinterest' => Array (
 					'key'=>'eventonsm_pn',
 					'counter' =>1,
 					'favicon' => 'pinterest.png',
 					'url' => '<a class="pn evo_ss" href="//www.pinterest.com/pin/create/button/?url=PERMALINK&media=IMAGEURL&description=SUMMARY"
-				        data-pin-do="buttonPin" data-pin-config="above" target="_blank" title="'.evo_lang('Share on Pinterest').'"><i class="fa fab fa-pinterest"></i></a>'
+				        data-pin-do="buttonPin" data-pin-config="above" target="_blank" rel="noopener noreferrer" title="'.evo_lang('Share on Pinterest').'"><i class="fa fab fa-pinterest"></i></a>'
 				),
 				'Whatsapp' => Array (
 					'key'=>'eventonsm_wa',
 					'counter' =>1,
 					'favicon' => 'whatsapp.png',
 					'url' => '<a class="wa evo_ss" href="https://api.whatsapp.com/send?text=PERMALINK"
-				        data-action="share/whatsapp/share" target="_blank" title="'.evo_lang('Share on Whatsapp').'"><i class="fa fab fa-whatsapp"></i></a>'
+				        data-action="share/whatsapp/share" target="_blank" rel="noopener noreferrer" title="'.evo_lang('Share on Whatsapp').'"><i class="fa fab fa-whatsapp"></i></a>'
 				),
 				// 2.2.13
 				'Reddit' => Array (
 					'key'=>'eventonsm_rd',
 					'counter' =>1,
 					'favicon' => 'reddit.png',
-					'url' => '<a class="rd evo_ss" href="https://reddit.com/submit?url=PERMALINK" rel="noopener" target="_blank" title="'.evo_lang('Share on Reddit').'"><i class="fa fab fa-reddit"></i></a>'
+					'url' => '<a class="rd evo_ss" href="https://reddit.com/submit?url=PERMALINK" rel="noopener" target="_blank" rel="noopener noreferrer" title="'.evo_lang('Share on Reddit').'"><i class="fa fab fa-reddit"></i></a>'
 				),
 				'SMS' => Array (
 					'key'=>'eventonsm_sms',
 					'counter' =>1,
 					'favicon' => 'sms.png',
 					'url' => '<a class="sms evo_ss" href="sms:?body=PERMALINK"
-				         target="_blank" title="'.evo_lang('Share via SMS').'"><i class="fa fa-comment"></i></a>'
+				         target="_blank" rel="noopener noreferrer" title="'.evo_lang('Share via SMS').'"><i class="fa fa-comment"></i></a>'
 				),
 				'EmailShare' => Array (
 					'key'=>'eventonsm_email',						
-					'url' => '<a class="em evo_ss" href="HREF" target="_blank"><i class="fa fa-envelope"></i></a>'
+					'url' => '<a class="em evo_ss" href="HREF" target="_blank" rel="noopener noreferrer"><i class="fa fa-envelope"></i></a>'
 				)						
 			));
 			

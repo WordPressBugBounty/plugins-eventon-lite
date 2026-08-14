@@ -42,7 +42,7 @@ if(
 			if($object->type=='button'){
 
 				$link = $EVENT->process_dynamic_tags( $object->valueL );	
-				$_target = (!empty($object->_target) && $object->_target=='yes')? 'target="_blank"':null;
+				$_target = (!empty($object->_target) && $object->_target=='yes')? 'target="_blank" rel="noopener noreferrer"':null;
 
 				// above button content
 				if( $cmf_above = $EVENT->get_prop('_'.$cmf_key.'_T')){

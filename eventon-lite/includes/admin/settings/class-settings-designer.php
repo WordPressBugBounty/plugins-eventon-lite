@@ -75,7 +75,7 @@ class EVO_Settings_Designer{
 					$type = $field['type'];
 					$id = $field['id'] ?? '';
         			$value = $data[$id] ?? ($field['default'] ?? '');
-        			$name = __($field['name'] ?? '', 'eventon');
+        			$name = $field['name'] ?? '';
         			$legend_code = $this->get_legend($field);
         			$skip_hr = in_array($type, self::NO_HR_TYPES, true) || !empty($field['afterstatement']);
 
@@ -106,7 +106,7 @@ class EVO_Settings_Designer{
 						case 'notice':
 							$rightside .= EVO()->elements->get_element([
 			                    'type' => 'notice',
-			                    'name' => $name . $legend,
+			                    'name' => $name . ( $legend ?? ''),
 			                    'row_class' => 'ajdes_notice'
 			                ]) ;
 							

@@ -38,7 +38,7 @@ if(!empty($EventData['location_name']) || !empty($EventData['location_address'])
 
 					if(!empty($location_address) && $location_address != $location_name ){
 						$encoded_address = urlencode($location_address);
-						$gmap_link = "<a href='https://www.google.com/maps?q={$encoded_address}' target='_blank'><i class='fa fa-arrow-up-right-from-square'></i></a>";
+						$gmap_link = "<a href='https://www.google.com/maps?q={$encoded_address}' target='_blank' rel='noopener noreferrer'><i class='fa fa-arrow-up-right-from-square'></i></a>";
     
 						echo "<p class='evo_location_address evodfxi evogap10'>". $locationLink . stripslashes($location_address) . ($locationLink? '</a>':'') . $gmap_link . "</p>";
 					}
@@ -56,7 +56,7 @@ if(!empty($EventData['location_name']) || !empty($EventData['location_address'])
 					?>
 					<a href="https://maps.apple.com/?q=<?php echo $encoded_address; ?>"
 					   target="_blank"
-					   rel="noopener"
+					   rel="noopener noreferrer"
 					   class="evo_openmap_trig evo_btn_arr evomart10i"
 					   data-d="<?php echo $encoded_address; ?>">
 					   <i class="fa fa-location-arrow evodfxi evofxaic" aria-hidden="true" style="    margin: 0 10px 0 0;"></i> 

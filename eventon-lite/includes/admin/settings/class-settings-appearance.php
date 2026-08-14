@@ -18,7 +18,7 @@ class evoadmin_set_appearance{
 		return apply_filters('eventon_appearance_add', 
 			array(
 				array('id'=>'evo_notice_1','type'=>'notice',				
-					'name'=>sprintf(__('Once you make changes to appearance make sure to clear browser and website cache to see results. <br/>Can not find appearance? <a href="%s" target="_blank" class="evo_trig_doc">See how you can add custom styles to change additional appearances</a>','eventon'),'https://docs.myeventon.com/documentations/change-css-calendar/') 
+					'name'=>sprintf(__('Once you make changes to appearance make sure to clear browser and website cache to see results. <br/>Can not find appearance? <a href="%s" target="_blank" rel="noopener noreferrer" class="evo_trig_doc">See how you can add custom styles to change additional appearances</a>','eventon'),'https://docs.myeventon.com/documentations/change-css-calendar/') 
 				)
 				
 				,array('id'=>'evoapp_code_1', 'type'=>'customcode','code'=>$this->appearance_theme_selector(), )

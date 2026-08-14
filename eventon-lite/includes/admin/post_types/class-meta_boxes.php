@@ -153,7 +153,7 @@ class evo_event_metaboxes{
 				
 				array(
 					'id'=>'ev_timedate',
-					'name'=>esc_html__('Time and Date','eventon'),	
+					'name'=>esc_html__('Time & Date','eventon'),	
 					'hiddenVal'=>'',	
 					'iconURL'=>'fa-clock-o','variation'=>'customfield','iconPOS'=>'',
 					'type'=>'code',
@@ -384,16 +384,17 @@ class evo_event_metaboxes{
 
 			ob_start();
 			?>
-					<div class='evomb_section additional_functionality evodfx evofxdrc' id='ev_add_func'>			
+					<div class='evomb_section additional_functionality evodfx evofxdrc' id='ev_add_func' style="border-bottom:none;">			
 						<div class='evomb_header'>
-							<span class="evomb_icon evII"><i class="fa fa-plug"></i></span>
-							<p><?php esc_html( esc_html_e('Expand EventON Lite','eventon') );?></p>
+							<span class="evomb_icon evII"><i class="fa fa-bolt"></i></span>
+							<p><?php esc_html( esc_html_e('Upgrade EventON Lite','eventon') );?></p>
 						</div>
 						<div class='evomb_body' style=''>
-							<p style='padding:15px 25px; margin:0; background-color:#f9d29f;background: linear-gradient(45deg, #f9d29f, #ff9f5b); color:#474747; text-align:center;border-radius: 10px; ' class="evomb_body_additional">
-								<span style='text-transform:uppercase; font-size:18px; display:block; font-weight:bold'><?php esc_html(esc_html_e('Need more cool features?','eventon'));?></span>
+							<p style='padding:25px; margin:0; background-color:#f9d29f;background: linear-gradient(45deg, #a9e8ff, #65dfff); color:var(--evo_color_1); border-radius: 10px; ' class="evomb_body_additional">
+								<span style='text-transform:uppercase; font-size:18px; display:block; font-weight:bold'>
+									<i class='evomarr10 fa fa-web-awesome'></i><?php esc_html(esc_html_e('Need more cool features?','eventon'));?></span>
 								<span style='font-weight:normal'><?php echo sprintf(
-									__('Like selling tickets, front-end event submissions, RSVPing to events, sliders and etc.?<br/> <a class="evo_btn" href="%1$s" target="_blank" style="margin-top:10px;">EventON FUll</a><a class="evo_btn" href="%2$s" target="_blank" style="margin-top:10px;">EventON addons</a>',
+									__('Like selling tickets, front-end event submissions, RSVPing to events, sliders and etc.?<br/> <a class="evo_btn" href="%1$s" target="_blank" rel="noopener noreferrer"style="margin-top:10px;">EventON Full</a><a class="evo_btn" href="%2$s" target="_blank" rel="noopener noreferrer" style="margin-top:10px;">EventON addons</a>',
 										'eventon'
 									), 
 									'https://www.myeventon.com',
