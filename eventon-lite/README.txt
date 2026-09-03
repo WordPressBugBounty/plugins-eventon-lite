@@ -4,12 +4,12 @@ Plugin Name: EventON Lite
 Author URI: http://ashanjay.com/
 Tags: calendar, event calendar, virtual events, events, event management
 Requires at least: 6.0
-Tested up to: 7.0.4
-Stable tag: 2.5.6
+Tested up to: 7.1
+Stable tag: 2.5.7
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Beautiful, responsive event calendar for WordPress. Unlimited events, repeating schedules, virtual events, maps, filters & AI tools. Clean design, SEO-ready, no bloat.
+Beautiful responsive event calendar for WordPress. Unlimited events, repeating schedules, virtual events, maps, filters & AI. Clean design, SEO-ready.
 
 == Description ==
 
@@ -48,6 +48,7 @@ Experience EventON Full version before you buy at **[EventON Full Demo](https://
 == Key Features ==
 
 <strong>Calendar Experience</strong>
+
 - Multiple views: Month, Schedule, Tile, Live Now
 - Gradient event colors and custom icons (Font Awesome)
 - Month jumper, load more events, and limit number of events shown
@@ -56,6 +57,7 @@ Experience EventON Full version before you buy at **[EventON Full Demo](https://
 - Show only featured events or hide past/cancelled events
 
 <strong>Event Creation Power</strong>
+
 - Unlimited events with featured images
 - Single-day, multi-day, all-day, month-long, and year-long events
 - Repeating events (daily, weekly, monthly, yearly, custom)
@@ -69,6 +71,7 @@ Experience EventON Full version before you buy at **[EventON Full Demo](https://
 - Add to Google Calendar & iCal
 
 <strong>Discovery & Engagement</strong>
+
 - Event search
 - Sort & filter by category, type, and more
 - Related events
@@ -77,6 +80,7 @@ Experience EventON Full version before you buy at **[EventON Full Demo](https://
 - Location & Organizer archive pages
 
 <strong>Ease of Use & Design</strong>
+
 - Interactive Shortcode Generator (works in Classic Editor and Blocks)
 - EventCard Designer with multiple layouts
 - Quick edit & bulk edit
@@ -85,6 +89,7 @@ Experience EventON Full version before you buy at **[EventON Full Demo](https://
 - Download all events as CSV or ICS
 
 <strong>Technical & SEO</strong>
+
 - Event Schema and JSON-LD markup for better search visibility
 - Basic PayPal payments support
 - OpenAI integration for titles, subtitles, descriptions, and X (Twitter) posts
@@ -242,6 +247,10 @@ For support with the Lite version, visit [support forum here](https://wordpress.
 You can report security bugs through the Patchstack Vulnerability Disclosure Program. The Patchstack team helps validate, triage and handle any security vulnerabilities. [Report a security vulnerability.](https://patchstack.com/database/vdp/9e5fbbf9-f1d1-4765-83e5-76b7743a35be)
 
 == Changelog ==
+= 2.5.7 (2026-9-3) = 
+FIXED: undefined $ri error on frontend
+UPDATED: handlebars.js library to version 4.7.9
+
 = 2.5.6 (2026-8-14) = 
 FIXED: target blank links to have proper rel attributes
 FIXED: date of 3 characters on custom date not working

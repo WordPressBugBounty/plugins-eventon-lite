@@ -135,7 +135,7 @@ class evo_frontend {
 		            $repeat_interval = get_query_var('repeat_interval');
 
 		            // Fetch the specific event data
-		            $EVENT = new EVO_Event($event_id,'',$ri);
+		            $EVENT = new EVO_Event($event_id,'',$repeat_interval);
 					$EVENT->get_event_post();
 		            	
 		            // validations
