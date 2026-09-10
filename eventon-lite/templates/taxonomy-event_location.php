@@ -6,7 +6,7 @@
  
  *	@Author: AJDE
  *	@EventON
- *	@version: 2.2.21
+ *	@version: 2.5.8
  */	
 	
 
@@ -45,7 +45,7 @@
 			}
 		}else{
 			if($location_latlan) $location_type = 'latlng';
-			$location_address = stripslashes($term_meta['location_address']);
+			$location_address = stripslashes( esc_attr( $term_meta['location_address'] ) );
 		}
 		
 	// location link

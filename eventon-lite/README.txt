@@ -5,7 +5,7 @@ Author URI: http://ashanjay.com/
 Tags: calendar, event calendar, virtual events, events, event management
 Requires at least: 6.0
 Tested up to: 7.1
-Stable tag: 2.5.7
+Stable tag: 2.5.8
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -247,6 +247,10 @@ For support with the Lite version, visit [support forum here](https://wordpress.
 You can report security bugs through the Patchstack Vulnerability Disclosure Program. The Patchstack team helps validate, triage and handle any security vulnerabilities. [Report a security vulnerability.](https://patchstack.com/database/vdp/9e5fbbf9-f1d1-4765-83e5-76b7743a35be)
 
 == Changelog ==
+= 2.5.8 (2026-9-10) = 
+FIXED: moved admin permission creation into activation hook
+FIXED: role permission for EVO_Taxonomies_editor() limit to admin only
+
 = 2.5.7 (2026-9-3) = 
 FIXED: undefined $ri error on frontend
 UPDATED: handlebars.js library to version 4.7.9

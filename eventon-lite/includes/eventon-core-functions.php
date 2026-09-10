@@ -7,7 +7,7 @@
  * @author 		AJDE
  * @category 	Core
  * @package 	EventON/Functions
- * @version     2.4
+ * @version     2.5.8
  */
 
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
@@ -1709,19 +1709,20 @@ require EVO_ABSPATH. 'includes/evo-conditional-functions.php';
 
 	/* Initiate capabilities for eventON */
 		function eventon_init_caps(){
-			global $wp_roles;
-			
-			if ( class_exists('WP_Roles') )
-				if ( ! isset( $wp_roles ) )
-					$wp_roles = new WP_Roles();
-			
-			$capabilities = eventon_get_core_capabilities();
-			
-			foreach( $capabilities as $cap_group ) {
-				foreach( $cap_group as $cap ) {
-					$wp_roles->add_cap( 'administrator', $cap );
-				}
-			}
+			 $admin_role = get_role('administrator');
+		    
+		    if ( ! $admin_role ) {
+		        return;
+		    }
+
+		    $capabilities = eventon_get_core_capabilities();
+		    
+		    foreach( $capabilities as $cap_group ) {
+		        foreach( $cap_group as $cap ) {
+		            // add_cap modifies the database, so we only do this once
+		            $admin_role->add_cap( $cap );
+		        }
+		    }
 		}
 
 	// for style values

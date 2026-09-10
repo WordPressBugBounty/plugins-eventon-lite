@@ -1,7 +1,7 @@
 <?php 
 /**
  * EventCard directions html content
- * @version 2.5.6
+ * @version 2.5.8
  */
 
 $_lang_1 = evo_lang_get('evcalL_getdir_placeholder','Type your address to get directions');
@@ -12,7 +12,7 @@ $_lang_4 = evo_lang('Copy Destination Address!');
 $aria_id = uniqid();
 $aria_label = esc_html( evo_lang('Address') .' - '. $EVENT->get_title() .' []');
 $aria_label2 = esc_html( evo_lang('Destination Address') .' - '. $EVENT->get_title() .' []');
-$readable_location_address = !empty( $location_address )? $location_address: false;
+$readable_location_address = !empty( $location_address )? esc_attr( $location_address ): false;
 
 $btn_style_class = "evodfx evofxdrr evogap5 evofxaic evocurp evohoop7o evofwb evoHKx2 evoHbgclg20 evopad10i evobr10 evocl1i evofz18i evonobtn";
 $input_go_btn_styles = "right: 5px;
@@ -26,7 +26,7 @@ $input_go_btn_styles = "right: 5px;
 
 echo "<div class='evo_metarow_getDr evorow evcal_evdata_row evcal_evrow_sm getdirections'>
 		<form action='https://maps.google.com/maps' method='get' target='_blank' rel='noopener noreferrer'>
-			<input type='hidden' name='daddr' value=\"{$_from_address}\"/> 
+			<input type='hidden' name='daddr' value=\"". esc_attr($_from_address) ."\"/> 
 			<div class='evo_get_direction_content evo_fx_dr_r evogap10'>
 				<span class='evogetdir_header evodfx evofxdrr evofxaic evogap10'>
 					<i class='mainicon fa ".get_eventON_icon('evcal__fai_008a', 'fa-route',$evOPT )." evofz24i'></i> 

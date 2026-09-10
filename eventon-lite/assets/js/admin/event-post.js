@@ -23,7 +23,7 @@ jQuery(document).ready(function($){
 			const id = $(this).data('id');
 			$(this).addClass('evoclp').siblings().removeClass('evoclp');
 			$(this).closest('.evo_event_main_settings_in').find('.evomb_section').each(function(){
-				console.log($(this).attr('id'));
+				//console.log($(this).attr('id'));
 				if( $(this).attr('id') == 'ev_add_func') return;
 				$(this).removeClass('evodfx').addClass('evodn');
 				if( $(this).hasClass( id )) $(this).removeClass('evodn').addClass('evodfx');

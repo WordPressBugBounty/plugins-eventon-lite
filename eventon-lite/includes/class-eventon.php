@@ -1,7 +1,7 @@
 <?php
 /**
  * EventON Lite Setup
- * @version 2.5.7
+ * @version 2.5.8
  * 
  */
 
@@ -11,7 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 class EventON {
 
 	// defines
-		public $version = '2.5.7';
+		public $version = '2.5.8';
 				
 		public $template_url;
 		public $print_scripts=false;
@@ -191,10 +191,6 @@ class EventON {
 			if( class_exists('evo_admin')) $this->evo_admin 	= new evo_admin();
 			if( class_exists('EVO_Taxonomies') ) $this->taxonomies	= new EVO_Taxonomies();	
 		}
-
-		
-		// roles and capabilities
-		eventon_init_caps();
 				
 		// Init action
 		do_action( 'eventon_init' );
@@ -223,6 +219,10 @@ class EventON {
 		
 	/** Activate function to store version.	 */
 		public function activate(){
+			// roles and capabilities
+			eventon_init_caps();
+				
+
 			set_transient( '_evo_activation_redirect', 1, 60 * 60 );	
 			flush_rewrite_rules();	
 			do_action('eventon_activate');

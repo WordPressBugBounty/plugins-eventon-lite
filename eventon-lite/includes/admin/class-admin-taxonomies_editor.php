@@ -1,7 +1,7 @@
 <?php
 /*
  * EventON Taxonomy Editor
- * @version 2.4.6
+ * @version 2.5.8
  */
 
 class EVO_Taxonomies_editor{
@@ -30,7 +30,7 @@ public function editor_ajax_calls(){
 	public function get_event_tax_term_section(){
 
 		// validate
-		EVO()->helper->validate_request( 'nn', 'eventon_admin_nonce', 'read', true, true );	
+		EVO()->helper->validate_request( 'nn', 'eventon_admin_nonce', 'edit_eventons', true, true );	
 
 		$post_data = EVO()->helper->sanitize_array( $_POST);
 
@@ -44,7 +44,7 @@ public function editor_ajax_calls(){
 	public function tax_select_term(){
 
 		// validate
-		EVO()->helper->validate_request( 'nn', 'eventon_admin_nonce', 'read', true, true );	
+		EVO()->helper->validate_request( 'nn', 'eventon_admin_nonce', 'edit_eventons', true, true );	
 
 		$post_data = EVO()->helper->sanitize_array( $_POST);
 		$terms = get_terms(
@@ -138,7 +138,7 @@ public function editor_ajax_calls(){
 		    }
 
 			// validate
-			EVO()->helper->validate_request( 'evo_noncename', 'evo_save_term_form', 'read', true, true );	
+			EVO()->helper->validate_request( 'evo_noncename', 'evo_save_term_form', 'edit_eventon', true, true );	
 			
 
 			$post_data = EVO()->helper->sanitize_array( $_POST);
