@@ -470,7 +470,7 @@ class evo_cal_body{
 				$hide_arrows = (!empty($this->cal->evopt1['evcal_arrow_hide']) && $this->cal->evopt1['evcal_arrow_hide']=='yes' || (!empty($SC['hide_arrows']) && $SC['hide_arrows']=='yes') ) ? true:false;				
 
 				echo "<p id='' class='evo_month_title ". (EVO()->cal->check_yn('evo_arrow_right','evcal_1')? 'right':'') ."'> ".
-					esc_html( $cal_header_title ) ."</p>";	
+					 wp_kses_post( $cal_header_title ) ."</p>";	
 				
 				// arrows
 				if(!$hide_arrows) echo $this->cal_parts_arrows();

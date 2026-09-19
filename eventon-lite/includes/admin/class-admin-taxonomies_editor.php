@@ -138,7 +138,7 @@ public function editor_ajax_calls(){
 		    }
 
 			// validate
-			EVO()->helper->validate_request( 'evo_noncename', 'evo_save_term_form', 'edit_eventon', true, true );	
+			EVO()->helper->validate_request( 'evo_noncename', 'evo_save_term_form', 'edit_eventons', true, true );	
 			
 
 			$post_data = EVO()->helper->sanitize_array( $_POST);
